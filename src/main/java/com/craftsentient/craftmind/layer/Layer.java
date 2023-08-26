@@ -1,7 +1,6 @@
 package com.craftsentient.craftmind.layer;
 
 import com.craftsentient.craftmind.neuron.Neuron;
-import com.craftsentient.craftmind.neuron.NeuronImpl;
 import lombok.Data;
 
 import java.util.ArrayList;
