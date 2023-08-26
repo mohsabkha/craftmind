@@ -11,9 +11,34 @@ import java.util.ArrayList;
 
 @Component
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class Layer {
-    ArrayList<Neuron> neuronList;
+    private ArrayList<Neuron> neuronList;
+    private ArrayList<Double> inputs;
+    private ArrayList<Double> layerOutput;
+
+    public Layer(){
+        this.neuronList = new ArrayList<>();
+        this.inputs = new ArrayList<>();
+        this.layerOutput = new ArrayList<>();
+    }
+
+    public ArrayList<Double> generateLayerOutput(){
+        this.layerOutput = new ArrayList<>();
+        neuronList.forEach(
+                neuron -> {
+                    layerOutput.add(neuron.generateOutput(inputs));
+                }
+        );
+        return this.layerOutput;
+    }
+
+    public void addNeuron(Neuron neuron){
+        this.neuronList.add(neuron);
+    }
+
+    public void addInput(Double inputValue){
+        this.inputs.add(inputValue);
+    }
 }
