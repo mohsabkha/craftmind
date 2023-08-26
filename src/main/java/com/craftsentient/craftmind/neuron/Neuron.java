@@ -1,13 +1,17 @@
 package com.craftsentient.craftmind.neuron;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 
 @Component
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Neuron {
     private Long output;
