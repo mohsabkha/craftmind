@@ -2,9 +2,11 @@ package com.craftsentient.craftmind.neuron;
 
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 
+@Component
 @Data
 @Builder
 public class Neuron {
