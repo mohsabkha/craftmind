@@ -1,5 +1,6 @@
 package com.craftsentient.craftmind.layer;
 
+import com.craftsentient.craftmind.neuron.Neuron;
 import com.craftsentient.craftmind.neuron.NeuronImpl;
 import lombok.Data;
 
@@ -8,7 +9,7 @@ import java.util.List;
 
 @Data
 public class Layer {
-    private List<NeuronImpl> neuronList;
+    private List<Neuron> neuronList;
     private ArrayList<Long> inputs;
     private ArrayList<Long> weights;
     private Long preBiasOutput;
