@@ -4,7 +4,6 @@ import com.craftsentient.craftmind.neuron.Neuron;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -25,6 +24,7 @@ public class Layer {
     }
 
     public ArrayList<Double> generateLayerOutput(){
+
         this.layerOutput = new ArrayList<>();
         neuronList.forEach(
                 neuron -> {

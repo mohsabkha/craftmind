@@ -1,14 +1,12 @@
 package com.craftsentient.craftmind.neuron;
 
+import com.craftsentient.craftmind.utils.MathUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Random;
-import java.util.random.RandomGenerator;
 
 @Component
 @Data
@@ -50,10 +48,7 @@ public class Neuron {
     }
 
     public Double generateOutput(ArrayList<Double>inputs){
-        for(int i = 0; i < inputs.size(); i++){
-            this.output += (inputs.get(i) * this.weights.get(i));
-        }
-        this.output += this.bias;
+        this.output = MathUtils.dotProduct(inputs, this.weights) + this.bias;
         return this.output;
     }
 }

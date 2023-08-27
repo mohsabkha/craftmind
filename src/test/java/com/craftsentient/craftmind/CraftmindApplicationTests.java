@@ -64,4 +64,10 @@ class CraftmindApplicationTests {
         Assertions.assertEquals(1.21, layerOutputs.get(1));
         Assertions.assertEquals(2.385, layerOutputs.get(2));
     }
+
+    @Test
+    public void mainTest(){
+        String [] args = new String[0];
+        CraftmindApplication.main(args);
+    }
 }

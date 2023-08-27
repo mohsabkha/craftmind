@@ -27,5 +27,6 @@ public class LayerTest {
         Assertions.assertNotNull(layer.getNeuronList());
         Assertions.assertNotNull(layer.getInputs());
         Assertions.assertNotNull(layer.getLayerOutput());
+        Assertions.assertNotNull(layer.toString());
     }
 }
