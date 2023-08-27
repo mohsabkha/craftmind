@@ -15,23 +15,23 @@ import java.util.ArrayList;
 public class Layer {
     private ArrayList<Neuron> neuronList;
     private ArrayList<Double> inputs;
-    private ArrayList<Double> layerOutput;
+    private ArrayList<Double> layerOutputs;
 
     public Layer(){
         this.neuronList = new ArrayList<>();
         this.inputs = new ArrayList<>();
-        this.layerOutput = new ArrayList<>();
+        this.layerOutputs = new ArrayList<>();
     }
 
     public ArrayList<Double> generateLayerOutput(){
 
-        this.layerOutput = new ArrayList<>();
+        this.layerOutputs = new ArrayList<>();
         neuronList.forEach(
                 neuron -> {
-                    layerOutput.add(neuron.generateOutput(inputs));
+                    layerOutputs.add(neuron.generateOutput(inputs));
                 }
         );
-        return this.layerOutput;
+        return this.layerOutputs;
     }
 
     public void addNeuron(Neuron neuron){
@@ -40,5 +40,11 @@ public class Layer {
 
     public void addInput(Double inputValue){
         this.inputs.add(inputValue);
+    }
+
+    public void generateLayer(int numberOfNeurons){
+        for(int i = 0; i <= numberOfNeurons; i++){
+            this.neuronList.add(new Neuron(numberOfNeurons, 1.0));
+        }
     }
 }
