@@ -30,10 +30,12 @@ public class Neuron {
     }
 
     public Neuron(int numberOfWeights, Double bias){
+        int maximum = 1;
+        int minimum = -1;
         this.bias = bias;
         this.weights = new ArrayList<>();
         for(int i = 0; i < numberOfWeights; i++){
-            weights.add(Math.random() * ((max - min) + min));
+            weights.add(Math.random() * ((maximum - minimum) + minimum));
         }
     }
 

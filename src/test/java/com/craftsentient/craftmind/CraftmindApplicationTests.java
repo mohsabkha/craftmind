@@ -39,11 +39,13 @@ class CraftmindApplicationTests {
 
         // create layer
         Layer layer = new Layer();
+
         // add inputs
         layer.addInput(1.0);
         layer.addInput(2.0);
         layer.addInput(3.0);
         layer.addInput(2.5);
+
         // add neuron
         layer.addNeuron(neuron1);
         layer.addNeuron(neuron2);
@@ -53,11 +55,15 @@ class CraftmindApplicationTests {
         ArrayList<Double> layerOutputs;
         layerOutputs = layer.generateLayerOutput();
 
+        //generate
+        Neuron neuron = new Neuron(4, 1.0);
+        System.out.println(neuron.getWeights());
+        Assertions.assertNotNull(neuron);
+
         // test against expected output
         Assertions.assertEquals(4.8, layerOutputs.get(0));
         Assertions.assertEquals(1.21, layerOutputs.get(1));
         Assertions.assertEquals(2.385, layerOutputs.get(2));
-
     }
 
 }
