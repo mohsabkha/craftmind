@@ -27,6 +27,15 @@ public class NeuronTest {
                 .build();
         Double output = neuron.generateOutput(inputs);
 
-        Assertions.assertEquals(2, output);
+        Assertions.assertEquals(2, neuron.getOutput());
+    }
+
+    @Test
+    public void createNeuronTest(){
+        Neuron neuron = new Neuron(4, 2.0, 1, -1);
+        Assertions.assertNotNull(neuron);
+        Assertions.assertEquals(1, neuron.getMax());
+        Assertions.assertEquals(-1, neuron.getMin());
+        Assertions.assertEquals(2.0, neuron.getBias());
     }
 }

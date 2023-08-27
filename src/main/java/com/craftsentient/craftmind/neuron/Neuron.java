@@ -40,6 +40,8 @@ public class Neuron {
     }
 
     public Neuron(int numberOfWeights, Double bias, int max, int min){
+        this.max = max;
+        this.min = min;
         this.bias = bias;
         this.weights = new ArrayList<>();
         for(int i = 0; i < numberOfWeights; i++){

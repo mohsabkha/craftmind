@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 
 @Component
-@Data
 @AllArgsConstructor
+@Data
 @Builder
 public class Layer {
     private ArrayList<Neuron> neuronList;

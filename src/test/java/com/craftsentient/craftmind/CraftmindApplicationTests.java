@@ -10,7 +10,6 @@ import java.util.ArrayList;
 
 @SpringBootTest
 class CraftmindApplicationTests {
-
     @Test
     public void neuralNetworkTest(){
         // create neuron
@@ -65,5 +64,4 @@ class CraftmindApplicationTests {
         Assertions.assertEquals(1.21, layerOutputs.get(1));
         Assertions.assertEquals(2.385, layerOutputs.get(2));
     }
-
 }
