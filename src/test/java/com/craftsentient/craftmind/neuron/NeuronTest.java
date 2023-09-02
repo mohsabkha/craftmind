@@ -38,4 +38,11 @@ public class NeuronTest {
         Assertions.assertEquals(-1, neuron.getMin());
         Assertions.assertEquals(2.0, neuron.getBias());
     }
+
+    @Test
+    public void generateNeuronTest(){
+        Neuron neuron = new Neuron(4, 1.0);
+        System.out.println(neuron.getWeights());
+        Assertions.assertNotNull(neuron);
+    }
 }

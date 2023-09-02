@@ -15,8 +15,8 @@ public class MathUtils {
     }
 
     public static ArrayList<Double> addVectors(ArrayList<Double> a, ArrayList<Double> b) throws ArithmeticException {
-        if(a.size() == 0) throw new ArithmeticException();
-        if(a.size() != b.size()) { throw new ArithmeticException(); }
+        if(a.size() != b.size()) { throw new ArithmeticException("vectors should be of same size"); }
+        if(a.size() == 0) throw new ArithmeticException("vector sizes should not be zero");
         ArrayList<Double> vectorSum = new ArrayList<>(a.size());
         for(int i = 0; i < a.size(); i++) { vectorSum.add(a.get(i) + b.get(i)); }
         return vectorSum;

@@ -52,18 +52,12 @@ class CraftmindApplicationTests {
         layer.addNeuron(neuron2);
         layer.addNeuron(neuron3);
 
-        ArrayList<Double> sum = MathUtils.addVectors(neuron1.getWeights(), neuron2.getWeights());
-        Assertions.assertNotNull(sum);
-        Assertions.assertFalse(sum.isEmpty());
 
         // generate and store outputs
         ArrayList<Double> layerOutputs;
         layerOutputs = layer.generateLayerOutput();
 
-        //generate
-        Neuron neuron = new Neuron(4, 1.0);
-        System.out.println(neuron.getWeights());
-        Assertions.assertNotNull(neuron);
+
 
         // test against expected output
         Assertions.assertEquals(4.8, layerOutputs.get(0));
@@ -76,4 +70,6 @@ class CraftmindApplicationTests {
         String [] args = new String[0];
         CraftmindApplication.main(args);
     }
+
+
 }
