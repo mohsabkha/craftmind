@@ -4,6 +4,7 @@ package com.craftsentient.craftmind.utils;
 import java.util.ArrayList;
 
 public class MathUtils {
+
     public static double dotProduct(ArrayList<Double> a, ArrayList<Double> b) {
         if(a.size() != b.size()) { throw new ArithmeticException(); }
         double output = 0.0;
@@ -14,9 +15,10 @@ public class MathUtils {
     }
 
     public static ArrayList<Double> addVectors(ArrayList<Double> a, ArrayList<Double> b) throws ArithmeticException {
+        if(a.size() == 0) throw new ArithmeticException();
         if(a.size() != b.size()) { throw new ArithmeticException(); }
         ArrayList<Double> vectorSum = new ArrayList<>(a.size());
-        for(int i = 0; i < a.size(); i++) { vectorSum.set(i, (a.get(i) + b.get(i))); }
+        for(int i = 0; i < a.size(); i++) { vectorSum.add(a.get(i) + b.get(i)); }
         return vectorSum;
     }
 }

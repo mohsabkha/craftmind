@@ -29,4 +29,17 @@ public class LayerTest {
         Assertions.assertNotNull(layer.getLayerOutputs());
         Assertions.assertNotNull(layer.toString());
     }
+
+    @Test
+    public void layerGeneratorTest(){
+        Layer layer = Layer.builder()
+                .layerOutputs(new ArrayList<>())
+                .neuronList(new ArrayList<>())
+                .inputs(new ArrayList<>())
+                .build();
+
+        Assertions.assertTrue(layer.getNeuronList().isEmpty());
+        layer.generateLayer(10);
+        Assertions.assertEquals(layer.getNeuronList().size(), 10);
+    }
 }

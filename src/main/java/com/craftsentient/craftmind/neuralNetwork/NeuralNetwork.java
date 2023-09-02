@@ -10,7 +10,4 @@ public class NeuralNetwork {
     private ArrayList<ArrayList<Double>> batchInputs;
     private ArrayList<ArrayList<Double>> outputs;
 
-    public void generateLayers(int numberOfLayers){
-
-    }
 }

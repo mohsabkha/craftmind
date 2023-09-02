@@ -1,7 +1,9 @@
 package com.craftsentient.craftmind;
 
 import com.craftsentient.craftmind.layer.Layer;
+import com.craftsentient.craftmind.neuralNetwork.NeuralNetwork;
 import com.craftsentient.craftmind.neuron.Neuron;
+import com.craftsentient.craftmind.utils.MathUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -49,6 +51,10 @@ class CraftmindApplicationTests {
         layer.addNeuron(neuron1);
         layer.addNeuron(neuron2);
         layer.addNeuron(neuron3);
+
+        ArrayList<Double> sum = MathUtils.addVectors(neuron1.getWeights(), neuron2.getWeights());
+        Assertions.assertNotNull(sum);
+        Assertions.assertFalse(sum.isEmpty());
 
         // generate and store outputs
         ArrayList<Double> layerOutputs;
