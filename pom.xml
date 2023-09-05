@@ -16,12 +16,8 @@
     <properties>
         <java.version>17</java.version>
     </properties>
+
     <dependencies>
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_2.13</artifactId>
-            <version>3.4.1</version>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
@@ -61,6 +57,27 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <argLine>--add-exports java.base/sun.nio.ch=ALL-UNNAMED</argLine>
+                    <argLine>--add-opens=java.base/java.lang=ALL-UNNAMED</argLine>
+                    <argLine>--add-opens=java.base/java.lang.invoke=ALL-UNNAMED</argLine>
+                    <argLine>--add-opens=java.base/java.lang.reflect=ALL-UNNAMED</argLine>
+                    <argLine>--add-opens=java.base/java.io=ALL-UNNAMED</argLine>
+                    <argLine>--add-opens=java.base/java.net=ALL-UNNAMED</argLine>
+                    <argLine>--add-opens=java.base/java.nio=ALL-UNNAMED</argLine>
+                    <argLine>--add-opens=java.base/java.util=ALL-UNNAMED</argLine>
+                    <argLine>--add-opens=java.base/java.util.concurrent=ALL-UNNAMED</argLine>
+                    <argLine>--add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED</argLine>
+                    <argLine>--add-opens=java.base/sun.nio.ch=ALL-UNNAMED</argLine>
+                    <argLine>--add-opens=java.base/sun.nio.cs=ALL-UNNAMED</argLine>
+                    <argLine>--add-opens=java.base/sun.security.action=ALL-UNNAMED</argLine>
+                    <argLine>--add-opens=java.base/sun.util.calendar=ALL-UNNAMED</argLine>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.10</version>
@@ -81,5 +98,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class LayerTest {
 
     @Test
-    public void layerConstructorTest(){
+    public void layerConstructorTest() {
         Layer layer = new Layer();
         Assertions.assertNotNull(layer);
         Assertions.assertNotNull(layer.getNeuronList());
@@ -17,7 +17,7 @@ public class LayerTest {
     }
 
     @Test
-    public void layerLombokConstructionTest(){
+    public void layerLombokConstructionTest() {
         Layer layer = Layer.builder()
                 .layerOutputs(new ArrayList<>())
                 .neuronList(new ArrayList<>())
@@ -31,7 +31,7 @@ public class LayerTest {
     }
 
     @Test
-    public void layerGeneratorTest(){
+    public void layerGeneratorTest() {
         Layer layer = Layer.builder()
                 .layerOutputs(new ArrayList<>())
                 .neuronList(new ArrayList<>())

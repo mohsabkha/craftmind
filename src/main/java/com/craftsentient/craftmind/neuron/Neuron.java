@@ -19,7 +19,7 @@ public class Neuron {
     private Double bias;
     private ArrayList<Double> weights;
 
-    public Neuron(){
+    public Neuron() {
         this.weights = new ArrayList<>();
         this.bias = 0.0;
         this.output = 0.0;
@@ -27,7 +27,7 @@ public class Neuron {
         this.max = 0;
     }
 
-    public Neuron(int numberOfWeights, Double bias){
+    public Neuron(int numberOfWeights, Double bias) {
         int maximum = 1;
         int minimum = -1;
         this.bias = bias;
@@ -47,8 +47,19 @@ public class Neuron {
         }
     }
 
-    public Double generateOutput(ArrayList<Double>inputs){
-        this.output = MathUtils.dotProduct(inputs, this.weights) + this.bias;
+    public Neuron(ArrayList<Double> weights, Double bias){
+        this.bias = bias;
+        this.weights = weights;
+    }
+
+    public Object generateOutput(ArrayList<Double>inputs){
+        this.output = (Double)MathUtils.dotProduct(inputs, this.weights) + this.bias;
         return this.output;
+    }
+
+    public void print(){
+        System.out.println("Neuron Weights: [");
+        this.getWeights().forEach(i -> System.out.println("\tWeight: " + i + ", "));
+        System.out.println("]");
     }
 }

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 @SpringBootTest
 class CraftmindApplicationTests {
     @Test
-    public void neuralNetworkTest(){
+    public void neuralNetworkTest() {
         // create neuron
         Neuron neuron1 = new Neuron();
         neuron1.getWeights().add(0.2);
@@ -66,7 +66,7 @@ class CraftmindApplicationTests {
     }
 
     @Test
-    public void mainTest(){
+    public void mainTest() {
         String [] args = new String[0];
         CraftmindApplication.main(args);
     }

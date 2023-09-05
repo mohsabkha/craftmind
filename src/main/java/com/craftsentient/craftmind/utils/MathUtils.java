@@ -2,16 +2,40 @@ package com.craftsentient.craftmind.utils;
 
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class MathUtils {
 
-    public static double dotProduct(ArrayList<Double> a, ArrayList<Double> b) {
-        if(a.size() != b.size()) { throw new ArithmeticException(); }
-        double output = 0.0;
-        for(int i = 0; i < a.size(); i++){
-            output += (a.get(i) * b.get(i));
+    public static Object dotProduct(Object a, Object b) {
+        if(isDoubleList(a) && isDoubleList(b)){
+            if (((ArrayList<Double>)a).size() != ((ArrayList<Double>)b).size()) {
+                throw new IllegalArgumentException("Lists must be of the same length.");
+            }
+            return IntStream.range(0, ((ArrayList<Double>)a).size())
+                    .parallel()
+                    .mapToDouble(i -> ((ArrayList<Double>)a).get(i) * ((ArrayList<Double>)b).get(i))
+                    .sum();
+
+        } else if (a instanceof ArrayList && b instanceof ArrayList) {
+            if (((ArrayList<Double>)a).size() != ((ArrayList<Double>)b).size()) {
+                throw new IllegalArgumentException("Lists must be of the same length.");
+            }
+            return IntStream.range(0, ((ArrayList<Double>)a).size())
+                    .parallel()
+                    .mapToObj(i -> dotProduct(((ArrayList<Double>)a).get(i), ((ArrayList<Double>)b).get(i)))
+                    .collect(Collectors.toCollection(ArrayList::new));
         }
-        return output;
+        else {
+            throw new IllegalArgumentException("Inputs must be ArrayLists or nested ArrayLists of equal structure.");
+        }
+    }
+
+    private static boolean isDoubleList(Object matrix) {
+        return
+            matrix instanceof ArrayList &&
+            !((ArrayList<?>) matrix).isEmpty() &&
+            ((ArrayList<?>) matrix).get(0) instanceof Double;
     }
 
     public static ArrayList<Double> addVectors(ArrayList<Double> a, ArrayList<Double> b) throws ArithmeticException {
