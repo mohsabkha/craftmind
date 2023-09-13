@@ -52,8 +52,8 @@ public class Neuron {
         this.weights = weights;
     }
 
-    public Object generateOutput(ArrayList<Double>inputs){
-        this.output = (Double)MathUtils.dotProduct(inputs, this.weights) + this.bias;
+    public Double generateOutput(ArrayList<Double>inputs){
+        this.output = MathUtils.dotProduct(inputs, this.weights) + this.bias;
         return this.output;
     }
 

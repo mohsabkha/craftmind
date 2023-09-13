@@ -124,20 +124,30 @@ public class MathUtilsTest {
         m1row2.add(7.0);
         m1row2.add(8.0);
 
+
         ArrayList<Double> m2row1 = new ArrayList<>();
         m2row1.add(1.0);
         m2row1.add(2.0);
+
+
+        ArrayList<Double> m2row2 = new ArrayList<>();
         m2row1.add(3.0);
         m2row1.add(4.0);
 
-        ArrayList<Double> m2row2 = new ArrayList<>();
+        ArrayList<Double> m2row3 = new ArrayList<>();
         m2row2.add(5.0);
         m2row2.add(6.0);
+
+        ArrayList<Double> m2row4 = new ArrayList<>();
         m2row2.add(7.0);
         m2row2.add(8.0);
 
+
+
         matrix2.add(m2row1);
         matrix2.add(m2row2);
+        matrix2.add(m2row3);
+        matrix2.add(m2row4);
 
         matrix1.add(m1row1);
         matrix1.add(m1row2);
@@ -145,7 +155,7 @@ public class MathUtilsTest {
         System.out.println(matrix2);
 
 
-        ArrayList<Double> result = (ArrayList<Double>) MathUtils.dotProduct(matrix1, matrix2);
+        Double result = MathUtils.dotProduct(matrix1, matrix2);
 
         System.out.println(result);
     }

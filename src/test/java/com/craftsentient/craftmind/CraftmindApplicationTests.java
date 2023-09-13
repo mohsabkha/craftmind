@@ -1,9 +1,7 @@
 package com.craftsentient.craftmind;
 
 import com.craftsentient.craftmind.layer.Layer;
-import com.craftsentient.craftmind.neuralNetwork.NeuralNetwork;
 import com.craftsentient.craftmind.neuron.Neuron;
-import com.craftsentient.craftmind.utils.MathUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -58,13 +56,11 @@ class CraftmindApplicationTests {
         layerOutputs = layer.generateLayerOutput();
 
 
-
         // test against expected output
         Assertions.assertEquals(4.8, layerOutputs.get(0));
         Assertions.assertEquals(1.21, layerOutputs.get(1));
         Assertions.assertEquals(2.385, layerOutputs.get(2));
     }
-
     @Test
     public void mainTest() {
         String [] args = new String[0];

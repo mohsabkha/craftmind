@@ -45,10 +45,11 @@ public class Layer {
     }
 
     // generating a layer with a vector of neurons
-    public void generateLayer(int numberOfNeurons) {
+    public Layer generateLayer(int numberOfNeurons) {
         for(int i = 0; i < numberOfNeurons; i++){
             this.neuronList.add(new Neuron(numberOfNeurons, 1.0));
         }
+        return this;
     }
 
     public static Layer addLayer(Layer a, Layer b){

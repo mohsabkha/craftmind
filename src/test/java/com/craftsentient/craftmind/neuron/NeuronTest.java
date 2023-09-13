@@ -25,7 +25,7 @@ public class NeuronTest {
                 .bias(BIAS)
                 .output(0.0)
                 .build();
-        Double output = (Double)neuron.generateOutput(inputs);
+        Double output = neuron.generateOutput(inputs);
 
         Assertions.assertEquals(2.0, neuron.getOutput());
     }
