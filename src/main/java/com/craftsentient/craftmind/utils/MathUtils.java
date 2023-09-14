@@ -122,7 +122,7 @@ public class MathUtils {
        return transposeMatrix(answer);
     }
 
-    private static ArrayList<ArrayList<Double>> transposeMatrix(ArrayList<ArrayList<Double>> matrix){
+    public static ArrayList<ArrayList<Double>> transposeMatrix(ArrayList<ArrayList<Double>> matrix){
         ArrayList<ArrayList<Double>> finalAnswer = new ArrayList<>();
         ArrayList<Double> temp2;
         for(int x = 0; x < matrix.get(0).size(); x++){
