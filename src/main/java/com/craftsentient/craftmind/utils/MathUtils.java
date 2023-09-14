@@ -1,5 +1,6 @@
 package com.craftsentient.craftmind.utils;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
@@ -38,27 +39,69 @@ public class MathUtils {
         }
     }
 
-//    public static void matrixDotProduct(Object a, Object b){
-//        // check to see if the first objects columns match second objects rows
-//        // --> a.get(0).size() == b.size()
-//            // if true then create a matrix that has the size of the columnA by rowB
-//            // then for each position, find the dot product for ColumnA and RowB and fill in that position
-//
-//        if(isDoubleList(a) && isDoubleList(b)){
-//            if( ((ArrayList<Double>)a).size() != ((ArrayList<Double>)a).size() ){
-//                throw new ArithmeticException("a and b must be of equal size");
-//            }
-//        } else if( isObjectList(a) && isDoubleList(b) ){
-//            if( isDoubleList(((ArrayList<?>)a).get(0)) && ( a.get(0).size() == ((ArrayList<Double>)b).size()) ){
-//
-//            }
-//        } else if(isDoubleList(a) && isObjectList(b)){
-//
-//        } else if(isObjectList(a) && isObjectList(b)){
-//
-//        }
-//
-//    }
+    public static Object matrixDotProduct(Object a, Object b){
+        if(isDoubleList(a) && isDoubleList(b)){
+            if(bothDoubleArraysAreNotOfTheSameSize(a,b)){
+                throw new ArithmeticException("a and b must be of equal size");
+            }
+            return MutliplyVectors((ArrayList<Double>) a, (ArrayList<Double>) b);
+        } else if( isObjectList(a) && isDoubleList(b) ){
+            if(ElementOfFirstArrayIsDoubleArrayAndBothAreOfSameSize(a,b)){
+                ArrayList<ArrayList<Double>> matrix = (ArrayList<ArrayList<Double>>) a;
+                ArrayList<Double> vector = (ArrayList<Double>) b;
+
+                return MultipleMatrixAndVector(matrix, vector);
+            }
+            else throw new ArithmeticException("a and b must be of equal size");
+        } else if(isObjectList(b) && isDoubleList(a)){
+            if(ElementOfFirstArrayIsDoubleArrayAndBothAreOfSameSize(b,a)){
+                ArrayList<ArrayList<Double>> matrix = (ArrayList<ArrayList<Double>>) b;
+                ArrayList<Double> vector = (ArrayList<Double>) a;
+                return MultipleMatrixAndVector(matrix, vector);
+            }
+            else throw new ArithmeticException("a and b must be of equal size");
+        } else if(isObjectList(a) && isObjectList(b)){
+            if(ElementsOfBothArraysAreDoubleArraysAndBothAreOfProperSize(a,b)){
+                ArrayList<ArrayList<Double>> matrix1 = (ArrayList<ArrayList<Double>>) a;
+                ArrayList<ArrayList<Double>> matrix2 = (ArrayList<ArrayList<Double>>) b;
+                return returnArrayOfDoubleArrays(matrix1, matrix2);
+            }
+            else throw new ArithmeticException("a and b must be of equal size");
+        }
+        else throw new ArithmeticException("a and b must be of equal size");
+    }
+
+    private static boolean bothDoubleArraysAreNotOfTheSameSize(Object a, Object b){
+        return ((ArrayList<Double>)a).size() != ((ArrayList<Double>)b).size();
+    }
+
+    private static boolean ElementOfFirstArrayIsDoubleArrayAndBothAreOfSameSize(Object a, Object b){
+        return isDoubleList(((ArrayList<?>)a).get(0)) && ( ((ArrayList<?>)((ArrayList<?>)a).get(0)).size() == ((ArrayList<Double>)b).size());
+    }
+
+    private static boolean ElementsOfBothArraysAreDoubleArraysAndBothAreOfProperSize(Object a, Object b){
+        return isDoubleList(((ArrayList<?>)a).get(0))
+                && isDoubleList(((ArrayList<?>)b).get(0))
+                && ( ((ArrayList<?>)((ArrayList<?>)b).get(0)).size() == ((ArrayList<Double>)a).size());
+    }
+
+    private static Double MutliplyVectors(ArrayList<Double> a, ArrayList<Double> b){
+        AtomicReference<Double> sum = new AtomicReference<>(0.0);
+        IntStream.range(0, a.size()).parallel().forEach( i -> {
+                    sum.updateAndGet(v -> v + a.get(i) + b.get(i));
+                }
+        );
+        return sum.get();
+    }
+
+    public static ArrayList<Double> MultipleMatrixAndVector(ArrayList<ArrayList<Double>> matrix, ArrayList<Double> vector){
+        ArrayList<Double> answer = new ArrayList<>();
+
+        IntStream.range(0, matrix.size()).parallel().forEach( i -> {
+            answer.add(MutliplyVectors(matrix.get(i), vector));
+        });
+        return answer;
+    }
 
     private static boolean isDoubleList(Object obj){
         return obj instanceof ArrayList &&
@@ -81,6 +124,25 @@ public class MathUtils {
         } else {
             return returnInnerDoubleArrays(obj);
         }
+    }
+
+    public static ArrayList<Double> returnDoubleArray(ArrayList<ArrayList<Double>> objectArray, int index){
+        return objectArray.get(index);
+    }
+
+    public static ArrayList<ArrayList<Double>> returnArrayOfDoubleArrays(ArrayList<ArrayList<Double>> matrix1, ArrayList<ArrayList<Double>> matrix2){
+        ArrayList<ArrayList<Double>> answer = new ArrayList<>();
+
+        IntStream.range(0, matrix1.size()).parallel().forEach( i -> {
+            ArrayList<Double> temp = new ArrayList<>();
+            IntStream.range(0, matrix1.get(0).size()).parallel().forEach(j -> {
+                for(int x = 0; x < matrix2.get(0).size(); x++){
+                    temp.add(matrix2.get(j).get(i));
+                }
+                answer.add(MultipleMatrixAndVector(matrix1, temp));
+            });
+        });
+        return answer;
     }
 
     public static ArrayList<Double> addVectors(ArrayList<Double> a, ArrayList<Double> b) throws ArithmeticException {
