@@ -122,6 +122,11 @@ public class MathUtilsTest {
         m1row2.add(7.0);
         m1row2.add(8.0);
 
+        ArrayList<Double> m1row3 = new ArrayList<>();
+        m1row3.add(2.0);
+        m1row3.add(2.0);
+        m1row3.add(2.0);
+        m1row3.add(2.0);
 
         ArrayList<Double> m2row1 = new ArrayList<>();
         m2row1.add(1.0);
@@ -141,11 +146,13 @@ public class MathUtilsTest {
 
         matrix1.add(m1row1);
         matrix1.add(m1row2);
+        matrix1.add(m1row3);
 
         matrix2.add(m2row1);
         matrix2.add(m2row2);
         matrix2.add(m2row3);
         matrix2.add(m2row4);
+        // 3 x 4  *  4 x 2
 
         ArrayList<ArrayList<Double>> result = (ArrayList<ArrayList<Double>>)MathUtils.matrixDotProduct(matrix1, matrix2);
 
