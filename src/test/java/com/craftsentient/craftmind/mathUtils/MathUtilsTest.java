@@ -1,9 +1,6 @@
-package com.craftsentient.craftmind.utils;
+package com.craftsentient.craftmind.mathUtils;
 
 import com.craftsentient.craftmind.neuron.Neuron;
-import no.uib.cipr.matrix.DenseMatrix;
-import no.uib.cipr.matrix.Matrix;
-import no.uib.cipr.matrix.Vector;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

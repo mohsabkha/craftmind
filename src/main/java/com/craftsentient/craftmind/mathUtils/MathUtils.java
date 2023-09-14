@@ -1,4 +1,4 @@
-package com.craftsentient.craftmind.utils;
+package com.craftsentient.craftmind.mathUtils;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
