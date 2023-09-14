@@ -1,6 +1,5 @@
 package com.craftsentient.craftmind.utils;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
@@ -11,45 +10,32 @@ public class MathUtils {
         if (isDoubleList(a) && isDoubleList(b)) {
             ArrayList<Double> vec1 = (ArrayList<Double>) a;
             ArrayList<Double> vec2 = (ArrayList<Double>) b;
-
-            if (vec1.size() != vec2.size()) {
+            if (vec1.size() != vec2.size())
                 throw new IllegalArgumentException("Dimensions mismatch");
-            }
-
             AtomicReference<Double> sum = new AtomicReference<>((double) 0);
-            IntStream.range(0, vec1.size()).parallel().forEach(i -> {
-                sum.updateAndGet(v -> (double) (v + vec1.get(i) * vec2.get(i)));
-            });
+            IntStream.range(0, vec1.size()).forEach(i -> sum.updateAndGet(v -> (double) (v + vec1.get(i) * vec2.get(i))));
             return sum.getAcquire();
+
         } else if (isObjectList(a) && isObjectList(a)) {
             ArrayList<Object> tensor1 = (ArrayList<Object>) a;
             ArrayList<Object> tensor2 = (ArrayList<Object>) b;
-
-            if (tensor1.size()!= tensor2.size()) {
+            if (tensor1.size()!= tensor2.size())
                 throw new IllegalArgumentException("Dimensions mismatch");
-            }
-
             AtomicReference<Double> sum = new AtomicReference<>((double) 0);
-            IntStream.range(0, tensor1.size()).parallel().forEach( i -> {
-                sum.updateAndGet(v ->  v + dotProduct(tensor1.get(i), tensor2.get(i)));
-            });
+            IntStream.range(0, tensor1.size()).forEach( i -> sum.updateAndGet(v ->  v + dotProduct(tensor1.get(i), tensor2.get(i))));
             return sum.getAcquire();
-        } else {
-            throw new IllegalArgumentException("Input must be arrays of the same dimension");
-        }
+        } else throw new IllegalArgumentException("Input must be arrays of the same dimension");
     }
 
     public static Object matrixDotProduct(Object a, Object b){
         if(isDoubleList(a) && isDoubleList(b)){
-            if(bothDoubleArraysAreNotOfTheSameSize(a,b)){
+            if(bothDoubleArraysAreNotOfTheSameSize(a,b))
                 throw new ArithmeticException("a and b must be of equal size");
-            }
             return MutliplyVectors((ArrayList<Double>) a, (ArrayList<Double>) b);
         } else if( isObjectList(a) && isDoubleList(b) ){
             if(ElementOfFirstArrayIsDoubleArrayAndBothAreOfSameSize(a,b)){
                 ArrayList<ArrayList<Double>> matrix = (ArrayList<ArrayList<Double>>) a;
                 ArrayList<Double> vector = (ArrayList<Double>) b;
-
                 return MultipleMatrixAndVector(matrix, vector);
             }
             else throw new ArithmeticException("a and b must be of equal size");
@@ -87,19 +73,13 @@ public class MathUtils {
 
     private static Double MutliplyVectors(ArrayList<Double> a, ArrayList<Double> b){
         AtomicReference<Double> sum = new AtomicReference<>(0.0);
-        IntStream.range(0, a.size()).parallel().forEach( i -> {
-                    sum.updateAndGet(v -> v + a.get(i) + b.get(i));
-                }
-        );
+        IntStream.range(0, a.size()).forEach( i -> sum.updateAndGet(v -> v + a.get(i) * b.get(i)));
         return sum.get();
     }
 
     public static ArrayList<Double> MultipleMatrixAndVector(ArrayList<ArrayList<Double>> matrix, ArrayList<Double> vector){
         ArrayList<Double> answer = new ArrayList<>();
-
-        IntStream.range(0, matrix.size()).parallel().forEach( i -> {
-            answer.add(MutliplyVectors(matrix.get(i), vector));
-        });
+        IntStream.range(0, matrix.size()).forEach( i -> answer.add(MutliplyVectors(matrix.get(i), vector)));
         return answer;
     }
 
@@ -126,21 +106,15 @@ public class MathUtils {
         }
     }
 
-    public static ArrayList<Double> returnDoubleArray(ArrayList<ArrayList<Double>> objectArray, int index){
-        return objectArray.get(index);
-    }
+    public static ArrayList<Double> returnDoubleArray(ArrayList<ArrayList<Double>> objectArray, int index){return objectArray.get(index);}
 
     public static ArrayList<ArrayList<Double>> returnArrayOfDoubleArrays(ArrayList<ArrayList<Double>> matrix1, ArrayList<ArrayList<Double>> matrix2){
         ArrayList<ArrayList<Double>> answer = new ArrayList<>();
-
-        IntStream.range(0, matrix1.size()).parallel().forEach( i -> {
-            ArrayList<Double> temp = new ArrayList<>();
-            IntStream.range(0, matrix1.get(0).size()).parallel().forEach(j -> {
-                for(int x = 0; x < matrix2.get(0).size(); x++){
-                    temp.add(matrix2.get(j).get(i));
-                }
-                answer.add(MultipleMatrixAndVector(matrix1, temp));
-            });
+        AtomicReference<ArrayList<Double>> temp = new AtomicReference<>();
+        IntStream.range(0, matrix1.size()).forEach( i -> {
+            temp.set(new ArrayList<>());
+            IntStream.range(0, matrix2.size()).forEach(j -> temp.get().add(matrix2.get(j).get(i)));
+            answer.add(MultipleMatrixAndVector(matrix1, temp.get()));
         });
         return answer;
     }
@@ -149,7 +123,7 @@ public class MathUtils {
         if(a.size() != b.size()) { throw new ArithmeticException("vectors should be of same size"); }
         if(a.size() == 0) throw new ArithmeticException("vector sizes should not be zero");
         ArrayList<Double> vectorSum = new ArrayList<>(a.size());
-        IntStream.range(0, a.size()).parallel().forEach( i -> { vectorSum.add(a.get(i) + b.get(i)); });
+        IntStream.range(0, a.size()).forEach( i -> { vectorSum.add(a.get(i) + b.get(i)); });
         return vectorSum;
     }
 }
