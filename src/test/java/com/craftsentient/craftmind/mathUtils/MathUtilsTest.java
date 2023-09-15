@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class MathUtilsTest {
 
@@ -17,43 +19,43 @@ public class MathUtilsTest {
     @Test
     public void addVectorsTest() {
         Neuron neuron1 = new Neuron();
-        neuron1.getWeights().add(0.2);
-        neuron1.getWeights().add(0.8);
-        neuron1.getWeights().add(-0.5);
-        neuron1.getWeights().add(1.0);
+        neuron1.addWeight(0.2);
+        neuron1.addWeight(0.8);
+        neuron1.addWeight(-0.5);
+        neuron1.addWeight(1.0);
         neuron1.setBias(2.0);
 
         // create neuron
         Neuron neuron2 = new Neuron();
-        neuron2.getWeights().add(0.5);
-        neuron2.getWeights().add(-0.91);
-        neuron2.getWeights().add(0.26);
-        neuron2.getWeights().add(-0.5);
+        neuron2.addWeight(0.5);
+        neuron2.addWeight(-0.91);
+        neuron2.addWeight(0.26);
+        neuron2.addWeight(-0.5);
         neuron2.setBias(3.0);
 
-        ArrayList<Double> sum = MathUtils.addVectors(neuron1.getWeights(), neuron2.getWeights());
+        double[] sum = MathUtils.addArrays(neuron1.getWeights(), neuron2.getWeights());
         Assertions.assertNotNull(sum);
-        Assertions.assertFalse(sum.isEmpty());
+        Assertions.assertFalse(sum.length == 0);
     }
 
     @Test
     public void addVectorsDifferentSizesExceptionTest() {
         try {
             Neuron neuron1 = new Neuron();
-            neuron1.getWeights().add(0.2);
-            neuron1.getWeights().add(0.8);
-            neuron1.getWeights().add(-0.5);
+            neuron1.addWeight(0.2);
+            neuron1.addWeight(0.8);
+            neuron1.addWeight(-0.5);
             neuron1.setBias(2.0);
 
             // create neuron
             Neuron neuron2 = new Neuron();
-            neuron2.getWeights().add(0.5);
-            neuron2.getWeights().add(-0.91);
-            neuron2.getWeights().add(0.26);
-            neuron2.getWeights().add(-0.5);
+            neuron2.addWeight(0.5);
+            neuron2.addWeight(-0.91);
+            neuron2.addWeight(0.26);
+            neuron2.addWeight(-0.5);
             neuron2.setBias(3.0);
 
-            ArrayList<Double> sum = MathUtils.addVectors(neuron1.getWeights(), neuron2.getWeights());
+            double[] sum = MathUtils.addArrays(neuron1.getWeights(), neuron2.getWeights());
         } catch( Exception e) {
             Assertions.assertEquals(e.getClass(), ArithmeticException.class);
             Assertions.assertEquals(e.getMessage(), "vectors should be of same size");
@@ -70,7 +72,7 @@ public class MathUtilsTest {
             Neuron neuron2 = new Neuron();
             neuron2.setBias(3.0);
 
-            ArrayList<Double> sum = MathUtils.addVectors(neuron1.getWeights(), neuron2.getWeights());
+            double[] sum = MathUtils.addArrays(neuron1.getWeights(), neuron2.getWeights());
         } catch( Exception e) {
             Assertions.assertEquals(e.getClass(), ArithmeticException.class);
             Assertions.assertEquals(e.getMessage(), "vector sizes should not be zero");
@@ -80,31 +82,31 @@ public class MathUtilsTest {
     @Test
     public void dotProductTest(){
         Neuron neuron1 = new Neuron();
-        neuron1.getWeights().add(1.0);
-        neuron1.getWeights().add(2.0);
-        neuron1.getWeights().add(3.0);
+        neuron1.addWeight(1.0);
+        neuron1.addWeight(2.0);
+        neuron1.addWeight(3.0);
         neuron1.setBias(2.0);
         // create neuron
         Neuron neuron2 = new Neuron();
-        neuron2.getWeights().add(3.0);
-        neuron2.getWeights().add(4.0);
-        neuron2.getWeights().add(5.0);
+        neuron2.addWeight(3.0);
+        neuron2.addWeight(4.0);
+        neuron2.addWeight(5.0);
         neuron2.setBias(3.0);
-        Double dotProduct1 = (Double)MathUtils.dotProduct(neuron1.getWeights(), neuron2.getWeights());
+        double dotProduct1 = MathUtils.arrayDotProduct(neuron1.getWeights(), neuron2.getWeights());
         Assertions.assertEquals(26.0, dotProduct1);
 
         Neuron neuron3 = new Neuron();
-        neuron3.getWeights().add(1.0);
-        neuron3.getWeights().add(2.0);
-        neuron3.getWeights().add(3.0);
+        neuron3.addWeight(1.0);
+        neuron3.addWeight(2.0);
+        neuron3.addWeight(3.0);
         neuron3.setBias(2.0);
         // create neuron
         Neuron neuron4 = new Neuron();
-        neuron4.getWeights().add(4.0);
-        neuron4.getWeights().add(5.0);
-        neuron4.getWeights().add(6.0);
+        neuron4.addWeight(4.0);
+        neuron4.addWeight(5.0);
+        neuron4.addWeight(6.0);
         neuron4.setBias(3.0);
-        Double dotProduct2 = (Double)MathUtils.matrixDotProduct(neuron4.getWeights(), neuron3.getWeights());
+        Double dotProduct2 = (Double)MathUtils.matrixDotProduct(MathUtils.arrayToArrayList(neuron4.getWeights()), MathUtils.arrayToArrayList(neuron3.getWeights()));
         Assertions.assertEquals(32.0, dotProduct2);
 
         ArrayList<ArrayList<Double>> matrix1 = new ArrayList<>();

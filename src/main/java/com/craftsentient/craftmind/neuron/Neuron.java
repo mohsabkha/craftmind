@@ -6,60 +6,60 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
+import java.time.InstantSource;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.IntStream;
 
 @Component
 @Data
 @AllArgsConstructor
 @Builder
 public class Neuron {
+    int size;
     int max;
     int min;
-    private Double output;
-    private Double bias;
-    private ArrayList<Double> weights;
+    private double output;
+    private double bias;
+    private double[] weights;
+    private int weightDataPosition;
 
     public Neuron() {
-        this.weights = new ArrayList<>();
+        this.weights = new double[0];
         this.bias = 0.0;
         this.output = 0.0;
         this.min = 0;
         this.max = 0;
+        this.size = 0;
     }
 
-    public Neuron(int numberOfWeights, Double bias) {
+    public Neuron(int weights, double bias) {
+        this.size = 0;
         int maximum = 1;
         int minimum = -1;
         this.bias = bias;
-        this.weights = new ArrayList<>();
-        for(int i = 0; i < numberOfWeights; i++){
-            weights.add(Math.random() * ((maximum - minimum) + minimum));
-        }
+        this.weights = IntStream.range(0, weights).parallel().mapToDouble(i -> Math.random() * ((maximum - minimum) + minimum)).toArray();
     }
 
-    public Neuron(int numberOfWeights, Double bias, int max, int min){
+    public Neuron(int weights, double bias, int max, int min){
         this.max = max;
         this.min = min;
         this.bias = bias;
-        this.weights = new ArrayList<>();
-        for(int i = 0; i < numberOfWeights; i++){
-            weights.add(Math.random() * ((max - min) + min));
-        }
+        this.weights = IntStream.range(0, weights).parallel().mapToDouble(i -> Math.random() * ((max - min) + min)).toArray();
     }
 
-    public Neuron(ArrayList<Double> weights, Double bias){
+    public Neuron(double[] weights, double bias){
         this.bias = bias;
         this.weights = weights;
     }
 
-    public Double generateOutput(ArrayList<Double>inputs){
-        this.output = MathUtils.dotProduct(inputs, this.weights) + this.bias;
+    public double generateOutput(double[] inputs){
+        this.output = MathUtils.arrayDotProduct(inputs, this.weights) + this.bias;
         return this.output;
     }
 
-    public void print(){
-        System.out.println("Neuron Weights: [");
-        this.getWeights().forEach(i -> System.out.println("\tWeight: " + i + ", "));
-        System.out.println("]");
+    public void addWeight(double value){
+        this.weights = MathUtils.addToDoubleArray(this.weights, value);
     }
+
 }

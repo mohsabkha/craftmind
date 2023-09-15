@@ -5,17 +5,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class NeuronTest {
 
-    ArrayList<Double> inputs = new ArrayList<>();
-    ArrayList<Double> weights = new ArrayList<>();
+    double[] inputs = new double[1];
+    double[] weights = {1.0};
     Double BIAS = 1.0;
 
     @BeforeEach
     public void setUp() {
-        inputs.add(1.0);
-        weights.add(1.0);
+        inputs[0] = (1.0);
+        weights = new double[]{0.87};
     }
 
     @Test
@@ -25,9 +26,10 @@ public class NeuronTest {
                 .bias(BIAS)
                 .output(0.0)
                 .build();
-        Double output = neuron.generateOutput(inputs);
+        double output = neuron.generateOutput(inputs);
 
-        Assertions.assertEquals(2.0, neuron.getOutput());
+        Assertions.assertEquals(1.87, neuron.getOutput());
+        Assertions.assertEquals(output, neuron.getOutput());
     }
 
     @Test

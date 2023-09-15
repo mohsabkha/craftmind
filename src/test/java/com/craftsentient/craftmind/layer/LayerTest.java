@@ -19,9 +19,9 @@ public class LayerTest {
     @Test
     public void layerLombokConstructionTest() {
         Layer layer = Layer.builder()
-                .layerOutputs(new ArrayList<>())
+                .layerOutputs(new double[0])
                 .neuronList(new ArrayList<>())
-                .inputs(new ArrayList<>())
+                .inputs(new double[0])
                 .build();
         Assertions.assertNotNull(layer);
         Assertions.assertNotNull(layer.getNeuronList());
@@ -33,9 +33,9 @@ public class LayerTest {
     @Test
     public void layerGeneratorTest() {
         Layer layer = Layer.builder()
-                .layerOutputs(new ArrayList<>())
+                .layerOutputs(new double[0])
                 .neuronList(new ArrayList<>())
-                .inputs(new ArrayList<>())
+                .inputs(new double[0])
                 .build();
 
         Assertions.assertTrue(layer.getNeuronList().isEmpty());

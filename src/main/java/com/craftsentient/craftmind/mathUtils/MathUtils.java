@@ -1,7 +1,10 @@
 package com.craftsentient.craftmind.mathUtils;
 
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class MathUtils {
@@ -10,12 +13,12 @@ public class MathUtils {
         if (isDoubleList(a) && isDoubleList(b)) {
             ArrayList<Double> vec1 = (ArrayList<Double>) a;
             ArrayList<Double> vec2 = (ArrayList<Double>) b;
+
             if (vec1.size() != vec2.size())
                 throw new IllegalArgumentException("Dimensions mismatch");
             AtomicReference<Double> sum = new AtomicReference<>((double) 0);
             IntStream.range(0, vec1.size()).forEach(i -> sum.updateAndGet(v -> (double) (v + vec1.get(i) * vec2.get(i))));
             return sum.getAcquire();
-
         } else if (isObjectList(a) && isObjectList(a)) {
             ArrayList<Object> tensor1 = (ArrayList<Object>) a;
             ArrayList<Object> tensor2 = (ArrayList<Object>) b;
@@ -24,8 +27,16 @@ public class MathUtils {
             AtomicReference<Double> sum = new AtomicReference<>((double) 0);
             IntStream.range(0, tensor1.size()).forEach( i -> sum.updateAndGet(v ->  v + dotProduct(tensor1.get(i), tensor2.get(i))));
             return sum.getAcquire();
-        } else throw new IllegalArgumentException("Input must be arrays of the same dimension");
+        } else throw new IllegalArgumentException("Input must be arrays of the same dimension, and if they are, they are not arrayLists!");
     }
+
+    public static double arrayDotProduct(double[]a, double[]b){
+        if(a.length != b.length) throw new IllegalArgumentException("Dimensions mismatch!");
+        AtomicReference<Double> sum = new AtomicReference<>((double) 0);
+        IntStream.range(0, a.length).forEach(i -> sum.updateAndGet(v -> (v + (a[i] * b[i]))));
+        return sum.getAcquire();
+    }
+
 
     public static Object matrixDotProduct(Object a, Object b){
         if(isDoubleList(a) && isDoubleList(b)){
@@ -141,5 +152,37 @@ public class MathUtils {
         ArrayList<Double> vectorSum = new ArrayList<>(a.size());
         IntStream.range(0, a.size()).forEach( i -> { vectorSum.add(a.get(i) + b.get(i)); });
         return vectorSum;
+    }
+
+    public static double[] addArrays(double[] a, double[] b){
+        if(a.length != b.length) { throw new ArithmeticException("vectors should be of same size"); }
+        if(a.length == 0) throw new ArithmeticException("vector sizes should not be zero");
+        double[] vectorSum = new double[a.length];
+        IntStream.range(0, a.length).forEach( i -> { vectorSum[i] = (a[i] + b[i]); });
+        return vectorSum;
+    }
+
+    public static double[] addToDoubleArray(double[] array, double value){
+        double[] temp;
+        if(array.length == 0) {
+            temp = new double[1];
+            temp[array.length] = value;
+        } else {
+            temp = new double[array.length + 1];
+            for(int i = 0; i < array.length; i++){ temp[i] = array[i]; }
+            temp[array.length] = value;
+        }
+        array = temp;
+        return array;
+    }
+
+    public static double[] fullMultiplication(double[] a, double[] b){
+        return IntStream.range(0, a.length).mapToDouble(i -> {
+            return IntStream.range(0, b.length).mapToDouble(j -> a[i] * b[j]).sum();
+        }).toArray();
+    }
+
+    public static ArrayList<Double> arrayToArrayList(double[] array){
+        return Arrays.stream(array).boxed().collect(Collectors.toCollection(ArrayList::new));
     }
 }
