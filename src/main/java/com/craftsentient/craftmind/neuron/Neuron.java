@@ -22,7 +22,6 @@ public class Neuron {
     private double output;
     private double bias;
     private double[] weights;
-    private int weightDataPosition;
 
     public Neuron() {
         this.weights = new double[0];

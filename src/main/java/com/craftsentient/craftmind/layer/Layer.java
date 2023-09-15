@@ -50,14 +50,15 @@ public class Layer {
         this.inputs = MathUtils.addToDoubleArray(this.inputs, inputValue);
     }
 
-    public void addInput(Layer layer){
-        this.inputs = layer.getLayerOutputs();
+    public void useOutputFromPreviousLayerAsInput(Layer layer){
+        this.inputs = layer.generateLayerOutput();
     }
 
     // generating a layer with a vector of neurons
     public Layer generateLayer(int numberOfNeurons) {
         for(int i = 0; i < numberOfNeurons; i++){
             this.neuronList.add(new Neuron(numberOfNeurons, 1.0));
+            this.inputs = MathUtils.addToDoubleArray(this.inputs, Math.random() * ((1 - (-1)) + 1));
         }
         return this;
     }
