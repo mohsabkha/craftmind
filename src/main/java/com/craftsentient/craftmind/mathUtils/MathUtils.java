@@ -4,6 +4,7 @@ package com.craftsentient.craftmind.mathUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -13,7 +14,6 @@ public class MathUtils {
         if (isDoubleList(a) && isDoubleList(b)) {
             ArrayList<Double> vec1 = (ArrayList<Double>) a;
             ArrayList<Double> vec2 = (ArrayList<Double>) b;
-
             if (vec1.size() != vec2.size())
                 throw new IllegalArgumentException("Dimensions mismatch");
             AtomicReference<Double> sum = new AtomicReference<>((double) 0);
@@ -33,9 +33,10 @@ public class MathUtils {
     public static double arrayDotProduct(double[]a, double[]b){
         if(a.length != b.length) throw new IllegalArgumentException("Dimensions mismatch!");
         AtomicReference<Double> sum = new AtomicReference<>((double) 0);
-        IntStream.range(0, a.length).forEach(i -> sum.updateAndGet(v -> (v + (a[i] * b[i]))));
+        IntStream.range(0, a.length).parallel().forEachOrdered(i -> sum.updateAndGet(v -> (v + (a[i] * b[i]))));
         return sum.getAcquire();
     }
+
 
 
     public static Object matrixDotProduct(Object a, Object b){
@@ -135,14 +136,27 @@ public class MathUtils {
 
     public static ArrayList<ArrayList<Double>> transposeMatrix(ArrayList<ArrayList<Double>> matrix){
         ArrayList<ArrayList<Double>> finalAnswer = new ArrayList<>();
-        ArrayList<Double> temp2;
-        for(int x = 0; x < matrix.get(0).size(); x++){
-            temp2 = new ArrayList<>();
-            for(int y = 0; y < matrix.size(); y++){
-                temp2.add(matrix.get(y).get(x));
-            }
-            finalAnswer.add(temp2);
-        }
+        AtomicReference<ArrayList<Double>> temp2 = new AtomicReference<>();
+
+        IntStream.range(0, matrix.get(0).size()).parallel().forEachOrdered(i -> {
+            temp2.set(new ArrayList<>());
+            IntStream.range(0, matrix.size()).parallel().forEachOrdered(j -> {
+                temp2.get().add(matrix.get(i).get(j));
+            });
+            finalAnswer.add(temp2.get());
+        });
+        return finalAnswer;
+    }
+
+    public static double[][] transposeMatrix(double[][] matrix){
+        double[][] finalAnswer = new double[matrix[0].length][matrix.length];
+        IntStream.range(0, matrix[0].length).forEach(i -> {
+            double[] temp = new double[matrix.length];
+            IntStream.range(0, matrix.length).forEach(j -> {
+                temp[j] = matrix[j][i];
+            });
+            finalAnswer[i]=(temp);
+        });
         return finalAnswer;
     }
 
@@ -166,18 +180,30 @@ public class MathUtils {
         double[] temp;
         if(array.length == 0) {
             temp = new double[1];
-            temp[array.length] = value;
+            temp[0] = value;
         } else {
             temp = new double[array.length + 1];
             for(int i = 0; i < array.length; i++){ temp[i] = array[i]; }
             temp[array.length] = value;
         }
-        array = temp;
-        return array;
+        return temp;
+    }
+
+    public static double[][] addToDoubleArray(double[][] array, double[] values){
+        double[][] temp;
+        if(array.length == 0){
+            temp = new double[1][values.length];
+            temp[0] = values;
+        } else {
+            temp = new double[array.length+1][array[0].length];
+            for(int i = 0; i < array.length; i++){ temp[i] = array[i]; }
+            temp[array.length] = values;
+        }
+        return temp;
     }
 
     public static double[] fullMultiplication(double[] a, double[] b){
-        return IntStream.range(0, a.length).mapToDouble(i -> {
+        return IntStream.range(0, a.length).parallel().mapToDouble(i -> {
             return IntStream.range(0, b.length).mapToDouble(j -> a[i] * b[j]).sum();
         }).toArray();
     }
