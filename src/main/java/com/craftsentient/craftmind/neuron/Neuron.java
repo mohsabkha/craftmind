@@ -31,17 +31,17 @@ public class Neuron {
 
     public Neuron(int weights, double bias) {
         this.size = 0;
-        int maximum = 1;
-        int minimum = -1;
+        this.max = 1;
+        this.min = -1;
         this.bias = bias;
-        this.weights = IntStream.range(0, weights).parallel().mapToDouble(i -> Math.random() * ((maximum - minimum) + minimum)).toArray();
+        this.weights = IntStream.range(0, weights).parallel().mapToDouble(i -> Math.random() * ((this.max - this.min) + this.min)).toArray();
     }
 
     public Neuron(int weights, double bias, int max, int min){
         this.max = max;
         this.min = min;
         this.bias = bias;
-        this.weights = IntStream.range(0, weights).parallel().mapToDouble(i -> Math.random() * ((max - min) + min)).toArray();
+        this.weights = IntStream.range(0, weights).parallel().mapToDouble(i -> Math.random() * ((this.max - this.min) + this.min)).toArray();
     }
 
     public Neuron(double[] weights, double bias){

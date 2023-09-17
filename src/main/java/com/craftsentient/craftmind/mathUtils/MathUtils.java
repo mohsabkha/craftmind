@@ -31,7 +31,7 @@ public class MathUtils {
     public static double arrayDotProduct(double[]a, double[]b){
         if(a.length != b.length) throw new IllegalArgumentException("Dimensions mismatch!");
         AtomicReference<Double> sum = new AtomicReference<>((double) 0);
-        IntStream.range(0, a.length).forEach(i -> sum.updateAndGet(v -> (v + (a[i] * b[i]))));
+        IntStream.range(0, a.length).parallel().forEachOrdered(i -> sum.updateAndGet(v -> (v + (a[i] * b[i]))));
         return sum.getAcquire();
     }
 
