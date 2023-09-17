@@ -6,9 +6,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Arrays;
-
-
 @SpringBootTest
 class CraftmindApplicationTests {
     @Test
@@ -37,7 +34,7 @@ class CraftmindApplicationTests {
         double[][] layerOutputs1 = (double[][])layer1.generateLayerOutput();
 
         layer2.useOutputFromPreviousLayerAsInput(layer1);
-        //double[][] layerOutputs2 = (double[][])layer2.generateLayerOutput();
+        double[][] layerOutputs2 = (double[][])layer2.generateLayerOutput();
 
         Assertions.assertEquals(3, layer1.getNeuronList().size());
         Assertions.assertEquals(3, layer1.getLayerOutputs().length);
@@ -45,15 +42,15 @@ class CraftmindApplicationTests {
         Assertions.assertEquals(1.21, layerOutputs1[0][1]);
         Assertions.assertEquals(2.385, layerOutputs1[0][2]);
 
-        for (int i = 0; i < layerOutputs1.length; i++) {
+        for (int i = 0; i < layerOutputs2.length; i++) {
             System.out.print("[");
-            for (int j = 0; j < layerOutputs1[0].length; j++) {
-                System.out.print(layerOutputs1[i][j] + " ");
+            for (int j = 0; j < layerOutputs2[0].length; j++) {
+                System.out.print(layerOutputs2[i][j] + ", ");
             }
             System.out.println("]");
         }
-
     }
+
     @Test
     public void mainTest() {
         String [] args = new String[0];

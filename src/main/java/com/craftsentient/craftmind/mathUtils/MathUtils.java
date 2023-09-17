@@ -4,12 +4,10 @@ package com.craftsentient.craftmind.mathUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class MathUtils {
-
     public static Double dotProduct(Object a, Object b) {
         if (isDoubleList(a) && isDoubleList(b)) {
             ArrayList<Double> vec1 = (ArrayList<Double>) a;
@@ -36,8 +34,6 @@ public class MathUtils {
         IntStream.range(0, a.length).parallel().forEachOrdered(i -> sum.updateAndGet(v -> (v + (a[i] * b[i]))));
         return sum.getAcquire();
     }
-
-
 
     public static Object matrixDotProduct(Object a, Object b){
         if(isDoubleList(a) && isDoubleList(b)){

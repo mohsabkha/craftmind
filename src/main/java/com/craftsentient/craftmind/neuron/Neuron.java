@@ -6,9 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
-import java.time.InstantSource;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.stream.IntStream;
 
 @Component
@@ -55,6 +52,10 @@ public class Neuron {
     public double generateOutput(double[] inputs){
         this.output = MathUtils.arrayDotProduct(inputs, this.weights) + this.bias;
         return this.output;
+    }
+
+    public static double generateOutput(double[] inputs, double[] weights, double bias){
+        return MathUtils.arrayDotProduct(inputs, weights) + bias;
     }
 
     public void addWeight(double value){

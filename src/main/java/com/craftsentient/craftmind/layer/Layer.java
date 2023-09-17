@@ -16,14 +16,18 @@ import java.util.stream.IntStream;
 @Builder
 public class Layer {
     private ArrayList<Neuron> neuronList;
+    private double[][] neuronWeights;
+    private double[] neuronBiases;
     private double[] inputs;
     private double[][] batchInputs;
     private double[] layerOutputs;
     private double[][] batchLayerOutputs;
-    private boolean layerAsInput = false;
+    private boolean isHiddenLayer = false;
 
     public Layer() {
         this.neuronList = new ArrayList<>();
+        this.neuronWeights = new double[0][0];
+        this.neuronBiases = new double[0];
         this.inputs = new double[0];
         this.layerOutputs = new double[0];
         this.batchInputs = new double[0][0];
@@ -32,41 +36,58 @@ public class Layer {
 
     public Object generateLayerOutput(){
         if(this.inputs.length == 0){
-            return generateLayerOutput(this.batchInputs.length);
+            return generateBatchedLayerOutput(this.batchInputs.length);
         }
-        return generateLayerOutput(this.inputs);
+        return generateNonBatchedLayerOutput(this.inputs);
     }
 
-    public double[] generateLayerOutput(double[] inputs) {
+    public double[][] generateBatchedLayerOutput(int batchSize){
+        this.batchLayerOutputs = new double[0][0];
+        if(this.isHiddenLayer){
+            if(this.neuronWeights[0].length != this.batchInputs[0].length) { this.neuronWeights = MathUtils.transposeMatrix(this.neuronWeights); }
+            this.generateOutput(this.batchInputs.length);
+        } else {
+            this.generateOutput(batchSize);
+        }
+
+        return this.batchLayerOutputs;
+    }
+
+    public double[] generateNonBatchedLayerOutput(double[] inputs) {
         this.layerOutputs = new double[0];
-        IntStream.range(0, neuronList.size()).parallel().forEachOrdered(i -> {
-            this.addOutput(neuronList.get(i).generateOutput(inputs));
+        IntStream.range(0, this.neuronBiases.length).forEach(i -> {
+            this.addOutput(Neuron.generateOutput(inputs, this.neuronWeights[i], this.neuronBiases[i]));
         });
         return this.layerOutputs;
     }
 
-    public double[][] generateLayerOutput(int batchSize){
-        this.batchLayerOutputs = new double[0][0];
-        IntStream.range(0, batchSize).parallel().forEachOrdered(i -> {
-            this.generateLayerOutput(this.batchInputs[i]);
+    private void generateOutput(int batchSize){
+        IntStream.range(0, batchSize).forEach(i -> {
+            this.generateNonBatchedLayerOutput(this.batchInputs[i]);
             this.addOutput(this.layerOutputs);
         });
-        return this.batchLayerOutputs;
     }
 
     public void addOutput(double value){
         this.layerOutputs = MathUtils.addToDoubleArray(this.layerOutputs,  value);
     }
+
     public void addOutput(double[] values){
         this.batchLayerOutputs = MathUtils.addToDoubleArray(this.batchLayerOutputs,  values);
     }
 
     public void addNeuron(Neuron neuron) {
         this.neuronList.add(neuron);
+        this.neuronWeights = MathUtils.addToDoubleArray(this.neuronWeights, neuron.getWeights());
+        this.neuronBiases = MathUtils.addToDoubleArray(this.neuronBiases, neuron.getBias());
     }
 
     public void addNeurons(ArrayList<Neuron> neurons){
         this.neuronList = neurons;
+        IntStream.range(0, neurons.size()).parallel().forEachOrdered(i -> {
+            this.neuronWeights = MathUtils.addToDoubleArray(this.neuronWeights, neurons.get(i).getWeights());
+            this.neuronBiases = MathUtils.addToDoubleArray(this.neuronBiases, neurons.get(i).getBias());
+        });
     }
 
     public void addInput(double inputValue) {
@@ -82,7 +103,7 @@ public class Layer {
     }
 
     public void useOutputFromPreviousLayerAsInput(Layer layer){
-        this.layerAsInput = true;
+        this.isHiddenLayer = true;
         if(inputs.length != 0) this.inputs = (double[])layer.generateLayerOutput();
         else this.batchInputs = layer.getBatchLayerOutputs();
     }
@@ -92,10 +113,11 @@ public class Layer {
             this.neuronList.add(new Neuron(numberOfNeurons, 1.0));
             this.inputs = MathUtils.addToDoubleArray(this.inputs, Math.random() * ((1 - (-1)) + 1));
         }
+        this.addNeurons(this.neuronList);
         return this;
     }
 
-    public static Layer addLayer(Layer a, Layer b){
+    public static Layer addLayers(Layer a, Layer b){
         Neuron neuron = new Neuron();
         IntStream.range(0, a.getNeuronList().size()).parallel().forEach( i -> {
                     neuron.setOutput(a.getNeuronList().get(i).getOutput() + b.getNeuronList().get(i).getOutput());
