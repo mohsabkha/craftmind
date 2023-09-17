@@ -44,7 +44,6 @@ public class NeuronTest {
     @Test
     public void generateNeuronTest() {
         Neuron neuron = new Neuron(4, 1.0);
-        System.out.println(neuron.getWeights());
         Assertions.assertNotNull(neuron);
     }
 }

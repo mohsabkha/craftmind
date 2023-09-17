@@ -152,6 +152,5 @@ public class MathUtilsTest {
         ArrayList<ArrayList<Double>> result = (ArrayList<ArrayList<Double>>)MathUtils.matrixDotProduct(matrix1, matrix2);
         Assertions.assertEquals(2, result.size());
         Assertions.assertEquals(2, result.get(0).size());
-        System.out.println(result);
     }
 }
