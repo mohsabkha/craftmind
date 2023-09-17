@@ -1,10 +1,12 @@
 package com.craftsentient.craftmind.layers;
 
 import com.craftsentient.craftmind.layer.Layer;
+import com.craftsentient.craftmind.mathUtils.MathUtils;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 @Getter
@@ -155,6 +157,10 @@ public class Layers {
     }
 
     public void printLayers() {
+        AtomicInteger counter = new AtomicInteger(1);
+        this.getLayerList().forEach(i -> {
+            MathUtils.print(i.getBatchLayerOutputs(), "Layer " + (counter.getAndIncrement()) + " Outputs");
+        });
 
     }
 

@@ -24,26 +24,14 @@ class CraftmindApplicationTests {
                 {   -0.26,-0.27,0.17,0.87   }};
         double[] biases = {2, 3, 0.5};
 
+        Layers layers1 = new Layers(4, new int[]{3,7,2,6}, weights, biases, inputs);
+        layers1.printLayers();
 
-        Layers neuralNetwork = new Layers(4, new int[]{3,7,2,6}, weights, biases, inputs);
-        double[][] layerOutputs1 = neuralNetwork.getLayerList().get(0).getBatchLayerOutputs();
-        MathUtils.print(layerOutputs1, "Layer 1 Outputs");
-
-        double[][] layerOutputs2 = neuralNetwork.getLayerList().get(1).getBatchLayerOutputs();
-        MathUtils.print(layerOutputs2, "Layer 2 Outputs");
-
-        double[][] layerOutputs3 = neuralNetwork.getLayerList().get(2).getBatchLayerOutputs();
-        MathUtils.print(layerOutputs3, "Layer 3 Outputs");
-
-        double[][] layerOutputs4 = neuralNetwork.getLayerList().get(3).getBatchLayerOutputs();
-        MathUtils.print(layerOutputs4, "Layer 4 Outputs");
-
-
-        Assertions.assertEquals(3, neuralNetwork.getLayerList().get(0).getNeuronList().size());
-        Assertions.assertEquals(3, neuralNetwork.getLayerList().get(0).getLayerOutputs().length);
-        Assertions.assertEquals(4.8, layerOutputs1[0][0]);
-        Assertions.assertEquals(1.21, layerOutputs1[0][1]);
-        Assertions.assertEquals(2.385, layerOutputs1[0][2]);
+        Assertions.assertEquals(3, layers1.getLayerList().get(0).getNeuronList().size());
+        Assertions.assertEquals(3, layers1.getLayerList().get(0).getLayerOutputs().length);
+        Assertions.assertEquals(4.8, layers1.getLayerList().get(0).getBatchLayerOutputs()[0][0]);
+        Assertions.assertEquals(1.21, layers1.getLayerList().get(0).getBatchLayerOutputs()[0][1]);
+        Assertions.assertEquals(2.385, layers1.getLayerList().get(0).getBatchLayerOutputs()[0][2]);
     }
 
     @Test
