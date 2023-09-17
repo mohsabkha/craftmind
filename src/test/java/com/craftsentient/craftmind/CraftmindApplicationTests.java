@@ -1,9 +1,6 @@
 package com.craftsentient.craftmind;
 
-import com.craftsentient.craftmind.layer.Layer;
 import com.craftsentient.craftmind.layers.Layers;
-import com.craftsentient.craftmind.mathUtils.MathUtils;
-import com.craftsentient.craftmind.neuron.Neuron;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
