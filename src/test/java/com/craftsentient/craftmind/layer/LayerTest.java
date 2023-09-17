@@ -33,7 +33,6 @@ public class LayerTest {
     @Test
     public void layerGeneratorTest() {
         Layer layer = new Layer();
-
         Assertions.assertTrue(layer.getNeuronList().isEmpty());
         layer.generateLayer(10);
         Assertions.assertEquals(layer.getNeuronList().size(), 10);

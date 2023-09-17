@@ -1,6 +1,7 @@
 package com.craftsentient.craftmind;
 
 import com.craftsentient.craftmind.layer.Layer;
+import com.craftsentient.craftmind.mathUtils.MathUtils;
 import com.craftsentient.craftmind.neuron.Neuron;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,15 +27,21 @@ class CraftmindApplicationTests {
         layer1.addNeuron(new Neuron(weights[1], 3.0));
         layer1.addNeuron(new Neuron(weights[2], 0.5));
         layer1.addInput(inputs);
+        double[][] layerOutputs1 = (double[][])layer1.generateLayerOutput();
 
         Layer layer2 = new Layer();
         layer2.addNeuron(new Neuron(weights[0], 2.0));
         layer2.addNeuron(new Neuron(weights[1], 3.0));
         layer2.addNeuron(new Neuron(weights[2], 0.5));
-        double[][] layerOutputs1 = (double[][])layer1.generateLayerOutput();
-
         layer2.useOutputFromPreviousLayerAsInput(layer1);
         double[][] layerOutputs2 = (double[][])layer2.generateLayerOutput();
+
+        Layer layer3 = new Layer();
+        layer3.addNeuron(new Neuron(weights[0], 2.0));
+        layer3.addNeuron(new Neuron(weights[1], 3.0));
+        layer3.addNeuron(new Neuron(weights[2], 0.5));
+        layer3.useOutputFromPreviousLayerAsInput(layer2);
+        double[][] layerOutputs3 = (double[][])layer3.generateLayerOutput();
 
         Assertions.assertEquals(3, layer1.getNeuronList().size());
         Assertions.assertEquals(3, layer1.getLayerOutputs().length);
@@ -42,13 +49,9 @@ class CraftmindApplicationTests {
         Assertions.assertEquals(1.21, layerOutputs1[0][1]);
         Assertions.assertEquals(2.385, layerOutputs1[0][2]);
 
-        for (int i = 0; i < layerOutputs2.length; i++) {
-            System.out.print("[");
-            for (int j = 0; j < layerOutputs2[0].length; j++) {
-                System.out.print(layerOutputs2[i][j] + ", ");
-            }
-            System.out.println("]");
-        }
+        MathUtils.print(layerOutputs1, "Layer 1 Outputs");
+        MathUtils.print(layerOutputs2, "Layer 2 Outputs");
+        MathUtils.print(layerOutputs3, "Layer 3 Outputs");
     }
 
     @Test
