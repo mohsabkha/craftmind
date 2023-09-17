@@ -32,11 +32,7 @@ public class LayerTest {
 
     @Test
     public void layerGeneratorTest() {
-        Layer layer = Layer.builder()
-                .layerOutputs(new double[0])
-                .neuronList(new ArrayList<>())
-                .inputs(new double[0])
-                .build();
+        Layer layer = new Layer();
 
         Assertions.assertTrue(layer.getNeuronList().isEmpty());
         layer.generateLayer(10);
