@@ -2,6 +2,7 @@ package com.craftsentient.craftmind.layer;
 
 import com.craftsentient.craftmind.mathUtils.MathUtils;
 import com.craftsentient.craftmind.neuron.Neuron;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -10,6 +11,7 @@ import java.util.stream.IntStream;
 
 @Builder
 @Getter
+@AllArgsConstructor
 public class DenseLayer implements Layer{
     private ArrayList<Neuron> neuronList;
     private double[][] neuronWeights;
@@ -204,7 +206,7 @@ public class DenseLayer implements Layer{
         for(int i = 0; i < numberOfNeurons; i++){
             this.neuronList.add(new Neuron(numberOfNeurons, 1.0));
             this.neuronBiases = MathUtils.addToDoubleArray(this.neuronBiases, 1.0);
-            this.inputs = MathUtils.addToDoubleArray(this.inputs, Math.random() * ((1 - (-1)) + 1));
+            this.inputs = MathUtils.addToDoubleArray(this.inputs, Neuron.randn());
         }
         this.addNeurons(this.neuronList);
     }
@@ -221,7 +223,7 @@ public class DenseLayer implements Layer{
         this.neuronWeights = weights;
         this.batchInputs = batchInputs;
         for(int i = 0; i < weights.length; i++){
-            double bias = Math.random() * ((1 - (-1)) + 1);
+            double bias = Neuron.randn();
             this.neuronList.add(new Neuron(weights[i], bias));
             this.neuronBiases = MathUtils.addToDoubleArray(this.neuronBiases, bias);
         }

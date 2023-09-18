@@ -49,5 +49,4 @@ public class LayersTest {
         DenseLayers layers5B = new DenseLayers(4, 3, weights, biases, inputs);
         layers5B.printLayers("Layer 5B");
     }
-
 }

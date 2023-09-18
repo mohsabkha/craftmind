@@ -5,6 +5,7 @@ import com.craftsentient.craftmind.mathUtils.MathUtils;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -13,7 +14,7 @@ import java.util.stream.IntStream;
 public class DenseLayers {
     private ArrayList<DenseLayer> layerList;
     private double[][] initialInput;
-    private static final Random random = new Random(0);
+    public static final Random random = new Random(0);
 
     public DenseLayers(int layers) {
         this.layerList = new ArrayList<>();
@@ -23,6 +24,14 @@ public class DenseLayers {
             if(i != 0) layerList.add(new DenseLayer(weights, layerList.get(i-1).getBatchLayerOutputs()));
             else layerList.add(new DenseLayer(weights, initialInput));
         });
+    }
+
+    public static DenseLayers init(int numberOfLayers, int numberOfInputs, int numberOfNeurons){
+        double[][] initialInput = randn(numberOfNeurons, numberOfInputs);
+        double[][] initialWeights= randn(numberOfNeurons, numberOfInputs);
+        double[] initialBiases = new double[numberOfNeurons];
+        IntStream.range(0, numberOfNeurons).parallel().forEachOrdered(i -> initialBiases[i] = 0);
+        return new DenseLayers(numberOfLayers, initialWeights, initialBiases, initialInput);
     }
 
 //    public Layers(int layers, double[] biases) {
@@ -194,7 +203,7 @@ public class DenseLayers {
         });
     }
 
-    public double[][] randn(int rows, int cols) {
+    public static double[][] randn(int rows, int cols) {
         return getDoubles(rows, cols, random);
     }
 
@@ -202,7 +211,7 @@ public class DenseLayers {
         double[][] output = new double[rows][cols];
         for (int i = 0; i < output.length; i++) {
             for (int j = 0; j < output[0].length; j++) {
-                output[i][j] = 0.1 * random.nextGaussian();
+                output[i][j] = (0.1 * random.nextGaussian());
             }
         }
         return output;

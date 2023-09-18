@@ -6,7 +6,10 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
+import java.util.Random;
 import java.util.stream.IntStream;
+
+import static com.craftsentient.craftmind.layers.DenseLayers.random;
 
 @Component
 @Data
@@ -14,8 +17,6 @@ import java.util.stream.IntStream;
 @Builder
 public class Neuron {
     int size;
-    int max;
-    int min;
     private double output;
     private double bias;
     private double[] weights;
@@ -24,24 +25,18 @@ public class Neuron {
         this.weights = new double[0];
         this.bias = 0.0;
         this.output = 0.0;
-        this.min = 0;
-        this.max = 0;
         this.size = 0;
     }
 
-    public Neuron(int weights, double bias) {
-        this.size = 0;
-        this.max = 1;
-        this.min = -1;
-        this.bias = bias;
-        this.weights = IntStream.range(0, weights).parallel().mapToDouble(i -> Math.random() * ((this.max - this.min) + this.min)).toArray();
+    public Neuron(int weights) {
+        this.size = weights;
+        this.bias = 0;
+        this.weights = randn(weights);
     }
 
-    public Neuron(int weights, double bias, int max, int min){
-        this.max = max;
-        this.min = min;
+    public Neuron(int weights, double bias){
         this.bias = bias;
-        this.weights = IntStream.range(0, weights).parallel().mapToDouble(i -> Math.random() * ((this.max - this.min) + this.min)).toArray();
+        this.weights = randn(weights);
     }
 
     public Neuron(double[] weights, double bias){
@@ -60,6 +55,16 @@ public class Neuron {
 
     public void addWeight(double value){
         this.weights = MathUtils.addToDoubleArray(this.weights, value);
+    }
+
+    public static double randn(){
+        return 0.1 * random.nextGaussian();
+    }
+
+    public double[] randn(int inputs){
+        double[] weights = new double[inputs];
+        IntStream.range(0, inputs).parallel().forEachOrdered(i -> weights[i] = randn());
+        return weights;
     }
 
 }
