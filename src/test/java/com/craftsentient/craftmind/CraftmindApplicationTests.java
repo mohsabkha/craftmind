@@ -21,14 +21,15 @@ class CraftmindApplicationTests {
                 {   -0.26,-0.27,0.17,0.87   }};
         double[] biases = {2, 3, 0.5};
 
-        Layers layers1 = new Layers(4, new int[]{3,7,2,6}, weights, biases, inputs);
-        layers1.printLayers();
 
-        Assertions.assertEquals(3, layers1.getLayerList().get(0).getNeuronList().size());
-        Assertions.assertEquals(3, layers1.getLayerList().get(0).getLayerOutputs().length);
-        Assertions.assertEquals(4.8, layers1.getLayerList().get(0).getBatchLayerOutputs()[0][0]);
-        Assertions.assertEquals(1.21, layers1.getLayerList().get(0).getBatchLayerOutputs()[0][1]);
-        Assertions.assertEquals(2.385, layers1.getLayerList().get(0).getBatchLayerOutputs()[0][2]);
+        Layers layers = new Layers(4, new int[]{3,7,2,6}, weights, biases, inputs);
+        layers.printLayers("Full Constructor Layer");
+
+        Assertions.assertEquals(3, layers.getLayerList().get(0).getNeuronList().size());
+        Assertions.assertEquals(3, layers.getLayerList().get(0).getLayerOutputs().length);
+        Assertions.assertEquals(4.8, layers.getLayerList().get(0).getBatchLayerOutputs()[0][0]);
+        Assertions.assertEquals(1.21, layers.getLayerList().get(0).getBatchLayerOutputs()[0][1]);
+        Assertions.assertEquals(2.385, layers.getLayerList().get(0).getBatchLayerOutputs()[0][2]);
     }
 
     @Test
