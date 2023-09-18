@@ -35,6 +35,20 @@ public class MathUtils {
         return sum.getAcquire();
     }
 
+    public static double[][] matrixDotProduct(double[][] input1, double[][] input2){
+        double[][] output = new double[input1.length][input2[0].length];
+        for (int i = 0; i < output.length; i++) {
+            for (int j = 0; j < output[0].length; j++) {
+                double value = 0;
+                for (int k = 0; k < input1[0].length; k++) {
+                    value += input1[i][k] * input2[k][j];
+                }
+                output[i][j] = value;
+            }
+        }
+        return output;
+    };
+
     public static Object matrixDotProduct(Object a, Object b){
         if(isDoubleList(a) && isDoubleList(b)){
             if(bothDoubleArraysAreNotOfTheSameSize(a,b))
@@ -164,6 +178,16 @@ public class MathUtils {
         double[] vectorSum = new double[a.length];
         IntStream.range(0, a.length).parallel().forEachOrdered( i -> { vectorSum[i] = (a[i] + b[i]); });
         return vectorSum;
+    }
+
+    public static double[][] add(double[][] a, double[] b){
+        double[][] output = new double[a.length][a[0].length];
+        for (int i = 0; i < a.length; i++) {
+            for (int j = 0; j < a[0].length; j++) {
+                output[i][j] = a[i][j] + b[j];
+            }
+        }
+        return output;
     }
 
     public static double[] addToDoubleArray(double[] array, double value){

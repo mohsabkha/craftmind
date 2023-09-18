@@ -1,6 +1,6 @@
 package com.craftsentient.craftmind;
 
-import com.craftsentient.craftmind.layers.Layers;
+import com.craftsentient.craftmind.layers.DenseLayers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,10 +19,10 @@ class CraftmindApplicationTests {
                 {    0.2, 0.8, -0.5, 1.0    },
                 {    0.5,-0.91,0.26,-0.5    },
                 {   -0.26,-0.27,0.17,0.87   }};
-        double[] biases = {2, 3, 0.5};
+        double[] biases = { 2, 3, 0.5 };
 
 
-        Layers layers = new Layers(4, new int[]{3,7,2,6}, weights, biases, inputs);
+        DenseLayers layers = new DenseLayers(4, new int[]{3,7,2,6}, weights, biases, inputs);
         layers.printLayers("Full Constructor Layer");
 
         Assertions.assertEquals(3, layers.getLayerList().get(0).getNeuronList().size());
