@@ -4,9 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 public class NeuronTest {
 
     double[] inputs = new double[1];
@@ -34,11 +31,9 @@ public class NeuronTest {
 
     @Test
     public void createNeuronTest() {
-        Neuron neuron = new Neuron(4, 2.0, 1, -1);
+        Neuron neuron = new Neuron(4);
         Assertions.assertNotNull(neuron);
-        Assertions.assertEquals(1, neuron.getMax());
-        Assertions.assertEquals(-1, neuron.getMin());
-        Assertions.assertEquals(2.0, neuron.getBias());
+        Assertions.assertEquals(0.0, neuron.getBias());
     }
 
     @Test

@@ -10,7 +10,7 @@ public class LayerTest {
 
     @Test
     public void layerConstructorTest() {
-        Layer layer = new Layer();
+        DenseLayer layer = new DenseLayer();
         Assertions.assertNotNull(layer);
         Assertions.assertNotNull(layer.getNeuronList());
         Assertions.assertNotNull(layer.getInputs());
@@ -18,7 +18,7 @@ public class LayerTest {
 
     @Test
     public void layerLombokConstructionTest() {
-        Layer layer = Layer.builder()
+        DenseLayer layer = DenseLayer.builder()
                 .layerOutputs(new double[0])
                 .neuronList(new ArrayList<>())
                 .inputs(new double[0])
@@ -32,7 +32,7 @@ public class LayerTest {
 
     @Test
     public void layerGeneratorTest() {
-        Layer layer = new Layer();
+        DenseLayer layer = new DenseLayer();
         Assertions.assertTrue(layer.getNeuronList().isEmpty());
         layer.generateLayer(10);
         Assertions.assertEquals(layer.getNeuronList().size(), 10);
