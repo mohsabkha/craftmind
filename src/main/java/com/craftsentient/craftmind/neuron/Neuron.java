@@ -35,11 +35,13 @@ public class Neuron {
     }
 
     public Neuron(int weights, double bias){
+        this.size = weights;
         this.bias = bias;
         this.weights = randn(weights);
     }
 
     public Neuron(double[] weights, double bias){
+        this.size = weights.length;
         this.bias = bias;
         this.weights = weights;
     }
@@ -55,10 +57,11 @@ public class Neuron {
 
     public void addWeight(double value){
         this.weights = MathUtils.addToDoubleArray(this.weights, value);
+        this.size = weights.length;
     }
 
     public static double randn(){
-        return 0.1 * random.nextGaussian();
+        return 0.01 * random.nextGaussian();
     }
 
     public double[] randn(int inputs){

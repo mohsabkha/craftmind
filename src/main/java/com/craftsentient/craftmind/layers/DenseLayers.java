@@ -16,6 +16,22 @@ public class DenseLayers {
     private double[][] initialInput;
     public static final Random random = new Random(0);
 
+    public static DenseLayers init(int numberOfLayers, int numberOfInputs, int numberOfNeurons){
+        double[][] initialInput = randn(1, numberOfInputs);
+        double[][] initialWeights= randn(numberOfNeurons, numberOfInputs);
+        double[] initialBiases = new double[numberOfNeurons];
+        IntStream.range(0, numberOfNeurons).parallel().forEachOrdered(i -> initialBiases[i] = 0);
+        return new DenseLayers(numberOfLayers, numberOfNeurons, initialWeights, initialBiases, initialInput);
+    }
+
+    public static DenseLayers init(int numberOfLayers, int numberOfInputs, int[] numberOfNeuronsPerLayer){
+        double[][] initialInput = randn(1, numberOfInputs);
+        double[][] initialWeights= randn(numberOfNeuronsPerLayer[0], numberOfInputs);
+        double[] initialBiases = new double[numberOfNeuronsPerLayer[0]];
+        IntStream.range(0, numberOfNeuronsPerLayer[0]).parallel().forEachOrdered(i -> initialBiases[i] = 0);
+        return new DenseLayers(numberOfLayers, numberOfNeuronsPerLayer, initialWeights, initialBiases, initialInput);
+    }
+
     public DenseLayers(int layers) {
         this.layerList = new ArrayList<>();
         this.initialInput = randn(layers,layers);
@@ -25,24 +41,6 @@ public class DenseLayers {
             else layerList.add(new DenseLayer(weights, initialInput));
         });
     }
-
-    public static DenseLayers init(int numberOfLayers, int numberOfInputs, int numberOfNeurons){
-        double[][] initialInput = randn(numberOfNeurons, numberOfInputs);
-        double[][] initialWeights= randn(numberOfNeurons, numberOfInputs);
-        double[] initialBiases = new double[numberOfNeurons];
-        IntStream.range(0, numberOfNeurons).parallel().forEachOrdered(i -> initialBiases[i] = 0);
-        return new DenseLayers(numberOfLayers, initialWeights, initialBiases, initialInput);
-    }
-
-//    public Layers(int layers, double[] biases) {
-//        this.layerList = new ArrayList<>();
-//        this.initialInput = randn(3,3);
-//        IntStream.range(0, layers).forEach(i -> {
-//            double[][] weights = randn(3, 3);
-//            if(i != 0) layerList.add(new Layer(weights, layerList.get(i-1).getBatchLayerOutputs()));
-//            else layerList.add(new Layer(weights, initialInput));
-//        });
-//    }
 
     public DenseLayers(int layers, double[][] initialInput) {
         this.initialInput = initialInput;
@@ -83,7 +81,7 @@ public class DenseLayers {
 
     public DenseLayers(int layers, int neuronsPerLayer) {
         this.layerList = new ArrayList<>();
-        this.initialInput = randn(3,3);
+        this.initialInput = randn(1,neuronsPerLayer);
 
         IntStream.range(0, layers).forEach(i -> {
             double[][] weights = randn(neuronsPerLayer, neuronsPerLayer);

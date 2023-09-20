@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class CraftmindApplicationTests {
     @Test
     public void neuralNetworkTest() {
-        DenseLayers layers = DenseLayers.init(3,5,4);
+        DenseLayers layers = DenseLayers.init(4,8, new int[]{1,8,8,1});
         layers.printLayers("INIT NETWORK");
     }
 

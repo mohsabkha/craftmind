@@ -25,9 +25,9 @@ public interface Layer {
 
     public void generateOutput(int batchSize);
 
-    public void addOutput(double value);
+    public void addOutput(double value) throws Exception;
 
-    public void addOutput(double[] values);
+    public void addOutput(double[] values) throws Exception;
 
     public void addNeuron(Neuron neuron);
 
@@ -55,9 +55,9 @@ public interface Layer {
 
     public void generateLayer(double[][] weights, double[] biases, double[] inputs);
 
-
     public void generateLayer(double[][] weights, double[] biases, double[][] batchInputs);
 
-    public Layer addLayers(Layer a, Layer b);
+    public Layer layerAddition(Layer a, Layer b);
 
+    Layer layer(Layer a, Layer b);
 }

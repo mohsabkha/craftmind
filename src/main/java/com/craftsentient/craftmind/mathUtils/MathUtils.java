@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class MathUtils {
+
     public static Double dotProduct(Object a, Object b) {
         if (isDoubleList(a) && isDoubleList(b)) {
             ArrayList<Double> vec1 = (ArrayList<Double>) a;
@@ -224,6 +225,17 @@ public class MathUtils {
 
     public static ArrayList<Double> arrayToArrayList(double[] array){
         return Arrays.stream(array).boxed().collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    private static double exp(double value){
+        return Math.exp(value);
+    }
+    private static double[] exp(double[] values){
+        for(int i = 0; i < values.length; i++){
+            values[i] = Math.exp(values[i]);
+        }
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = exp(values[i]));
+        return values;
     }
 
     public static void print(double[][] matrix){
