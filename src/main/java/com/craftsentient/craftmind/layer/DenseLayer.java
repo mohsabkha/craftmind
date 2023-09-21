@@ -36,10 +36,10 @@ public class DenseLayer implements Layer {
         this.layerOutputs = new double[0];
         this.batchInputs = new double[0][0];
         this.batchLayerOutputs = new double[0][0];
-        this.activationFunction = DEFAULT_ACTIVATION_FUNCTIONS.RELU_ACTIVATION_FUNCTION;
+        this.activationFunction = DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION;
     }
 
-    public DenseLayer(double[][] weights) {
+    public DenseLayer(double[][] weights, DEFAULT_ACTIVATION_FUNCTIONS activationFunction) {
         this.neuronList = new ArrayList<>();
         this.neuronWeights = new double[0][0];
         this.neuronBiases = new double[0];
@@ -47,12 +47,12 @@ public class DenseLayer implements Layer {
         this.layerOutputs = new double[0];
         this.batchInputs = new double[0][0];
         this.batchLayerOutputs = new double[0][0];
-        this.activationFunction = DEFAULT_ACTIVATION_FUNCTIONS.RELU_ACTIVATION_FUNCTION;
+        this.activationFunction = activationFunction;
         this.generateLayer(weights);
         this.generateBatchedLayerOutput(weights.length);
     }
 
-    public DenseLayer(double[][] weights, double[] biases) {
+    public DenseLayer(double[][] weights, double[] biases, DEFAULT_ACTIVATION_FUNCTIONS activationFunction) {
         this.neuronList = new ArrayList<>();
         this.neuronWeights = new double[0][0];
         this.neuronBiases = new double[0];
@@ -60,12 +60,12 @@ public class DenseLayer implements Layer {
         this.layerOutputs = new double[0];
         this.batchInputs = new double[0][0];
         this.batchLayerOutputs = new double[0][0];
-        this.activationFunction = DEFAULT_ACTIVATION_FUNCTIONS.RELU_ACTIVATION_FUNCTION;
+        this.activationFunction = activationFunction;
         this.generateLayer(weights, biases);
         this.generateBatchedLayerOutput(weights.length);
     }
 
-    public DenseLayer(double[][] weights, double[][] batchInputs) {
+    public DenseLayer(double[][] weights, double[][] batchInputs, DEFAULT_ACTIVATION_FUNCTIONS activationFunction) {
         this.neuronList = new ArrayList<>();
         this.neuronWeights = new double[0][0];
         this.neuronBiases = new double[0];
@@ -73,12 +73,12 @@ public class DenseLayer implements Layer {
         this.layerOutputs = new double[0];
         this.batchInputs = new double[0][0];
         this.batchLayerOutputs = new double[0][0];
-        this.activationFunction = DEFAULT_ACTIVATION_FUNCTIONS.RELU_ACTIVATION_FUNCTION;
+        this.activationFunction = activationFunction;
         this.generateLayer(weights, batchInputs);
         this.generateBatchedLayerOutput(weights.length);
     }
 
-    public DenseLayer(double[][] weights, double[] biases, double[] inputs) {
+    public DenseLayer(double[][] weights, double[] biases, double[] inputs, DEFAULT_ACTIVATION_FUNCTIONS activationFunction) {
         this.neuronList = new ArrayList<>();
         this.neuronWeights = new double[0][0];
         this.neuronBiases = new double[0];
@@ -86,12 +86,12 @@ public class DenseLayer implements Layer {
         this.layerOutputs = new double[0];
         this.batchInputs = new double[0][0];
         this.batchLayerOutputs = new double[0][0];
-        this.activationFunction = DEFAULT_ACTIVATION_FUNCTIONS.RELU_ACTIVATION_FUNCTION;
+        this.activationFunction = activationFunction;
         this.generateLayer(weights, biases, inputs);
         this.generateBatchedLayerOutput(weights.length);
     }
 
-    public DenseLayer(double[][] weights, double[] biases, double[][] batchInputs) {
+    public DenseLayer(double[][] weights, double[] biases, double[][] batchInputs, DEFAULT_ACTIVATION_FUNCTIONS activationFunction) {
         this.neuronList = new ArrayList<>();
         this.neuronWeights = new double[0][0];
         this.neuronBiases = new double[0];
@@ -99,12 +99,12 @@ public class DenseLayer implements Layer {
         this.layerOutputs = new double[0];
         this.batchInputs = new double[0][0];
         this.batchLayerOutputs = new double[0][0];
-        this.activationFunction = DEFAULT_ACTIVATION_FUNCTIONS.RELU_ACTIVATION_FUNCTION;
+        this.activationFunction = activationFunction;
         this.generateLayer(weights, biases, batchInputs);
         this.generateBatchedLayerOutput(weights.length);
     }
 
-    public DenseLayer(int numberOfNeurons) {
+    public DenseLayer(int numberOfNeurons, DEFAULT_ACTIVATION_FUNCTIONS activationFunction) {
         this.neuronList = new ArrayList<>();
         this.neuronWeights = new double[0][0];
         this.neuronBiases = new double[0];
@@ -112,7 +112,7 @@ public class DenseLayer implements Layer {
         this.layerOutputs = new double[0];
         this.batchInputs = new double[0][0];
         this.batchLayerOutputs = new double[0][0];
-        this.activationFunction = DEFAULT_ACTIVATION_FUNCTIONS.RELU_ACTIVATION_FUNCTION;
+        this.activationFunction = activationFunction;
         this.generateLayer(numberOfNeurons);
         this.generateBatchedLayerOutput(numberOfNeurons);
     }
@@ -296,5 +296,10 @@ public class DenseLayer implements Layer {
         });
         return a;
     }
+
+    public Neuron getNeuronAt(int index) {
+        return this.getNeuronList().get(index);
+    }
+
 
 }
