@@ -162,11 +162,19 @@ public class DenseLayer implements Layer {
     }
 
     public void addOutput(double value) throws Exception {
-        this.layerOutputs = activationFunction(this.activationFunction, MathUtils.addToDoubleArray(this.layerOutputs, value));
+        this.layerOutputs = MathUtils.addToDoubleArray(this.layerOutputs,activationFunction(this.activationFunction, value));
     }
 
     public void addOutput(double[] values) throws Exception {
-        this.batchLayerOutputs = activationFunction(this.activationFunction, MathUtils.addToDoubleArray(this.batchLayerOutputs, values));
+        this.batchLayerOutputs = MathUtils.addToDoubleArray(this.batchLayerOutputs,  activationFunction(this.activationFunction, values));
+    }
+
+    public void addOutput(double value, double alpha, double beta) throws Exception {
+        this.layerOutputs = MathUtils.addToDoubleArray(this.layerOutputs,activationFunction(this.activationFunction, value, alpha, beta));
+    }
+
+    public void addOutput(double[] values, double[] alphas, double[] betas) throws Exception {
+        this.batchLayerOutputs = MathUtils.addToDoubleArray(this.batchLayerOutputs,  activationFunction(this.activationFunction, values, alphas, betas));
     }
 
     public void addNeuron(Neuron neuron) {

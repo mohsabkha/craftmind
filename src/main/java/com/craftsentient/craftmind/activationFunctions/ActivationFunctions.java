@@ -4,25 +4,18 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 
 public class ActivationFunctions {
-    public static double activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double value, double beta) throws Exception {
+    public static double activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double value) throws Exception {
         switch (activationFunction) {
-            case EXPONENTIAL_ELU_ACTIVATION_FUNCTION -> {
-                return exponentialElu(value);
-            }
+
             case GAUSSIAN_ACTIVATION_FUNCTION -> {
                 return gaussian(value);
             }
-            case LEAKY_RELU_ACTIVATION_FUNCTION -> {
-                return leakyRelu(value);
-            }
+
             case LINEAR_ACTIVATION_FUNCTION -> {
                 return linear(value);
             }
             case MISH_ACTIVATION_FUNCTION -> {
                 return mish(value);
-            }
-            case PARAMETRIC_RELU_ACTIVATION_FUNCTION -> {
-                return parametricRelu(value);
             }
             case RELU_ACTIVATION_FUNCTION -> {
                 return rectifiedLinearUnit(value);
@@ -33,35 +26,42 @@ public class ActivationFunctions {
             case SOFTPLUS_ACTIVATION_FUNCTION -> {
                 return softplus(value);
             }
-            case SWISH_ACTIVATION_FUNCTION -> {
-                return swish(value, beta);
-            }
+
             case TANH_ACTIVATION_FUNCTION -> {
                 return tanh(value);
             }
             default -> throw new Exception("Incorrect Activation Function Name Entered: " + activationFunction.name());
         }
     }
-
-    public static double[] activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double[] values, double[] betas) throws Exception {
+    public static double activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double value, double alpha, double beta) throws Exception {
         switch (activationFunction) {
-            case EXPONENTIAL_ELU_ACTIVATION_FUNCTION -> {
-                return exponentialElu(values);
+            case SWISH_ACTIVATION_FUNCTION -> {
+                return swish(value, beta);
             }
-            case GAUSSIAN_ACTIVATION_FUNCTION -> {
-                return gaussian(values);
+            case EXPONENTIAL_ELU_ACTIVATION_FUNCTION -> {
+                return exponentialElu(value, alpha, beta);
             }
             case LEAKY_RELU_ACTIVATION_FUNCTION -> {
-                return leakyRelu(values);
+                return leakyRelu(value, alpha);
+            }
+            case PARAMETRIC_RELU_ACTIVATION_FUNCTION -> {
+                return parametricRelu(value,alpha);
+            }
+            default -> throw new Exception("Incorrect Activation Function Name Entered: " + activationFunction.name());
+        }
+    }
+
+    public static double[] activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double[] values) throws Exception {
+        switch (activationFunction) {
+
+            case GAUSSIAN_ACTIVATION_FUNCTION -> {
+                return gaussian(values);
             }
             case LINEAR_ACTIVATION_FUNCTION -> {
                 return linear(values);
             }
             case MISH_ACTIVATION_FUNCTION -> {
                 return mish(values);
-            }
-            case PARAMETRIC_RELU_ACTIVATION_FUNCTION -> {
-                return parametricRelu(values);
             }
             case RELU_ACTIVATION_FUNCTION -> {
                 return rectifiedLinearUnit(values);
@@ -75,36 +75,37 @@ public class ActivationFunctions {
             case SOFTPLUS_ACTIVATION_FUNCTION -> {
                 return softplus(values);
             }
-            case SWISH_ACTIVATION_FUNCTION -> {
-                return swish(values, betas);
-            }
             case TANH_ACTIVATION_FUNCTION -> {
                 return tanh(values);
             }
             default -> throw new Exception("Incorrect Activation Function Name Entered: " + activationFunction.name());
-
+        }
+    }
+    public static double[] activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double values[], double alphas[], double betas[]) throws Exception {
+        switch (activationFunction) {
+            case SWISH_ACTIVATION_FUNCTION -> {
+                return swish(values, betas);
+            }
+            case EXPONENTIAL_ELU_ACTIVATION_FUNCTION -> {
+                return exponentialElu(values, alphas, betas);
+            }
+            case PARAMETRIC_RELU_ACTIVATION_FUNCTION -> {
+                return parametricRelu(values,alphas);
+            }
+            default -> throw new Exception("Incorrect Activation Function Name Entered: " + activationFunction.name());
         }
     }
 
-    public static double[][] activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double[][] values, double[][] betas) throws Exception {
+    public static double[][] activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double[][] values) throws Exception {
         switch (activationFunction) {
-            case EXPONENTIAL_ELU_ACTIVATION_FUNCTION -> {
-                return exponentialElu(values);
-            }
             case GAUSSIAN_ACTIVATION_FUNCTION -> {
                 return gaussian(values);
-            }
-            case LEAKY_RELU_ACTIVATION_FUNCTION -> {
-                return leakyRelu(values);
             }
             case LINEAR_ACTIVATION_FUNCTION -> {
                 return linear(values);
             }
             case MISH_ACTIVATION_FUNCTION -> {
                 return mish(values);
-            }
-            case PARAMETRIC_RELU_ACTIVATION_FUNCTION -> {
-                return parametricRelu(values);
             }
             case RELU_ACTIVATION_FUNCTION -> {
                 return rectifiedLinearUnit(values);
@@ -118,25 +119,47 @@ public class ActivationFunctions {
             case SOFTPLUS_ACTIVATION_FUNCTION -> {
                 return softplus(values);
             }
-            case SWISH_ACTIVATION_FUNCTION -> {
-                return swish(values, betas);
-            }
             case TANH_ACTIVATION_FUNCTION -> {
                 return tanh(values);
             }
             default -> throw new Exception("Incorrect Activation Function Name Entered: " + activationFunction.name());
-
         }
     }
+    public static double[][] activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double values[][], double alphas[][], double betas[][]) throws Exception {
+        switch (activationFunction) {
+            case SWISH_ACTIVATION_FUNCTION -> {
+                return swish(values, betas);
+            }
+            case EXPONENTIAL_ELU_ACTIVATION_FUNCTION -> {
+                return exponentialElu(values, alphas, betas);
+            }
+            case PARAMETRIC_RELU_ACTIVATION_FUNCTION -> {
+                return parametricRelu(values,alphas);
+            }
+            default -> throw new Exception("Incorrect Activation Function Name Entered: " + activationFunction.name());
+        }
+    }
+
+
 
     // EXPONENTIAL_ELU
-    private static double exponentialElu(double value){
-        return value;
+    private static double exponentialElu(double value,double alpha, double beta){
+        if (value < 0) {
+            return alpha * (Math.exp(value) - 1);
+        } else {
+            return beta * Math.exp(value);
+        }
     }
-    private static double[] exponentialElu(double[] values){
+    private static double[] exponentialElu(double values[],double alphas[], double betas[]){
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> {
+            values[i] = exponentialElu(values[i], alphas[i], betas[i]);
+        });
         return values;
     }
-    private static double[][] exponentialElu(double[][] values){
+    private static double[][] exponentialElu(double values[][],double alphas[][], double betas[][]){
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> {
+            values[i] = exponentialElu(values[i], alphas[i], betas[i]);
+        });
         return values;
     }
 
@@ -158,15 +181,20 @@ public class ActivationFunctions {
         return values;
     }
 
-
     // LEAKY_RELU
-    private static double leakyRelu(double value){
-        return value;
+    private static double leakyRelu(double value, double alpha){
+        if (value > 0) {
+            return value;
+        } else {
+            return alpha * value;
+        }
     }
-    private static double[] leakyRelu(double[] values){
+    private static double[] leakyRelu(double[] values, double alpha){
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = leakyRelu(values[i], alpha));
         return values;
     }
-    private static double[][] leakyRelu(double[][] values){
+    private static double[][] leakyRelu(double[][] values, double alpha){
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = leakyRelu(values[i], alpha));
         return values;
     }
 
@@ -185,24 +213,32 @@ public class ActivationFunctions {
 
     // MISH_ACTIVATION
     private static double mish(double value){
-        return value;
+        return value * Math.tanh(Math.log1p(Math.exp(value)));
     }
     private static double[] mish(double[] values){
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = mish(values[i]));
         return values;
     }
     private static double[][] mish(double[][] values){
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = mish(values[i]));
         return values;
     }
 
 
     // PARAMETRIC_RELU
-    private static double parametricRelu(double value){
-        return value;
+    private static double parametricRelu(double value, double alpha){
+        if (value > 0) {
+            return value;
+        } else {
+            return alpha * value;
+        }
     }
-    private static double[] parametricRelu(double[] values){
+    private static double[] parametricRelu(double[] values, double[] alphas){
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = parametricRelu(values[i], alphas[i]));
         return values;
     }
-    private static double[][] parametricRelu(double[][] values){
+    private static double[][] parametricRelu(double[][] values, double[][] alphas){
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = parametricRelu(values[i], alphas[i]));
         return values;
     }
 
@@ -235,6 +271,7 @@ public class ActivationFunctions {
         return values;
     }
 
+
     private static double[] softmax(double[] values){
         double sum = 0.0;
         for (double value : values) { sum += Math.exp(value); }
@@ -249,12 +286,14 @@ public class ActivationFunctions {
 
     // SOFTPLUS
     private static double softplus(double value){
-        return value;
+        return Math.log1p(Math.exp(value));
     }
     private static double[] softplus(double[] values){
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = softplus(values[i]));
         return values;
     }
     private static double[][] softplus(double[][] values){
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = softplus(values[i]));
         return values;
     }
 
@@ -263,11 +302,12 @@ public class ActivationFunctions {
     private static double swish(double value, double beta){
         return value * sigmoid(value);
     }
-    private static double[] swish(double[] values, double[] beta){
-        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = values[i]*sigmoid(values[i]));
+    private static double[] swish(double[] values, double[] beta) {
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = beta[i] * sigmoid(values[i]));
         return values;
     }
     private static double[][] swish(double[][] values, double[][] beta){
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = swish(values[i], beta[i]));
         return values;
     }
 
