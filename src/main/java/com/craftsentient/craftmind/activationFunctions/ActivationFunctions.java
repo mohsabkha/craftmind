@@ -1,9 +1,10 @@
 package com.craftsentient.craftmind.activationFunctions;
 
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
 public class ActivationFunctions {
-    public static double activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double value) throws Exception {
+    public static double activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double value, double beta) throws Exception {
         switch (activationFunction) {
             case EXPONENTIAL_ELU_ACTIVATION_FUNCTION -> {
                 return exponentialElu(value);
@@ -29,14 +30,11 @@ public class ActivationFunctions {
             case SIGMOID_ACTIVATION_FUNCTION -> {
                 return sigmoid(value);
             }
-            case SOFTMAX_ACTIVATION_FUNCTION -> {
-                return softmax(value);
-            }
             case SOFTPLUS_ACTIVATION_FUNCTION -> {
                 return softplus(value);
             }
             case SWISH_ACTIVATION_FUNCTION -> {
-                return swish(value);
+                return swish(value, beta);
             }
             case TANH_ACTIVATION_FUNCTION -> {
                 return tanh(value);
@@ -45,7 +43,7 @@ public class ActivationFunctions {
         }
     }
 
-    public static double[] activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double[] values) throws Exception {
+    public static double[] activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double[] values, double[] betas) throws Exception {
         switch (activationFunction) {
             case EXPONENTIAL_ELU_ACTIVATION_FUNCTION -> {
                 return exponentialElu(values);
@@ -78,7 +76,7 @@ public class ActivationFunctions {
                 return softplus(values);
             }
             case SWISH_ACTIVATION_FUNCTION -> {
-                return swish(values);
+                return swish(values, betas);
             }
             case TANH_ACTIVATION_FUNCTION -> {
                 return tanh(values);
@@ -88,7 +86,7 @@ public class ActivationFunctions {
         }
     }
 
-    public static double[][] activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double[][] values) throws Exception {
+    public static double[][] activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double[][] values, double[][] betas) throws Exception {
         switch (activationFunction) {
             case EXPONENTIAL_ELU_ACTIVATION_FUNCTION -> {
                 return exponentialElu(values);
@@ -121,7 +119,7 @@ public class ActivationFunctions {
                 return softplus(values);
             }
             case SWISH_ACTIVATION_FUNCTION -> {
-                return swish(values);
+                return swish(values, betas);
             }
             case TANH_ACTIVATION_FUNCTION -> {
                 return tanh(values);
@@ -145,12 +143,18 @@ public class ActivationFunctions {
 
     // GAUSSIAN_ACTIVATION
     private static double gaussian(double value){
-        return value;
+        return Math.exp(-(value*value));
     }
     private static double[] gaussian(double[] values){
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> {
+            values[i] = gaussian(values[i]);
+        });
         return values;
     }
     private static double[][] gaussian(double[][] values){
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> {
+            values[i] = gaussian(values[i]);
+        });
         return values;
     }
 
@@ -220,25 +224,26 @@ public class ActivationFunctions {
 
     // SIGMOID_ACTIVATION
     private static double sigmoid(double value){
-        return  value;
+        return 1.0 / (1.0 + Math.exp(-value));
     }
     private static double[]sigmoid(double[] values){
-        return  values;
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = sigmoid(values[i]));
+        return values;
     }
     private static double[][] sigmoid(double[][] values){
-        return  values;
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = sigmoid(values[i]));
+        return values;
     }
 
-
-    // SOFTMAX
-    private static double softmax(double value){
-        return  value;
-    }
     private static double[] softmax(double[] values){
-        return  values;
+        double sum = 0.0;
+        for (double value : values) { sum += Math.exp(value); }
+        for (int i = 0; i < values.length; i++) { values[i] = Math.exp(values[i]) / sum; }
+        return values;
     }
     private static double[][] softmax(double[][] values){
-        return  values;
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = softmax(values[i]));
+        return values;
     }
 
 
@@ -255,25 +260,30 @@ public class ActivationFunctions {
 
 
     // SWISH
-    private static double swish(double value){
-        return value;
+    private static double swish(double value, double beta){
+        return value * sigmoid(value);
     }
-    private static double[] swish(double[] values){
+    private static double[] swish(double[] values, double[] beta){
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = values[i]*sigmoid(values[i]));
         return values;
     }
-    private static double[][] swish(double[][] values){
+    private static double[][] swish(double[][] values, double[][] beta){
         return values;
     }
 
 
     // TANH
     private static double tanh(double value){
-        return value;
+        return (2/(1 + Math.exp(-(2*value)))) - 1;
     }
     private static double[] tanh(double[] values){
+        IntStream.range(0, values.length).parallel().forEachOrdered(i ->
+                values[i] = tanh(values[i]));
         return values;
     }
     private static double[][] tanh(double[][] values){
+        IntStream.range(0, values.length).parallel().forEachOrdered(i ->
+                values[i] = tanh(values[i]));
         return values;
     }
 }
