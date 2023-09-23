@@ -1,6 +1,6 @@
 package com.craftsentient.craftmind;
 
-import com.craftsentient.craftmind.activationFunctions.DEFAULT_ACTIVATION_FUNCTIONS;
+import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATION_FUNCTIONS;
 import com.craftsentient.craftmind.layers.DenseLayers;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

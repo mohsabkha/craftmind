@@ -1,13 +1,12 @@
 package com.craftsentient.craftmind.layers;
 
-import com.craftsentient.craftmind.activationFunctions.DEFAULT_ACTIVATION_FUNCTIONS;
+import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATION_FUNCTIONS;
 import com.craftsentient.craftmind.layer.DenseLayer;
 import com.craftsentient.craftmind.mathUtils.MathUtils;
 import com.craftsentient.craftmind.neuron.Neuron;
 import lombok.Getter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;

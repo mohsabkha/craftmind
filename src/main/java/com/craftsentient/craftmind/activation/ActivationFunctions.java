@@ -1,4 +1,4 @@
-package com.craftsentient.craftmind.activationFunctions;
+package com.craftsentient.craftmind.activation;
 
 import java.util.Arrays;
 import java.util.stream.IntStream;
@@ -274,6 +274,7 @@ public class ActivationFunctions {
 
     private static double[] softmax(double[] values){
         double sum = 0.0;
+        double sum2 = 0.0;
         for (double value : values) { sum += Math.exp(value); }
         for (int i = 0; i < values.length; i++) { values[i] = Math.exp(values[i]) / sum; }
         return values;

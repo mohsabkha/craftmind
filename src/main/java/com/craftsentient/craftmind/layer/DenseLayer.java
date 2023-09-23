@@ -1,6 +1,6 @@
 package com.craftsentient.craftmind.layer;
 
-import com.craftsentient.craftmind.activationFunctions.DEFAULT_ACTIVATION_FUNCTIONS;
+import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATION_FUNCTIONS;
 import com.craftsentient.craftmind.mathUtils.MathUtils;
 import com.craftsentient.craftmind.neuron.Neuron;
 import lombok.AllArgsConstructor;
@@ -11,7 +11,7 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.stream.IntStream;
 
-import static com.craftsentient.craftmind.activationFunctions.ActivationFunctions.activationFunction;
+import static com.craftsentient.craftmind.activation.ActivationFunctions.activationFunction;
 
 @Builder
 @Getter
@@ -117,7 +117,7 @@ public class DenseLayer implements Layer {
         this.generateBatchedLayerOutput(numberOfNeurons);
     }
 
-    public Object generateLayerOutput() {
+    public Object generateLayerOutput() throws Exception {
         if (this.inputs.length == 0) {
             return generateBatchedLayerOutput(this.batchInputs.length);
         }
@@ -138,7 +138,7 @@ public class DenseLayer implements Layer {
         return this.batchLayerOutputs;
     }
 
-    public double[] generateNonBatchedLayerOutput(double[] inputs) {
+    public double[] generateNonBatchedLayerOutput(double[] inputs) throws Exception {
         this.layerOutputs = new double[0];
         IntStream.range(0, this.neuronBiases.length).forEach(i -> {
             try {
@@ -147,13 +147,14 @@ public class DenseLayer implements Layer {
                 throw new RuntimeException(e);
             }
         });
+        this.layerOutputs = activationFunction(this.activationFunction, this.layerOutputs);
         return this.layerOutputs;
     }
 
     public void generateOutput(int batchSize) {
         IntStream.range(0, batchSize).forEach(i -> {
-            this.generateNonBatchedLayerOutput(this.batchInputs[i]);
             try {
+                this.generateNonBatchedLayerOutput(this.batchInputs[i]);
                 this.addOutput(this.layerOutputs);
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -162,15 +163,15 @@ public class DenseLayer implements Layer {
     }
 
     public void addOutput(double value) throws Exception {
-        this.layerOutputs = MathUtils.addToDoubleArray(this.layerOutputs,activationFunction(this.activationFunction, value));
+        this.layerOutputs = MathUtils.addToDoubleArray(this.layerOutputs, value);
     }
 
     public void addOutput(double[] values) throws Exception {
-        this.batchLayerOutputs = MathUtils.addToDoubleArray(this.batchLayerOutputs,  activationFunction(this.activationFunction, values));
+        this.batchLayerOutputs = MathUtils.addToDoubleArray(this.batchLayerOutputs, values);
     }
 
     public void addOutput(double value, double alpha, double beta) throws Exception {
-        this.layerOutputs = MathUtils.addToDoubleArray(this.layerOutputs,activationFunction(this.activationFunction, value, alpha, beta));
+        this.layerOutputs = MathUtils.addToDoubleArray(this.layerOutputs, value);
     }
 
     public void addOutput(double[] values, double[] alphas, double[] betas) throws Exception {
@@ -223,11 +224,11 @@ public class DenseLayer implements Layer {
     }
 
     @Override
-    public void useOutputFromPreviousLayerAsInput(Layer layer) {
+    public void useOutputFromPreviousLayerAsInput(Layer layer) throws Exception {
         useOutputFromPreviousLayerAsInput((DenseLayer) layer);
     }
 
-    public void useOutputFromPreviousLayerAsInput(DenseLayer layer) {
+    public void useOutputFromPreviousLayerAsInput(DenseLayer layer) throws Exception {
         this.isHiddenLayer = true;
         if (inputs.length != 0) this.inputs = (double[]) layer.generateLayerOutput();
         else this.batchInputs = layer.getBatchLayerOutputs();

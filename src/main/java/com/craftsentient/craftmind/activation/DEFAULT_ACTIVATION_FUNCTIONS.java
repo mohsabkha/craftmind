@@ -1,4 +1,4 @@
-package com.craftsentient.craftmind.activationFunctions;
+package com.craftsentient.craftmind.activation;
 
 public enum DEFAULT_ACTIVATION_FUNCTIONS {
     EXPONENTIAL_ELU_ACTIVATION_FUNCTION,
