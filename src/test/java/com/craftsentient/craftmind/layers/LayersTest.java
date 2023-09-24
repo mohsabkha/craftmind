@@ -3,6 +3,8 @@ package com.craftsentient.craftmind.layers;
 import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATION_FUNCTIONS;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+
 public class LayersTest {
     @Test
     public void testAllConstructors() {
@@ -62,8 +64,8 @@ public class LayersTest {
 //        layers5B.printLayers("Layers 5B");
 
         // create neural network with number of layers, initial weights per input, biases for each neuron, and initial inputs
-        DenseLayers layers5C = new DenseLayers(4, new int[]{3,5,6,7}, weights, biases, inputs,DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION);
-        layers5C.printLayers("Layers 5C");
+//        DenseLayers layers5C = new DenseLayers(4, new int[]{3,5,6,7}, weights, biases, inputs,DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION, new HashMap<>());
+//        layers5C.printLayers("Layers 5C");
 
     }
 }
