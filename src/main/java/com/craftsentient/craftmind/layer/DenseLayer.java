@@ -1,19 +1,16 @@
 package com.craftsentient.craftmind.layer;
 
+import com.craftsentient.craftmind.activation.ActivationFunctions;
 import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATION_FUNCTIONS;
 import com.craftsentient.craftmind.mathUtils.MathUtils;
 import com.craftsentient.craftmind.neuron.Neuron;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.stream.IntStream;
 
 import static com.craftsentient.craftmind.activation.ActivationFunctions.activationFunction;
 
-@Builder
 @Getter
 @AllArgsConstructor
 public class DenseLayer implements Layer {
@@ -22,7 +19,9 @@ public class DenseLayer implements Layer {
     private double[] neuronBiases;
     private double[] inputs;
     private double[][] batchInputs;
+    @Setter
     private double[] layerOutputs;
+    @Setter
     private double[][] batchLayerOutputs;
     private boolean isHiddenLayer = true;
     @Setter
@@ -309,6 +308,5 @@ public class DenseLayer implements Layer {
     public Neuron getNeuronAt(int index) {
         return this.getNeuronList().get(index);
     }
-
 
 }
