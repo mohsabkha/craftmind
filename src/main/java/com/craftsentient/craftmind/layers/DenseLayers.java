@@ -16,31 +16,15 @@ import java.util.stream.IntStream;
 
 @Getter
 public class DenseLayers {
-    private ArrayList<DenseLayer> layerList;
-    private double[][] initialInput;
+    private final ArrayList<DenseLayer> layerList;
+    private final double[][] initialInput;
     public static final Random random = new Random(0);
-
-    private static DenseLayers init(int numberOfLayers, int numberOfInputs, int numberOfNeurons, DEFAULT_ACTIVATION_FUNCTIONS activationFunction){
-        double[][] initialInput = randn(1, numberOfInputs);
-        double[][] initialWeights= randn(numberOfNeurons, numberOfInputs);
-        double[] initialBiases = new double[numberOfNeurons];
-        IntStream.range(0, numberOfNeurons).parallel().forEachOrdered(i -> initialBiases[i] = 0);
-        return new DenseLayers(numberOfLayers, numberOfNeurons, initialWeights, initialBiases, initialInput, activationFunction, new HashMap<>());
-    }
-
-    private static DenseLayers init(int numberOfLayers, int numberOfInputs, int[] numberOfNeuronsPerLayer, DEFAULT_ACTIVATION_FUNCTIONS activationFunction){
-        double[][] initialInput = randn(1, numberOfInputs);
-        double[][] initialWeights= randn(numberOfNeuronsPerLayer[0], numberOfInputs);
-        double[] initialBiases = new double[numberOfNeuronsPerLayer[0]];
-        IntStream.range(0, numberOfNeuronsPerLayer[0]).parallel().forEachOrdered(i -> initialBiases[i] = 0);
-        return new DenseLayers(numberOfLayers, numberOfNeuronsPerLayer, initialWeights, initialBiases, initialInput, activationFunction, new HashMap<>());
-    }
 
     private DenseLayers(int layers, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         this.layerList = new ArrayList<>();
         this.initialInput = randn(layers,layers);
         IntStream.range(0, layers).forEach(i -> {
-                DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.containsKey(i) ? activationFunctionsMap.get(i) : activationFunction;
+                DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
                 double[][] weights = randn(layers, layers);
                 if(i != 0) layerList.add(new DenseLayer(weights, layerList.get(i-1).getBatchLayerOutputs(), activationFunctionToUse));
                 else layerList.add(new DenseLayer(weights, initialInput, activationFunctionToUse));
@@ -51,7 +35,7 @@ public class DenseLayers {
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
         IntStream.range(0, layers).forEach(i -> {
-            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.containsKey(i) ? activationFunctionsMap.get(i) : activationFunction;
+            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             double[][] weights = randn(initialInput.length, initialInput[0].length);
             if(i != 0) layerList.add(new DenseLayer(weights, layerList.get(i-1).getBatchLayerOutputs(), activationFunctionToUse));
             else layerList.add(new DenseLayer(weights, initialInput, activationFunctionToUse));
@@ -62,7 +46,7 @@ public class DenseLayers {
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
         IntStream.range(0, layers).forEach(i -> {
-            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.containsKey(i) ? activationFunctionsMap.get(i) : activationFunction;
+            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             if(i != 0) {
                 double[][] weights = randn(initialWeights.length, initialInput[0].length);
                 layerList.add(new DenseLayer(weights, layerList.get(i - 1).getBatchLayerOutputs(), activationFunctionToUse));
@@ -76,11 +60,10 @@ public class DenseLayers {
         this.layerList = new ArrayList<>();
         this.initialInput = initialInput;
         IntStream.range(0, layers).forEach(i -> {
-            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.containsKey(i) ? activationFunctionsMap.get(i) : activationFunction;
+            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             if(i != 0) {
                 double[][] weights = randn(initialWeights.length, initialInput[0].length);
                 layerList.add(new DenseLayer(weights, layerList.get(i - 1).getBatchLayerOutputs(), activationFunctionToUse));
-                System.out.println("");
             } else {
                 layerList.add(new DenseLayer(initialWeights, biases, initialInput, activationFunctionToUse));
             }
@@ -92,7 +75,7 @@ public class DenseLayers {
         this.initialInput = randn(1,numberOfNeurons);
 
         IntStream.range(0, layers).forEach(i -> {
-            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.containsKey(i) ? activationFunctionsMap.get(i) : activationFunction;
+            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             double[][] weights = randn(numberOfNeurons, numberOfNeurons);
             if(i != 0) layerList.add(new DenseLayer(weights, layerList.get(i-1).getBatchLayerOutputs(), activationFunctionToUse));
             else layerList.add(new DenseLayer(weights, initialInput, activationFunctionToUse));
@@ -106,7 +89,7 @@ public class DenseLayers {
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
         IntStream.range(0, layers).forEach(i -> {
-            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.containsKey(i) ? activationFunctionsMap.get(i) : activationFunction;
+            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             double[][] weights = randn(numberOfNeurons, initialInput[0].length);
             if(i != 0) layerList.add(new DenseLayer(weights, layerList.get(i-1).getBatchLayerOutputs(), activationFunctionToUse));
             else layerList.add(new DenseLayer(weights, initialInput, activationFunctionToUse));
@@ -117,7 +100,7 @@ public class DenseLayers {
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
         IntStream.range(0, layers).forEach(i -> {
-            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.containsKey(i) ? activationFunctionsMap.get(i) : activationFunction;
+            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             if(i != 0) {
                 double[][] weights = randn(numberOfNeurons, numberOfNeurons);
                 layerList.add(new DenseLayer(weights, layerList.get(i - 1).getBatchLayerOutputs(), activationFunctionToUse));
@@ -131,11 +114,10 @@ public class DenseLayers {
         this.layerList = new ArrayList<>();
         this.initialInput = initialInput;
         IntStream.range(0, layers).forEach(i -> {
-            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.containsKey(i) ? activationFunctionsMap.get(i) : activationFunction;
+            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             if(i != 0) {
                 double[][] weights = randn(numberOfNeurons, numberOfNeurons);
                 layerList.add(new DenseLayer(weights, layerList.get(i - 1).getBatchLayerOutputs(), activationFunctionToUse));
-                System.out.println("");
             } else {
                 layerList.add(new DenseLayer(initialWeights, biases, initialInput, activationFunctionToUse));
             }
@@ -150,7 +132,7 @@ public class DenseLayers {
         this.layerList = new ArrayList<>();
         this.initialInput = randn(numberOfNeuronsPerLayer[0], numberOfNeuronsPerLayer[0]);
         IntStream.range(0, layers).forEach(i -> {
-            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.containsKey(i) ? activationFunctionsMap.get(i) : activationFunction;
+            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             double[][] weights;
             if(i != 0) {
                 weights = randn(numberOfNeuronsPerLayer[i], numberOfNeuronsPerLayer[i-1]);
@@ -167,7 +149,7 @@ public class DenseLayers {
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
         IntStream.range(0, layers).forEach(i -> {
-            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.containsKey(i) ? activationFunctionsMap.get(i) : activationFunction;
+            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             double[][] weights;
             if(i != 0) {
                 weights = randn(numberOfNeuronsPerLayer[i], numberOfNeuronsPerLayer[i-1]);
@@ -184,7 +166,7 @@ public class DenseLayers {
         this.layerList = new ArrayList<>();
         this.initialInput = initialInput;
         IntStream.range(0, layers).forEach(i -> {
-            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.containsKey(i) ? activationFunctionsMap.get(i) : activationFunction;
+            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             if(i != 0) {
                 double[][] weights = randn(numberOfNeuronsPerLayer[i], numberOfNeuronsPerLayer[i-1]);
                 layerList.add(new DenseLayer(weights, layerList.get(i - 1).getBatchLayerOutputs(), activationFunctionToUse));
@@ -198,7 +180,7 @@ public class DenseLayers {
         this.layerList = new ArrayList<>();
         this.initialInput = initialInput;
         IntStream.range(0, layers).forEach(i -> {
-            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.containsKey(i) ? activationFunctionsMap.get(i) : activationFunction;
+            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             if(i != 0) {
                 double[][] weights = randn(numberOfNeuronsPerLayer[i], numberOfNeuronsPerLayer[i-1]);
                 layerList.add(new DenseLayer(weights, layerList.get(i - 1).getBatchLayerOutputs(), activationFunctionToUse));
@@ -218,10 +200,10 @@ public class DenseLayers {
     }
 
     public static double[][] randn(int rows, int cols) {
-        return getDoubles(rows, cols, random);
+        return getDoubles(rows, cols);
     }
 
-    static double[][] getDoubles(int rows, int cols, Random random) {
+    static double[][] getDoubles(int rows, int cols) {
         double[][] output = new double[rows][cols];
         for (int i = 0; i < output.length; i++) {
             for (int j = 0; j < output[0].length; j++) {
@@ -249,7 +231,7 @@ public class DenseLayers {
         private boolean isUsingListOfLayers = true;
 
         private DEFAULT_ACTIVATION_FUNCTIONS activationFunction = DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION;
-        private Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap = new HashMap<>();
+        private final Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap = new HashMap<>();
 
 
         private boolean hasSetSpecificLayerActivationFunctions = false;
@@ -271,11 +253,12 @@ public class DenseLayers {
         private boolean isUsingSpecificNeurons = false;
         private int numberOfNeurons;
         private boolean isUsingNumberOfNeurons = false;
+        private Random random;
 
-//        public DenseLayersBuilder withRandom(Random random){
-//            this.random = random;
-//            return this;
-//        }
+        public DenseLayersBuilder withRandomSeed(long randomSeed){
+            this.random = new Random(randomSeed);
+            return this;
+        }
 
         public DenseLayersBuilder withLayerList(ArrayList<DenseLayer> layerList){
             this.isUsingListOfLayers = true;
