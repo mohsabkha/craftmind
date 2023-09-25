@@ -183,46 +183,43 @@ public class ActivationFunctions {
 
 
     //BENT IDENTITY
-    private static double bentIdentity(double value){
+    private static double bentIdentity(double value) {
         return (Math.sqrt(value * value + 1) - 1) / 2 + value;
     }
-    private static double[] bentIdentity(double[] values){
+    private static double[] bentIdentity(double[] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = bentIdentity(values[i]));
         return values;
     }
-    private static double[][] bentIdentity(double[][] values){
+    private static double[][] bentIdentity(double[][] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = bentIdentity(values[i]));
         return values;
     }
 
 
     // EXPONENTIAL_ELU
-    private static double exponentialElu(double value,double alpha, double beta){
-        if (value < 0) {
-            return alpha * (Math.exp(value) - 1);
-        } else {
-            return beta * Math.exp(value);
-        }
+    private static double exponentialElu(double value,double alpha, double beta) {
+        if (value < 0) return alpha * (Math.exp(value) - 1);
+        else return beta * Math.exp(value);
     }
-    private static double[] exponentialElu(double values[],double alphas[], double betas[]){
+    private static double[] exponentialElu(double values[],double alphas[], double betas[]) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = exponentialElu(values[i], alphas[i], betas[i]));
         return values;
     }
-    private static double[][] exponentialElu(double values[][],double alphas[][], double betas[][]){
+    private static double[][] exponentialElu(double values[][],double alphas[][], double betas[][]) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = exponentialElu(values[i], alphas[i], betas[i]));
         return values;
     }
 
 
     // GAUSSIAN_ACTIVATION
-    private static double gaussian(double value){
+    private static double gaussian(double value) {
         return Math.exp(-(value*value));
     }
-    private static double[] gaussian(double[] values){
+    private static double[] gaussian(double[] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = gaussian(values[i]));
         return values;
     }
-    private static double[][] gaussian(double[][] values){
+    private static double[][] gaussian(double[][] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = gaussian(values[i]));
         return values;
     }
@@ -234,160 +231,154 @@ public class ActivationFunctions {
         else if (value > 2.5) return 1.0;
         else return 0.2 * value + 0.5;
     }
-    private static double[] hardSigmoid(double[] values){
+    private static double[] hardSigmoid(double[] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = hardSigmoid(values[i]));
         return values;
     }
-    private static double[][] hardSigmoid(double[][] values){
+    private static double[][] hardSigmoid(double[][] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = hardSigmoid(values[i]));
         return values;
     }
 
 
     // LEAKY_RELU
-    private static double leakyRelu(double value, double alpha){
-        if (value > 0) {
-            return value;
-        } else {
-            return alpha * value;
-        }
+    private static double leakyRelu(double value, double alpha) {
+        if (value > 0) return value;
+        else return alpha * value;
     }
-    private static double[] leakyRelu(double[] values, double alpha){
+    private static double[] leakyRelu(double[] values, double alpha) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = leakyRelu(values[i], alpha));
         return values;
     }
-    private static double[][] leakyRelu(double[][] values, double alpha){
+    private static double[][] leakyRelu(double[][] values, double alpha) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = leakyRelu(values[i], alpha));
         return values;
     }
 
 
     // LINEAR_ACTIVATION
-    private static double linear(double value){
+    private static double linear(double value) {
         return value;
     }
-    private static double[] linear(double[] values){
+    private static double[] linear(double[] values) {
         return values;
     }
-    private static double[][] linear(double[][] values){
+    private static double[][] linear(double[][] values) {
         return values;
     }
 
 
     // MISH_ACTIVATION
-    private static double mish(double value){
+    private static double mish(double value) {
         return value * Math.tanh(Math.log1p(Math.exp(value)));
     }
-    private static double[] mish(double[] values){
+    private static double[] mish(double[] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = mish(values[i]));
         return values;
     }
-    private static double[][] mish(double[][] values){
+    private static double[][] mish(double[][] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = mish(values[i]));
         return values;
     }
 
 
     // PARAMETRIC_RELU
-    private static double parametricRelu(double value, double alpha){
-        if (value > 0) {
-            return value;
-        } else {
-            return alpha * value;
-        }
+    private static double parametricRelu(double value, double alpha) {
+        if (value > 0) return value;
+        else return alpha * value;
     }
-    private static double[] parametricRelu(double[] values, double[] alphas){
+    private static double[] parametricRelu(double[] values, double[] alphas) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = parametricRelu(values[i], alphas[i]));
         return values;
     }
-    private static double[][] parametricRelu(double[][] values, double[][] alphas){
+    private static double[][] parametricRelu(double[][] values, double[][] alphas) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = parametricRelu(values[i], alphas[i]));
         return values;
     }
 
 
     // RELU_ACTIVATION
-    private static double rectifiedLinearUnit(double value){
+    private static double rectifiedLinearUnit(double value) {
         return Math.max(0, value);
     }
-    private static double[] rectifiedLinearUnit(double[] values){
+    private static double[] rectifiedLinearUnit(double[] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = rectifiedLinearUnit(values[i]));
         return values;
     }
-    private static double[][] rectifiedLinearUnit(double[][] values){
+    private static double[][] rectifiedLinearUnit(double[][] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = rectifiedLinearUnit(values[i]));
         return values;
     }
 
 
     // RELU6
-    private static double rectifiedLinearUnit6(double value){
+    private static double rectifiedLinearUnit6(double value) {
         return Math.min(Math.max(0, value), 6);
     }
-    private static double[] rectifiedLinearUnit6(double[] values){
+    private static double[] rectifiedLinearUnit6(double[] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = rectifiedLinearUnit6(values[i]));
         return values;
     }
-    private static double[][] rectifiedLinearUnit6(double[][] values){
+    private static double[][] rectifiedLinearUnit6(double[][] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = rectifiedLinearUnit6(values[i]));
         return values;
     }
 
 
     // SELU
-    private static double scaledExponentialLinear(double value){
+    private static double scaledExponentialLinear(double value) {
         double LAMBDA = 1.0507;
         double ALPHA = 1.67326;
         if (value > 0) return LAMBDA * value;
         else return LAMBDA * (ALPHA * (Math.exp(value) - 1));
     }
-    private static double[] scaledExponentialLinear(double[] values){
+    private static double[] scaledExponentialLinear(double[] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = scaledExponentialLinear(values[i]));
         return values;
     }
-    private static double[][] scaledExponentialLinear(double[][] values){
+    private static double[][] scaledExponentialLinear(double[][] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = scaledExponentialLinear(values[i]));
         return values;
     }
 
 
     // SIGMOID_ACTIVATION
-    private static double sigmoid(double value){
+    private static double sigmoid(double value) {
         return 1.0 / (1.0 + Math.exp(-value));
     }
-    private static double[] sigmoid(double[] values){
+    private static double[] sigmoid(double[] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = sigmoid(values[i]));
         return values;
     }
-    private static double[][] sigmoid(double[][] values){
+    private static double[][] sigmoid(double[][] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = sigmoid(values[i]));
         return values;
     }
 
 
     // SOFTMAX
-    private static double[] softmax(double[] values){
+    private static double[] softmax(double[] values) {
         double sum = 0.0;
         double sum2 = 0.0;
         for (double value : values) { sum += Math.exp(value); }
         for (int i = 0; i < values.length; i++) { values[i] = Math.exp(values[i]) / sum; }
         return values;
     }
-    private static double[][] softmax(double[][] values){
+    private static double[][] softmax(double[][] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = softmax(values[i]));
         return values;
     }
 
 
     // SOFTPLUS
-    private static double softplus(double value){
+    private static double softplus(double value) {
         return Math.log1p(Math.exp(value));
     }
-    private static double[] softplus(double[] values){
+    private static double[] softplus(double[] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = softplus(values[i]));
         return values;
     }
-    private static double[][] softplus(double[][] values){
+    private static double[][] softplus(double[][] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = softplus(values[i]));
         return values;
     }
@@ -408,28 +399,28 @@ public class ActivationFunctions {
 
 
     // SWISH
-    private static double swish(double value, double beta){
+    private static double swish(double value, double beta) {
         return value * sigmoid(value);
     }
     private static double[] swish(double[] values, double[] beta) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = beta[i] * sigmoid(values[i]));
         return values;
     }
-    private static double[][] swish(double[][] values, double[][] beta){
+    private static double[][] swish(double[][] values, double[][] beta) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = swish(values[i], beta[i]));
         return values;
     }
 
 
     // TANH
-    private static double tanh(double value){
+    private static double tanh(double value) {
         return (2/(1 + Math.exp(-(2*value)))) - 1;
     }
-    private static double[] tanh(double[] values){
+    private static double[] tanh(double[] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = tanh(values[i]));
         return values;
     }
-    private static double[][] tanh(double[][] values){
+    private static double[][] tanh(double[][] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = tanh(values[i]));
         return values;
     }
