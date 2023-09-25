@@ -6,11 +6,15 @@ import java.util.stream.IntStream;
 public class ActivationFunctions {
     public static double activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double value) throws Exception {
         switch (activationFunction) {
-
+            case BENT_IDENTITY_ACTIVATION_FUNCTION -> {
+                return bentIdentity(value);
+            }
             case GAUSSIAN_ACTIVATION_FUNCTION -> {
                 return gaussian(value);
             }
-
+            case HARD_SIGMOID_ACTIVATION_FUNCTION -> {
+                return hardSigmoid(value);
+            }
             case LINEAR_ACTIVATION_FUNCTION -> {
                 return linear(value);
             }
@@ -20,13 +24,21 @@ public class ActivationFunctions {
             case RELU_ACTIVATION_FUNCTION -> {
                 return rectifiedLinearUnit(value);
             }
+            case RELU_6_ACTIVATION_FUNCTION -> {
+                return rectifiedLinearUnit6(value);
+            }
+            case SELU_ACTIVATION_FUNCTION -> {
+                return scaledExponentialLinear(value);
+            }
             case SIGMOID_ACTIVATION_FUNCTION -> {
                 return sigmoid(value);
             }
             case SOFTPLUS_ACTIVATION_FUNCTION -> {
                 return softplus(value);
             }
-
+            case SOFTSIGN_ACTIVATION_FUNCTION -> {
+                return softsign(value);
+            }
             case TANH_ACTIVATION_FUNCTION -> {
                 return tanh(value);
             }
@@ -53,9 +65,14 @@ public class ActivationFunctions {
 
     public static double[] activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double[] values) throws Exception {
         switch (activationFunction) {
-
+            case BENT_IDENTITY_ACTIVATION_FUNCTION -> {
+                return bentIdentity(values);
+            }
             case GAUSSIAN_ACTIVATION_FUNCTION -> {
                 return gaussian(values);
+            }
+            case HARD_SIGMOID_ACTIVATION_FUNCTION -> {
+                return hardSigmoid(values);
             }
             case LINEAR_ACTIVATION_FUNCTION -> {
                 return linear(values);
@@ -66,6 +83,12 @@ public class ActivationFunctions {
             case RELU_ACTIVATION_FUNCTION -> {
                 return rectifiedLinearUnit(values);
             }
+            case RELU_6_ACTIVATION_FUNCTION -> {
+                return rectifiedLinearUnit6(values);
+            }
+            case SELU_ACTIVATION_FUNCTION -> {
+                return scaledExponentialLinear(values);
+            }
             case SIGMOID_ACTIVATION_FUNCTION -> {
                 return sigmoid(values);
             }
@@ -74,6 +97,9 @@ public class ActivationFunctions {
             }
             case SOFTPLUS_ACTIVATION_FUNCTION -> {
                 return softplus(values);
+            }
+            case SOFTSIGN_ACTIVATION_FUNCTION -> {
+                return softsign(values);
             }
             case TANH_ACTIVATION_FUNCTION -> {
                 return tanh(values);
@@ -98,8 +124,14 @@ public class ActivationFunctions {
 
     public static double[][] activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double[][] values) throws Exception {
         switch (activationFunction) {
+            case BENT_IDENTITY_ACTIVATION_FUNCTION -> {
+                return bentIdentity(values);
+            }
             case GAUSSIAN_ACTIVATION_FUNCTION -> {
                 return gaussian(values);
+            }
+            case HARD_SIGMOID_ACTIVATION_FUNCTION -> {
+                return hardSigmoid(values);
             }
             case LINEAR_ACTIVATION_FUNCTION -> {
                 return linear(values);
@@ -110,6 +142,12 @@ public class ActivationFunctions {
             case RELU_ACTIVATION_FUNCTION -> {
                 return rectifiedLinearUnit(values);
             }
+            case RELU_6_ACTIVATION_FUNCTION -> {
+                return rectifiedLinearUnit6(values);
+            }
+            case SELU_ACTIVATION_FUNCTION -> {
+                return scaledExponentialLinear(values);
+            }
             case SIGMOID_ACTIVATION_FUNCTION -> {
                 return sigmoid(values);
             }
@@ -118,6 +156,9 @@ public class ActivationFunctions {
             }
             case SOFTPLUS_ACTIVATION_FUNCTION -> {
                 return softplus(values);
+            }
+            case SOFTSIGN_ACTIVATION_FUNCTION -> {
+                return softsign(values);
             }
             case TANH_ACTIVATION_FUNCTION -> {
                 return tanh(values);
@@ -141,6 +182,19 @@ public class ActivationFunctions {
     }
 
 
+    //BENT IDENTITY
+    private static double bentIdentity(double value){
+        return (Math.sqrt(value * value + 1) - 1) / 2 + value;
+    }
+    private static double[] bentIdentity(double[] values){
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = bentIdentity(values[i]));
+        return values;
+    }
+    private static double[][] bentIdentity(double[][] values){
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = bentIdentity(values[i]));
+        return values;
+    }
+
 
     // EXPONENTIAL_ELU
     private static double exponentialElu(double value,double alpha, double beta){
@@ -151,15 +205,11 @@ public class ActivationFunctions {
         }
     }
     private static double[] exponentialElu(double values[],double alphas[], double betas[]){
-        IntStream.range(0, values.length).parallel().forEachOrdered(i -> {
-            values[i] = exponentialElu(values[i], alphas[i], betas[i]);
-        });
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = exponentialElu(values[i], alphas[i], betas[i]));
         return values;
     }
     private static double[][] exponentialElu(double values[][],double alphas[][], double betas[][]){
-        IntStream.range(0, values.length).parallel().forEachOrdered(i -> {
-            values[i] = exponentialElu(values[i], alphas[i], betas[i]);
-        });
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = exponentialElu(values[i], alphas[i], betas[i]));
         return values;
     }
 
@@ -169,17 +219,30 @@ public class ActivationFunctions {
         return Math.exp(-(value*value));
     }
     private static double[] gaussian(double[] values){
-        IntStream.range(0, values.length).parallel().forEachOrdered(i -> {
-            values[i] = gaussian(values[i]);
-        });
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = gaussian(values[i]));
         return values;
     }
     private static double[][] gaussian(double[][] values){
-        IntStream.range(0, values.length).parallel().forEachOrdered(i -> {
-            values[i] = gaussian(values[i]);
-        });
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = gaussian(values[i]));
         return values;
     }
+
+
+    // HARD SIGMOID
+    private static double hardSigmoid(double value) {
+        if (value < -2.5) return 0.0;
+        else if (value > 2.5) return 1.0;
+        else return 0.2 * value + 0.5;
+    }
+    private static double[] hardSigmoid(double[] values){
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = hardSigmoid(values[i]));
+        return values;
+    }
+    private static double[][] hardSigmoid(double[][] values){
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = hardSigmoid(values[i]));
+        return values;
+    }
+
 
     // LEAKY_RELU
     private static double leakyRelu(double value, double alpha){
@@ -248,12 +311,42 @@ public class ActivationFunctions {
         return Math.max(0, value);
     }
     private static double[] rectifiedLinearUnit(double[] values){
-        return Arrays.stream(values).map(ActivationFunctions::rectifiedLinearUnit).toArray();
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = rectifiedLinearUnit(values[i]));
+        return values;
     }
     private static double[][] rectifiedLinearUnit(double[][] values){
-        for(int i = 0; i < values.length; i++) {
-            values[i] = rectifiedLinearUnit(values[i]);
-        }
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = rectifiedLinearUnit(values[i]));
+        return values;
+    }
+
+
+    // RELU6
+    private static double rectifiedLinearUnit6(double value){
+        return Math.min(Math.max(0, value), 6);
+    }
+    private static double[] rectifiedLinearUnit6(double[] values){
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = rectifiedLinearUnit6(values[i]));
+        return values;
+    }
+    private static double[][] rectifiedLinearUnit6(double[][] values){
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = rectifiedLinearUnit6(values[i]));
+        return values;
+    }
+
+
+    // SELU
+    private static double scaledExponentialLinear(double value){
+        double LAMBDA = 1.0507;
+        double ALPHA = 1.67326;
+        if (value > 0) return LAMBDA * value;
+        else return LAMBDA * (ALPHA * (Math.exp(value) - 1));
+    }
+    private static double[] scaledExponentialLinear(double[] values){
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = scaledExponentialLinear(values[i]));
+        return values;
+    }
+    private static double[][] scaledExponentialLinear(double[][] values){
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = scaledExponentialLinear(values[i]));
         return values;
     }
 
@@ -262,7 +355,7 @@ public class ActivationFunctions {
     private static double sigmoid(double value){
         return 1.0 / (1.0 + Math.exp(-value));
     }
-    private static double[]sigmoid(double[] values){
+    private static double[] sigmoid(double[] values){
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = sigmoid(values[i]));
         return values;
     }
@@ -272,6 +365,7 @@ public class ActivationFunctions {
     }
 
 
+    // SOFTMAX
     private static double[] softmax(double[] values){
         double sum = 0.0;
         double sum2 = 0.0;
@@ -299,6 +393,20 @@ public class ActivationFunctions {
     }
 
 
+    // SOFTSIGN
+    private static double softsign(double value) {
+        return value / (1 + Math.abs(value));
+    }
+    private static double[] softsign(double[] values) {
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = softsign(values[i]));
+        return values;
+    }
+    private static double[][] softsign(double[][] values) {
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = softsign(values[i]));
+        return values;
+    }
+
+
     // SWISH
     private static double swish(double value, double beta){
         return value * sigmoid(value);
@@ -318,13 +426,11 @@ public class ActivationFunctions {
         return (2/(1 + Math.exp(-(2*value)))) - 1;
     }
     private static double[] tanh(double[] values){
-        IntStream.range(0, values.length).parallel().forEachOrdered(i ->
-                values[i] = tanh(values[i]));
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = tanh(values[i]));
         return values;
     }
     private static double[][] tanh(double[][] values){
-        IntStream.range(0, values.length).parallel().forEachOrdered(i ->
-                values[i] = tanh(values[i]));
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = tanh(values[i]));
         return values;
     }
 }

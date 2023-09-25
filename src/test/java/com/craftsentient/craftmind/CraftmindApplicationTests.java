@@ -27,10 +27,7 @@ class CraftmindApplicationTests {
                 .withInitialInput(inputs)
                 .withInitialBiases(biases)
                 .withInitialWeights(weights)
-                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION)
-                .withSingleActivationFunctionForSingleLayer(2, DEFAULT_ACTIVATION_FUNCTIONS.GAUSSIAN_ACTIVATION_FUNCTION)
-                .withSingleActivationFunctionForMultipleLayers(0,1, DEFAULT_ACTIVATION_FUNCTIONS.RELU_ACTIVATION_FUNCTION)
-                .withSingleActivationFunctionForSingleLayer(1, DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION)
+                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .build();
         builtLayer.printLayers("BUILT NETWORK");
     }

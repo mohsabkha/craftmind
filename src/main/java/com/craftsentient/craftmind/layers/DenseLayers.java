@@ -191,6 +191,12 @@ public class DenseLayers {
         });
     }
 
+//    public void regenerateLayers(DenseLayers network){
+//        IntStream.range(0, network.layerList.size()).parallel().forEachOrdered(i -> {
+//            layerList.set(i, layerList.get(i).generateLayer();
+//        });
+//    }
+
     public void printLayers(String label) {
         System.out.println(":::: " + label + " ::::");
         AtomicInteger counter = new AtomicInteger(1);

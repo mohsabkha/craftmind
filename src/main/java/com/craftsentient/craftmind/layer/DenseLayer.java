@@ -235,6 +235,7 @@ public class DenseLayer implements Layer {
     }
 
     public void generateLayer(int numberOfNeurons) {
+        this.neuronList = new ArrayList<>();
         for (int i = 0; i < numberOfNeurons; i++) {
             this.neuronList.add(new Neuron(numberOfNeurons, 1.0));
             this.neuronBiases = MathUtils.addToDoubleArray(this.neuronBiases, 1.0);
@@ -244,6 +245,7 @@ public class DenseLayer implements Layer {
     }
 
     public void generateLayer(double[][] weights) {
+        this.neuronList = new ArrayList<>();
         this.neuronWeights = weights;
         for (double[] weight : weights) {
             this.neuronList.add(new Neuron(weight, 1.0));
@@ -252,6 +254,7 @@ public class DenseLayer implements Layer {
     }
 
     public void generateLayer(double[][] weights, double[][] batchInputs) {
+        this.neuronList = new ArrayList<>();
         this.neuronWeights = weights;
         this.batchInputs = batchInputs;
         for (double[] weight : weights) {
@@ -262,6 +265,7 @@ public class DenseLayer implements Layer {
     }
 
     public void generateLayer(double[][] weights, double[] biases) {
+        this.neuronList = new ArrayList<>();
         this.neuronWeights = weights;
         this.neuronBiases = biases;
         for (int i = 0; i < weights.length; i++) {
@@ -270,6 +274,7 @@ public class DenseLayer implements Layer {
     }
 
     public void generateLayer(double[][] weights, double[] biases, double[] inputs) {
+        this.neuronList = new ArrayList<>();
         this.neuronWeights = weights;
         this.neuronBiases = biases;
         this.inputs = inputs;
@@ -279,6 +284,7 @@ public class DenseLayer implements Layer {
     }
 
     public void generateLayer(double[][] weights, double[] biases, double[][] batchInputs) {
+        this.neuronList = new ArrayList<>();
         this.neuronWeights = weights;
         this.neuronBiases = biases;
         this.batchInputs = batchInputs;
@@ -305,9 +311,4 @@ public class DenseLayer implements Layer {
         });
         return a;
     }
-
-    public Neuron getNeuronAt(int index) {
-        return this.getNeuronList().get(index);
-    }
-
 }
