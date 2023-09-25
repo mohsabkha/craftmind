@@ -13,6 +13,7 @@ import static com.craftsentient.craftmind.activation.ActivationFunctions.activat
 
 @Getter
 @AllArgsConstructor
+@Builder
 public class DenseLayer implements Layer {
     private ArrayList<Neuron> neuronList;
     private double[][] neuronWeights;

@@ -332,7 +332,6 @@ public class DenseLayers {
             return this;
         }
 
-
         public DenseLayers build(){
             DenseLayers built = null;
             if(!this.isUsingNumberOfLayers && !this.isUsingListOfLayers) throw new IllegalArgumentException("Please use the numberOfLayers() builder method to initialize, or provide an ArrayList<DenseLayer> using the withLayerList() builder method!");
