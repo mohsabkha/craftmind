@@ -50,7 +50,7 @@ public class ErrorLossFunctions {
             //case RANKNET_LOSS_FUNCTION -> { return rankNet(trueValues, predictedValues); }
             //case SPARSE_CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION -> { return sparseCategoricalCrossEntropy(trueValues, predictedValues); }
             case SQUARED_HINGE_LOSS_FUNCTION -> { return squaredHinge(trueValues, predictedValues); }
-            case SSIM_LOSS_FUNCTION -> { return structuralSimilarityIndex(trueValues, predictedValues); }
+            //case SSIM_LOSS_FUNCTION -> { return structuralSimilarityIndex(trueValues, predictedValues); }
             //case TRIPLET_MARGIN_LOSS_FUNCTION -> { return tripletMargin(trueValues, predictedValues); }
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
@@ -436,20 +436,27 @@ public class ErrorLossFunctions {
     }
 
 
+    private static double computeMean(double[] data){
+        double sum = 0;
+        for (double value : data) { sum += value; }
+        return sum / data.length;
+    }
+    private static double computeVariance(double[] data) {
+        double mean = computeMean(data);
+        double temp = 0;
+        for (double value : data) {
+            temp += (value - mean) * (value - mean);
+        }
+        return temp / data.length;
+    }
     private static double computeLossForChannel(double[] firstImageChannel, double[] secondImageChannel) {
         // Compute means
-        double sum = 0;
-        for (double value : firstImageChannel) { sum += value; }
-        double muX = sum / firstImageChannel.length;
-
-        sum = 0;
-        for (double value : secondImageChannel) { sum += value; }
-        double muY = sum / secondImageChannel.length;
+        double muX = computeMean(firstImageChannel);
+        double muY = computeMean(secondImageChannel);
 
         // Compute variances
-        Variance variance = new Variance();
-        double sigmaX2 = variance.evaluate(firstImageChannel);
-        double sigmaY2 = variance.evaluate(secondImageChannel);
+        double sigmaX2 = computeVariance(firstImageChannel);
+        double sigmaY2 = computeVariance(secondImageChannel);
 
         // Compute covariance
         double sigmaXY = 0;
