@@ -1,6 +1,5 @@
 package com.craftsentient.craftmind.activation;
 
-import java.util.Arrays;
 import java.util.stream.IntStream;
 
 public class ActivationFunctions {
@@ -43,7 +42,7 @@ public class ActivationFunctions {
             case RELU_6_ACTIVATION_FUNCTION -> { return rectifiedLinearUnit6(values); }
             case SELU_ACTIVATION_FUNCTION -> { return scaledExponentialLinear(values); }
             case SIGMOID_ACTIVATION_FUNCTION -> { return sigmoid(values); }
-            case SOFTMAX_ACTIVATION_FUNCTION -> { return softmax(values); }
+            case SOFTMAX_ACTIVATION_FUNCTION -> { return cappedSoftmax(values); }
             case SOFTPLUS_ACTIVATION_FUNCTION -> { return softplus(values); }
             case SOFTSIGN_ACTIVATION_FUNCTION -> { return softsign(values); }
             case TANH_ACTIVATION_FUNCTION -> { return tanh(values); }
@@ -71,7 +70,7 @@ public class ActivationFunctions {
             case RELU_6_ACTIVATION_FUNCTION -> { return rectifiedLinearUnit6(values); }
             case SELU_ACTIVATION_FUNCTION -> { return scaledExponentialLinear(values); }
             case SIGMOID_ACTIVATION_FUNCTION -> { return sigmoid(values); }
-            case SOFTMAX_ACTIVATION_FUNCTION -> { return softmax(values); }
+            case SOFTMAX_ACTIVATION_FUNCTION -> { return cappedSoftmax(values); }
             case SOFTPLUS_ACTIVATION_FUNCTION -> { return softplus(values); }
             case SOFTSIGN_ACTIVATION_FUNCTION -> { return softsign(values); }
             case TANH_ACTIVATION_FUNCTION -> { return tanh(values); }
@@ -266,12 +265,27 @@ public class ActivationFunctions {
     // SOFTMAX
     private static double[] softmax(double[] values) {
         double sum = 0.0;
-        double sum2 = 0.0;
         for (double value : values) { sum += Math.exp(value); }
         for (int i = 0; i < values.length; i++) { values[i] = Math.exp(values[i]) / sum; }
         return values;
     }
     private static double[][] softmax(double[][] values) {
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = softmax(values[i]));
+        return values;
+    }
+
+    // TODO: implement finding the largest value in the layer itself as neurons are added
+    // CAPPED SOFTMAX
+    private static double[] cappedSoftmax(double[] values) {
+        double sum = 0.0;
+        double largest = 0;
+        for (double value : values) { if (value > largest) largest = value; }
+        // subtract largest from max values to verify no overflow
+        for (double value : values) { sum += Math.exp(value-largest); }
+        for (int i = 0; i < values.length; i++) { values[i] = Math.exp(values[i]-largest) / sum; }
+        return values;
+    }
+    private static double[][] cappedSoftmax(double[][] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = softmax(values[i]));
         return values;
     }

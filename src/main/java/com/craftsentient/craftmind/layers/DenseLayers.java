@@ -2,17 +2,20 @@ package com.craftsentient.craftmind.layers;
 
 import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATION_FUNCTIONS;
 import com.craftsentient.craftmind.layer.DenseLayer;
-import com.craftsentient.craftmind.mathUtils.MathUtils;
+import com.craftsentient.craftmind.utils.FileUtils;
+import com.craftsentient.craftmind.utils.MathUtils;
 import com.craftsentient.craftmind.neuron.Neuron;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
+
+import static com.craftsentient.craftmind.utils.PrintUtils.green;
+import static com.craftsentient.craftmind.utils.PrintUtils.yellow;
+import static com.craftsentient.craftmind.utils.PrintUtils.red;
+import static com.craftsentient.craftmind.utils.PrintUtils.bold;
 
 @Getter
 public class DenseLayers {
@@ -184,7 +187,6 @@ public class DenseLayers {
             if(i != 0) {
                 double[][] weights = randn(numberOfNeuronsPerLayer[i], numberOfNeuronsPerLayer[i-1]);
                 layerList.add(new DenseLayer(weights, layerList.get(i - 1).getBatchLayerOutputs(), activationFunctionToUse));
-                System.out.println("");
             } else {
                 layerList.add(new DenseLayer(initialWeights, biases, initialInput, activationFunctionToUse));
             }
@@ -198,11 +200,13 @@ public class DenseLayers {
 //    }
 
     public void printLayers(String label) {
-        System.out.println(":::: " + label + " ::::");
+
+        System.out.println(bold(green(":::: " + label + " ::::")));
         AtomicInteger counter = new AtomicInteger(1);
         this.getLayerList().forEach(i -> {
-            MathUtils.print(i.getBatchLayerOutputs(), "Layer " + (counter.getAndIncrement()) + " Outputs Using Activation Function: " + i.getActivationFunction().name());
+            MathUtils.print(i.getBatchLayerOutputs(), bold(green("Layer " + (counter.getAndIncrement()))) + " Outputs Using Activation Function: " +  bold(yellow((i.getActivationFunction().name()))));
         });
+        System.out.println("");
     }
 
     public static double[][] randn(int rows, int cols) {
@@ -223,6 +227,10 @@ public class DenseLayers {
         return this.getLayerList().get(index);
     }
 
+    public double[][] getBatchOutputs(){
+        return getLayerAt(getLayerList().size()-1).getBatchLayerOutputs();
+    }
+
     public ArrayList<Neuron> getNeuronsFromLayerAt(int index){
         return this.getLayerList().get(index).getNeuronList();
     }
@@ -238,7 +246,6 @@ public class DenseLayers {
 
         private DEFAULT_ACTIVATION_FUNCTIONS activationFunction = DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION;
         private final Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap = new HashMap<>();
-
 
         private boolean hasSetSpecificLayerActivationFunctions = false;
         private int numberOfLayers = 1;
@@ -260,6 +267,23 @@ public class DenseLayers {
         private int numberOfNeurons;
         private boolean isUsingNumberOfNeurons = false;
         private Random random;
+        private String filePath = "";
+        private boolean isUsingFileAsInput= false;
+
+
+        public DenseLayersBuilder withTextFileAsInput(String filePath, String delimiter){
+            this.filePath = filePath;
+            this.isUsingFileAsInput = true;
+            if (filePath.charAt(filePath.length()-1) == 't' && filePath.charAt(filePath.length()-2) == 'x' && filePath.charAt(filePath.length()-3) == 't' && filePath.charAt(filePath.length()-4) == '.'){
+                this.initialInput = FileUtils.readTextFile(filePath, delimiter);
+
+            } else if (filePath.charAt(filePath.length()-1) == 'v' && filePath.charAt(filePath.length()-2) == 's' && filePath.charAt(filePath.length()-3) == 'c' && filePath.charAt(filePath.length()-4) == '.'){
+                this.initialInput = FileUtils.readCsvFile(filePath);
+            } else {
+                throw new IllegalArgumentException("Error: file must be of type txt or csv");
+            }
+            return this;
+        }
 
         public DenseLayersBuilder withRandomSeed(long randomSeed){
             this.random = new Random(randomSeed);
@@ -341,7 +365,51 @@ public class DenseLayers {
         public DenseLayers build(){
             DenseLayers built = null;
             if(!this.isUsingNumberOfLayers && !this.isUsingListOfLayers) throw new IllegalArgumentException("Please use the numberOfLayers() builder method to initialize, or provide an ArrayList<DenseLayer> using the withLayerList() builder method!");
-            if(!this.isUsingSpecificNeurons && !this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers){
+
+
+            if(!this.isUsingSpecificNeurons && !this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingBatchInputs){
+                if(this.isUsingFileAsInput && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
+                    built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                }
+                else if(this.isUsingFileAsInput && this.isUsingSpecificWeights) {
+                    built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                }
+                else if(this.isUsingFileAsInput) {
+                    built = new DenseLayers(this.numberOfLayers, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                }
+                else if(!this.isUsingFileAsInput && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
+                    built = new DenseLayers(this.numberOfLayers, this.activationFunction, this.activationFunctionsMap);
+                }
+            }
+            else if(this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingBatchInputs) {
+                if(this.isUsingFileAsInput && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
+                    built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                }
+                else if(this.isUsingFileAsInput  && this.isUsingSpecificWeights) {
+                    built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                }
+                else if(this.isUsingFileAsInput) {
+                    built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                }
+                else if(!this.isUsingFileAsInput && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
+                    built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.activationFunction, this.activationFunctionsMap);
+                }
+            }
+            else if(this.isUsingSpecificNeurons && this.isUsingNumberOfLayers && !this.isUsingBatchInputs) {
+                if(this.isUsingFileAsInput && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
+                    built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                }
+                else if(this.isUsingFileAsInput && this.isUsingSpecificWeights) {
+                    built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                }
+                else if(this.isUsingFileAsInput) {
+                    built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                }
+                else if(!this.isUsingFileAsInput && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
+                    built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.activationFunction, this.activationFunctionsMap);
+                }
+            }
+            else if(!this.isUsingSpecificNeurons && !this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingFileAsInput){
                 if(this.isUsingBatchInputs && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
@@ -355,7 +423,7 @@ public class DenseLayers {
                     built = new DenseLayers(this.numberOfLayers, this.activationFunction, this.activationFunctionsMap);
                 }
             }
-            else if(this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers) {
+            else if(this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingFileAsInput) {
                 if(this.isUsingBatchInputs && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
@@ -369,7 +437,7 @@ public class DenseLayers {
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.activationFunction, this.activationFunctionsMap);
                 }
             }
-            else if(this.isUsingSpecificNeurons && this.isUsingNumberOfLayers) {
+            else if(this.isUsingSpecificNeurons && this.isUsingNumberOfLayers && !this.isUsingFileAsInput) {
                 if(this.isUsingBatchInputs && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
@@ -385,7 +453,10 @@ public class DenseLayers {
             }
             else {
                 built = new DenseLayers(2, DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION, this.activationFunctionsMap);
-                throw new RuntimeException("Builder Not Configured Properly!");
+                if(this.isUsingBatchInputs && this.isUsingFileAsInput){
+                    throw new RuntimeException(bold(red("Builder Not Configured Properly! Do Not Use File As Input and Batch Input Together!")));
+                }
+                throw new RuntimeException(bold(red("Builder Not Configured Properly!")));
             }
 
             return built;

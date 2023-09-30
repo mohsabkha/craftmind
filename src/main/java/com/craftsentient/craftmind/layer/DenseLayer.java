@@ -1,8 +1,7 @@
 package com.craftsentient.craftmind.layer;
 
-import com.craftsentient.craftmind.activation.ActivationFunctions;
 import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATION_FUNCTIONS;
-import com.craftsentient.craftmind.mathUtils.MathUtils;
+import com.craftsentient.craftmind.utils.MathUtils;
 import com.craftsentient.craftmind.neuron.Neuron;
 import lombok.*;
 

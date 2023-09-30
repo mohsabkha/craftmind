@@ -1,4 +1,4 @@
-package com.craftsentient.craftmind.mathUtils;
+package com.craftsentient.craftmind.utils;
 
 
 import java.util.ArrayList;
@@ -261,7 +261,7 @@ public class MathUtils {
 
 
     public static void print(double[][] matrix, String name) {
-        System.out.println(name + " Matrix (" + matrix.length +" x " + matrix[0].length + ")");
+        System.out.println(name + " {Matrix (" + matrix.length +" x " + matrix[0].length + ")}");
         for (int i = 0; i < matrix.length; i++) {
             System.out.print("Row " + (i+1) + " : [");
             for (int j = 0; j < matrix[0].length; j++) {
@@ -271,6 +271,5 @@ public class MathUtils {
             }
             System.out.println("]");
         }
-        System.out.println("");
     }
 }

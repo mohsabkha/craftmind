@@ -45,7 +45,7 @@ public class ErrorLossFunctions {
             case MAPE_LOSS_FUNCTION -> { return meanAbsolutePercentageError(trueValues, predictedValues); }
             //case MSE_LOSS_FUNCTION -> { return meanStandardError(trueValues, predictedValues); }
             case MSLE_LOSS_FUNCTION -> {  return meanStandardLogarithmicError(trueValues, predictedValues); }
-            //case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueValues, predictedValues); }
+
             case QUADRATIC_LOSS -> { return quadratic(trueValues, predictedValues); }
             //case RANKNET_LOSS_FUNCTION -> { return rankNet(trueValues, predictedValues); }
             //case SPARSE_CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION -> { return sparseCategoricalCrossEntropy(trueValues, predictedValues); }
@@ -55,6 +55,20 @@ public class ErrorLossFunctions {
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
+
+    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueClass, double[] predictedValues) throws Exception {
+        switch (lossFunction) {
+            case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues); }
+            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+        }
+    }
+    public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueClass, double[][] predictedValues) throws Exception {
+        switch (lossFunction) {
+            case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues); }
+            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+        }
+    }
+
     public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues, int y, double margin) throws Exception {
         switch (lossFunction){
             case CONTRASTIVE_LOSS_FUNCTION -> { return contrastive(trueValues, predictedValues, y, margin); }
@@ -70,7 +84,6 @@ public class ErrorLossFunctions {
     public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double trueValues, double predictedValues, double alpha, double gamma) throws Exception {
         switch (lossFunction){
             case FOCAL_LOSS_FUNCTION -> { return focal(trueValues, predictedValues, alpha, gamma); }
-
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
@@ -134,7 +147,6 @@ public class ErrorLossFunctions {
         }
         distance = Math.sqrt(distance);
         return (1 - y) * 0.5 * distance * distance + y * 0.5 * Math.pow(Math.max(0, margin - distance), 2);
-
     }
     private static double[] contrastive(double[][] trueValues, double[][] predictedValues, int y, double margin) {
         double[] loss = new double[trueValues.length];
@@ -253,11 +265,9 @@ public class ErrorLossFunctions {
     * @return The L1 loss.
      */
     private static double absoluteError(double[] trueValues, double[] predictedValues) {
-        double loss = 0.0;
-        for (int i = 0; i < trueValues.length; i++) {
-            loss += Math.abs(trueValues[i] - predictedValues[i]);
-        }
-        return loss / trueValues.length;
+        AtomicReference<Double> loss = new AtomicReference<>((double) 0);
+        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss.getAndUpdate( v -> v + Math.abs(trueValues[i] - predictedValues[i])));
+        return loss.get();
     }
     private static double[] absoluteError(double[][] trueValues, double[][] predictedValues) {
         double[] loss = new double[trueValues.length];
@@ -331,9 +341,46 @@ public class ErrorLossFunctions {
         }
         return -Math.log(predictedProbability);
     }
+    private static double[] negativeLogLikelihood(int[] trueValues, double[] predictedValues){
+        double[] loss = new double[trueValues.length];
+        int trueClass = 0;
+        for(int i = 0; i < trueValues.length; i++){
+            if(trueValues[i] == 1) trueClass = i;
+        }
+        int finalTrueClass = trueClass;
+        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = negativeLogLikelihood(finalTrueClass, predictedValues));
+        return loss;
+    }
+    /**
+     * Compute the Negative Log Likelihood (NLL) Loss for a series of observations.
+     *
+     * @param predictedValues Array of predicted batch probabilities for each class.
+     * @param trueValues The actual class indices.
+     * @return The NLL value for the given observation.
+     */
     private static double[] negativeLogLikelihood(int[] trueValues, double[][] predictedValues) {
         double[] loss = new double[trueValues.length];
-        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = negativeLogLikelihood(trueValues[i], predictedValues[i]));
+        int[] trueClasses = new int[trueValues.length];
+        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> {
+             if(trueValues[i] == 1) trueClasses[i] = i;
+        });
+        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = negativeLogLikelihood(trueClasses[i], predictedValues[i]));
+        return loss;
+    }
+    /**
+     * Compute the Negative Log Likelihood (NLL) Loss for a batch series of observations.
+     *
+     * @param predictedValues Array of predicted probabilities for each class.
+     * @param trueValues The actual class of batch indices.
+     * @return The NLL value for the given observation.
+     */
+    private static double[] negativeLogLikelihood(int[][] trueValues, double[][] predictedValues) {
+        double[] loss = new double[trueValues.length];
+        int[] trueClasses = new int[trueValues.length];
+        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> {
+            IntStream.range(0, trueValues[i].length).parallel().forEachOrdered(j -> { if(trueValues[i][j] == 1) trueClasses[i] = j; });
+        });
+        IntStream.range(0, trueClasses.length).parallel().forEachOrdered(i -> loss[i] = negativeLogLikelihood(trueClasses[i], predictedValues[i]));
         return loss;
     }
 

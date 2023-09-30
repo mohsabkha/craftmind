@@ -1,12 +1,11 @@
 package com.craftsentient.craftmind.neuron;
 
-import com.craftsentient.craftmind.mathUtils.MathUtils;
+import com.craftsentient.craftmind.utils.MathUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
-import java.util.Random;
 import java.util.stream.IntStream;
 
 import static com.craftsentient.craftmind.layers.DenseLayers.random;
