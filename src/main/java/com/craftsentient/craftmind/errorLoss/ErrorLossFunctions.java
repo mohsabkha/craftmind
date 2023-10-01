@@ -68,6 +68,12 @@ public class ErrorLossFunctions {
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
+    public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueClass, double[] predictedValues) throws Exception {
+        switch (lossFunction) {
+            case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues); }
+            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+        }
+    }
 
     public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues, int y, double margin) throws Exception {
         switch (lossFunction){

@@ -1,5 +1,9 @@
 package com.craftsentient.craftmind.utils;
 
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
+
 public class PrintUtils {
     private static String BLACK = "\033[30m";
     private static String RED = "\033[31m";
@@ -76,5 +80,169 @@ public class PrintUtils {
         return BOLD + str + RESET;
     }
 
+    public static void printGeneric(double[] vec, String label){
+        System.out.println(bold(cyan(":::: " + label + " ::::")));
+        AtomicInteger counter = new AtomicInteger(1);
+        IntStream.range(0, vec.length).forEach(i-> {
+            if(i != vec.length-1) System.out.print(cyan(bold(String.valueOf(i))) + ": " + vec[i] + ", ");
+            else System.out.print(cyan(bold(String.valueOf(i))) + ": " + vec[i]);
+        });
+        System.out.print("\n");
+    }
+    public static void printGeneric(int[] vec, String label){
+        System.out.println(bold(green(":::: " + label + " ::::")));
+        AtomicInteger counter = new AtomicInteger(1);
+        IntStream.range(0, vec.length).forEach(i-> {
+            if(i != vec.length-1) System.out.print(cyan(bold(String.valueOf(i))) + ": " + vec[i] + ", ");
+            else System.out.print(cyan(bold(String.valueOf(i))) + ": " + vec[i]);
+        });
+        System.out.print("\n");
+    }
+    public static void printGeneric(String[] vec, String label){
+        System.out.println(bold(green(":::: " + label + " ::::")));
+        AtomicInteger counter = new AtomicInteger(1);
+        IntStream.range(0, vec.length).forEach(i-> {
+            if(i != vec.length-1) System.out.print(cyan(bold(String.valueOf(i))) + ": " + vec[i] + ", ");
+            else System.out.print(cyan(bold(String.valueOf(i))) + ": " + vec[i]);
+        });
+        System.out.print("\n");
+    }
 
+    public static void printPositive(double[] vec, String label){
+        System.out.println(bold(cyan(":::: " + label + " ::::")));
+        AtomicInteger counter = new AtomicInteger(1);
+        IntStream.range(0, vec.length).forEach(i-> {
+            if(i != vec.length-1) System.out.print(green(bold(String.valueOf(i))) + ": " + vec[i] + ", ");
+            else System.out.print(cyan(bold(String.valueOf(i))) + ": " + vec[i]);
+        });
+        System.out.print("\n");
+    }
+    public static void printPositive(int[] vec, String label){
+        System.out.println(bold(green(":::: " + label + " ::::")));
+        AtomicInteger counter = new AtomicInteger(1);
+        IntStream.range(0, vec.length).forEach(i-> {
+            if(i != vec.length-1) System.out.print(green(bold(String.valueOf(i))) + ": " + vec[i] + ", ");
+            else System.out.print(cyan(bold(String.valueOf(i))) + ": " + vec[i]);
+        });
+        System.out.print("\n");
+    }
+    public static void printPositive(String[] vec, String label){
+        System.out.println(bold(green(":::: " + label + " ::::")));
+        AtomicInteger counter = new AtomicInteger(1);
+        IntStream.range(0, vec.length).forEach(i-> {
+            if(i != vec.length-1) System.out.print(green(bold(String.valueOf(i))) + ": " + vec[i] + ", ");
+            else System.out.print(cyan(bold(String.valueOf(i))) + ": " + vec[i]);
+        });
+        System.out.print("\n");
+    }
+
+    public static void printWarning(double[] vec, String label){
+        System.out.println(bold(cyan(":::: " + label + " ::::")));
+        AtomicInteger counter = new AtomicInteger(1);
+        IntStream.range(0, vec.length).forEach(i-> {
+            if(i != vec.length-1) System.out.print(yellow(bold(String.valueOf(i))) + ": " + vec[i] + ", ");
+            else System.out.print(cyan(bold(String.valueOf(i))) + ": " + vec[i]);
+        });
+        System.out.print("\n");
+    }
+    public static void printWarning(int[] vec, String label){
+        System.out.println(bold(green(":::: " + label + " ::::")));
+        AtomicInteger counter = new AtomicInteger(1);
+        IntStream.range(0, vec.length).forEach(i-> {
+            if(i != vec.length-1) System.out.print(yellow(bold(String.valueOf(i))) + ": " + vec[i] + ", ");
+            else System.out.print(cyan(bold(String.valueOf(i))) + ": " + vec[i]);
+        });
+        System.out.print("\n");
+    }
+    public static void printWarning(String[] vec, String label){
+        System.out.println(bold(green(":::: " + label + " ::::")));
+        AtomicInteger counter = new AtomicInteger(1);
+        IntStream.range(0, vec.length).forEach(i-> {
+            if(i != vec.length-1) System.out.print(yellow(bold(String.valueOf(i))) + ": " + vec[i] + ", ");
+            else System.out.print(cyan(bold(String.valueOf(i))) + ": " + vec[i]);
+        });
+        System.out.print("\n");
+    }
+
+    public static void printNegative(double[] vec, String label){
+        System.out.println(bold(cyan(":::: " + label + " ::::")));
+        AtomicInteger counter = new AtomicInteger(1);
+        IntStream.range(0, vec.length).forEach(i-> {
+            if(i != vec.length-1) System.out.print(red(bold(String.valueOf(i))) + ": " + vec[i] + ", ");
+            else System.out.print(cyan(bold(String.valueOf(i))) + ": " + vec[i]);
+        });
+        System.out.print("\n");
+    }
+    public static void printNegative(int[] vec, String label){
+        System.out.println(bold(green(":::: " + label + " ::::")));
+        AtomicInteger counter = new AtomicInteger(1);
+        IntStream.range(0, vec.length).forEach(i-> {
+            if(i != vec.length-1) System.out.print(red(bold(String.valueOf(i))) + ": " + vec[i] + ", ");
+            else System.out.print(cyan(bold(String.valueOf(i))) + ": " + vec[i]);
+        });
+        System.out.print("\n");
+    }
+    public static void printNegative(String[] vec, String label){
+        System.out.println(bold(green(":::: " + label + " ::::")));
+        AtomicInteger counter = new AtomicInteger(1);
+        IntStream.range(0, vec.length).forEach(i-> {
+            if(i != vec.length-1) System.out.print(red(bold(String.valueOf(i))) + ": " + vec[i] + ", ");
+            else System.out.print(cyan(bold(String.valueOf(i))) + ": " + vec[i]);
+        });
+        System.out.print("\n");
+    }
+
+    public static void printInfo(double[] vec, String label){
+        System.out.println(bold(cyan(":::: " + label + " ::::")));
+        AtomicInteger counter = new AtomicInteger(1);
+        IntStream.range(0, vec.length).forEach(i-> {
+            if(i != vec.length-1) System.out.print(red(bold(String.valueOf(i))) + ": " + vec[i] + ", ");
+            else System.out.print(cyan(bold(String.valueOf(i))) + ": " + vec[i]);
+        });
+        System.out.print("\n");
+    }
+    public static void printInfo(int[] vec, String label){
+        System.out.println(bold(green(":::: " + label + " ::::")));
+        AtomicInteger counter = new AtomicInteger(1);
+        IntStream.range(0, vec.length).forEach(i-> {
+            if(i != vec.length-1) System.out.print(red(bold(String.valueOf(i))) + ": " + vec[i] + ", ");
+            else System.out.print(cyan(bold(String.valueOf(i))) + ": " + vec[i]);
+        });
+        System.out.print("\n");
+    }
+    public static void printInfo(String[] vec, String label){
+        System.out.println(bold(green(":::: " + label + " ::::")));
+        AtomicInteger counter = new AtomicInteger(1);
+        IntStream.range(0, vec.length).forEach(i-> {
+            if(i != vec.length-1) System.out.print(red(bold(String.valueOf(i))) + ": " + vec[i] + ", ");
+            else System.out.print(cyan(bold(String.valueOf(i))) + ": " + vec[i]);
+        });
+        System.out.print("\n");
+    }
+
+
+    public static void printGeneric(double[][] matrix, String label){
+        System.out.println(bold(green(":::: " + label + " ::::")));
+        AtomicInteger counter = new AtomicInteger(1);
+        IntStream.range(0, matrix.length).forEach(i-> {
+            IntStream.range(0, matrix[0].length).forEach(j -> System.out.print(i + ": " + matrix[i][j] + " "));
+            System.out.print("\n");
+        });
+    }
+    public static void printGeneric(int[][] matrix, String label){
+        System.out.println(bold(green(":::: " + label + " ::::")));
+        AtomicInteger counter = new AtomicInteger(1);
+        IntStream.range(0, matrix.length).forEach(i-> {
+            IntStream.range(0, matrix[0].length).forEach(j -> System.out.print(i + ": " + matrix[i][j] + " "));
+            System.out.print("\n");
+        });
+    }
+    public static void printGeneric(String[][] matrix, String label){
+        System.out.println(bold(green(":::: " + label + " ::::")));
+        AtomicInteger counter = new AtomicInteger(1);
+        IntStream.range(0, matrix.length).forEach(i-> {
+            IntStream.range(0, matrix[0].length).forEach(j -> System.out.print(i + ": " + matrix[i][j] + " "));
+            System.out.print("\n");
+        });
+    }
 }

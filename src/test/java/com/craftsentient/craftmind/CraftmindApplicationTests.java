@@ -4,6 +4,7 @@ import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATION_FUNCTIONS;
 import com.craftsentient.craftmind.errorLoss.DEFAULT_LOSS_FUNCTIONS;
 import com.craftsentient.craftmind.errorLoss.ErrorLossFunctions;
 import com.craftsentient.craftmind.layers.DenseLayers;
+import com.craftsentient.craftmind.utils.PrintUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -31,27 +32,13 @@ class CraftmindApplicationTests {
                 .withInitialWeights(weights)
                 .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .withSingleActivationFunctionForSingleLayer(0, DEFAULT_ACTIVATION_FUNCTIONS.RELU_ACTIVATION_FUNCTION)
+                .withLossFunction(DEFAULT_LOSS_FUNCTIONS.NLL_LOSS_FUNCTION)
+                .withTrueValue(new int[] {2, 0, 3})
                 .build();
 
-        DenseLayers builtLayer = new DenseLayers.DenseLayersBuilder()
-                .withNumberOfLayers(4)
-                .withNumberOfNeuronsPerLayer(new int[]{3,5,6,7})
-                .withTextFileAsInput("src/main/resources/inputs.txt", ",")
-                .withInitialBiases(biases)
-                .withInitialWeights(weights)
-                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
-                .withSingleActivationFunctionForSingleLayer(0, DEFAULT_ACTIVATION_FUNCTIONS.RELU_ACTIVATION_FUNCTION)
-                .build();
-
-
-        builtLayer.printLayers("BUILD WITHOUT FILE");
+        //builtLayer.printLayers("BUILD WITHOUT FILE");
         builtLayerWithFile.printLayers("BUILT WITH FILE NETWORK");
-
-        double loss = ErrorLossFunctions.lossFunction(DEFAULT_LOSS_FUNCTIONS.NLL_LOSS_FUNCTION, 0, new double[] {0.7, 0.1, 0.2});
-
-        System.out.println(":::: LOSS FUNCTION :::: " + loss);
-
-
+        PrintUtils.printGeneric(builtLayerWithFile.generateLoss(), "Layer Loss");
     }
 
     @Test
