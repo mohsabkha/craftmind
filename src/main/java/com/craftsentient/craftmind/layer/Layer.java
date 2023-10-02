@@ -17,17 +17,17 @@ public interface Layer {
     double[][] batchLayerOutputs = new double[0][0];
     boolean isHiddenLayer = true;
 
-    public Object generateLayerOutput();
+    public Object generateLayerOutput() throws Exception;
 
     public double[][] generateBatchedLayerOutput(int batchSize);
 
-    public double[] generateNonBatchedLayerOutput(double[] inputs);
+    public double[] generateNonBatchedLayerOutput(double[] inputs) throws Exception;
 
     public void generateOutput(int batchSize);
 
-    public void addOutput(double value);
+    public void addOutput(double value) throws Exception;
 
-    public void addOutput(double[] values);
+    public void addOutput(double[] values) throws Exception;
 
     public void addNeuron(Neuron neuron);
 
@@ -43,7 +43,7 @@ public interface Layer {
 
     public void addInput(double[][] inputValues);
 
-    public void useOutputFromPreviousLayerAsInput(Layer layer);
+    public void useOutputFromPreviousLayerAsInput(Layer layer) throws Exception;
 
     public void generateLayer(int numberOfNeurons);
 
@@ -55,9 +55,9 @@ public interface Layer {
 
     public void generateLayer(double[][] weights, double[] biases, double[] inputs);
 
-
     public void generateLayer(double[][] weights, double[] biases, double[][] batchInputs);
 
-    public Layer addLayers(Layer a, Layer b);
+    public Layer layerAddition(Layer a, Layer b);
 
+    Layer layer(Layer a, Layer b);
 }

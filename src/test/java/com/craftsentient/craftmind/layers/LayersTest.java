@@ -1,6 +1,9 @@
 package com.craftsentient.craftmind.layers;
 
+import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATION_FUNCTIONS;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
 
 public class LayersTest {
     @Test
@@ -16,37 +19,107 @@ public class LayersTest {
                 {-0.26, -0.27, 0.17, 0.87}};
         double[] biases = {2, 3, 0.5};
 
-        DenseLayers layers1 = new DenseLayers(5);
-        layers1.printLayers("Layer 1");
+        new DenseLayers.DenseLayersBuilder()
+                .withNumberOfLayers(5)
+                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION)
+                .build().printLayers("NETWORK 1 NEW");
 
-        DenseLayers layers2A = new DenseLayers(7, 3);
-        layers2A.printLayers("Layer 2A");
+        new DenseLayers.DenseLayersBuilder()
+                .withNumberOfLayers(7)
+                .withNumberOfNeurons(7)
+                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION)
+                .build().printLayers("NETWORK 2 NEW");
 
-        DenseLayers layers2B = new DenseLayers(7, new int[]{2, 5, 9, 2, 5, 4, 1});
-        layers2B.printLayers("Layer 2B");
+        new DenseLayers.DenseLayersBuilder()
+                .withNumberOfLayers(7)
+                .withNumberOfInputs(27)
+                .withNumberOfNeurons(7)
+                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION)
+                .build().printLayers("NETWORK 2A NEW");
 
-        DenseLayers layers3A = new DenseLayers(3, inputs);
-        layers3A.printLayers("Layer 3A");
+        // create neural network with number of layers and specific number of neurons in each layer as input
+        new DenseLayers.DenseLayersBuilder()
+                .withNumberOfLayers(7)
+                .withNumberOfNeuronsPerLayer(new int[]{2, 5, 9, 2, 5, 4, 1})
+                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION)
+                .build().printLayers("NETWORK 2B NEW");
 
-        DenseLayers layers3B = new DenseLayers(5, 3, inputs);
-        layers3B.printLayers("Layer 3B");
+        // create neural network with number of layers and initial inputs as input
+        new DenseLayers.DenseLayersBuilder()
+                .withNumberOfLayers(3)
+                .withInitialInput(inputs)
+                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION)
+                .build().printLayers("NETWORK 3A NEW");
 
-        DenseLayers layers3C = new DenseLayers(3, new int[]{3, 5, 9, 4, 6, 3}, inputs);
-        layers3C.printLayers("Layer 3C");
+        // create neural network with number of layers, number of neurons per layer, and initial inputs as input
+        new DenseLayers.DenseLayersBuilder()
+                .withNumberOfLayers(7)
+                .withNumberOfNeurons(3)
+                .withInitialInput(inputs)
+                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION)
+                .build().printLayers("NETWORK 3B NEW");
 
-        DenseLayers layers4A = new DenseLayers(5, weights, inputs);
-        layers4A.printLayers("Layer 4A");
+        // create neural network with number of layers, the specific number of neurons in each layer, and initial inputs
+        new DenseLayers.DenseLayersBuilder()
+                .withNumberOfLayers(3)
+                .withNumberOfNeuronsPerLayer(new int[]{3, 5, 9, 4, 6, 3})
+                .withInitialInput(inputs)
+                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION)
+                .build().printLayers("NETWORK 3C NEW");
 
-        DenseLayers layers4B = new DenseLayers(5, 3, weights, inputs);
-        layers4B.printLayers("Layer 4B");
+        // create neural network with number of layers, initial weights for inputs, and initial inputs
+        new DenseLayers.DenseLayersBuilder()
+                .withNumberOfLayers(5)
+                .withInitialWeights(weights)
+                .withInitialInput(inputs)
+                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION)
+                .build().printLayers("NETWORK 4A NEW");
 
-        DenseLayers layers4C = new DenseLayers(5, new int[]{3, 5, 9, 2, 7}, weights, inputs);
-        layers4C.printLayers("Layer 4C");
+        // create neural network with number of layers, number of neurons per layer, initial weights for inputs, and initial inputs
+        new DenseLayers.DenseLayersBuilder()
+                .withNumberOfLayers(5)
+                .withNumberOfNeurons(3)
+                .withInitialWeights(weights)
+                .withInitialInput(inputs)
+                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION)
+                .build().printLayers("NETWORK 4B NEW");
 
-        DenseLayers layers5A = new DenseLayers(4, weights, biases, inputs);
-        layers5A.printLayers("Layer 5A");
+        // create neural network with number of layers, specific number of neurons per layer, initial weights for inputs, and initial inputs
+        new DenseLayers.DenseLayersBuilder()
+                .withNumberOfLayers(5)
+                .withNumberOfNeuronsPerLayer( new int[]{3, 5, 9, 2, 7})
+                .withInitialWeights(weights)
+                .withInitialInput(inputs)
+                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION)
+                .build().printLayers("NETWORK 4C NEW");
 
-        DenseLayers layers5B = new DenseLayers(4, 3, weights, biases, inputs);
-        layers5B.printLayers("Layer 5B");
+        // create neural network with number of layers, initial weights per input, biases for each neuron, and initial inputs
+        new DenseLayers.DenseLayersBuilder()
+                .withNumberOfLayers(4)
+                .withInitialWeights(weights)
+                .withInitialBiases(biases)
+                .withInitialInput(inputs)
+                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION)
+                .build().printLayers("NETWORK 5A NEW");
+
+        // create neural network with number of layers, number of neurons per layer, initial weights per input, biases for each neuron, and initial inputs
+        new DenseLayers.DenseLayersBuilder()
+                .withNumberOfLayers(4)
+                .withNumberOfNeurons(3)
+                .withInitialWeights(weights)
+                .withInitialBiases(biases)
+                .withInitialInput(inputs)
+                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION)
+                .build().printLayers("NETWORK 5B NEW");
+
+        // create neural network with number of layers, specific number of neurons per layer, initial weights per input, biases for each neuron, and initial inputs
+        new DenseLayers.DenseLayersBuilder()
+                .withNumberOfLayers(4)
+                .withNumberOfNeuronsPerLayer(new int[]{3,5,6,7})
+                .withInitialWeights(weights)
+                .withInitialBiases(biases)
+                .withInitialInput(inputs)
+                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION)
+                .build().printLayers("NETWORK 5C NEW");
     }
 }
