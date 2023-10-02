@@ -31,14 +31,14 @@ class CraftmindApplicationTests {
                 .withInitialBiases(biases)
                 .withInitialWeights(weights)
                 .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
-                .withSingleActivationFunctionForSingleLayer(0, DEFAULT_ACTIVATION_FUNCTIONS.RELU_ACTIVATION_FUNCTION)
                 .withLossFunction(DEFAULT_LOSS_FUNCTIONS.NLL_LOSS_FUNCTION)
                 .withTrueValue(new int[] {2, 0, 3})
                 .build();
 
-        //builtLayer.printLayers("BUILD WITHOUT FILE");
         builtLayerWithFile.printLayers("BUILT WITH FILE NETWORK");
-        //PrintUtils.printGeneric(builtLayerWithFile.generateLoss(), "Layer Loss");
+        PrintUtils.printGeneric(builtLayerWithFile.generateLoss(), "Layer Loss");
+        double[]loss = ErrorLossFunctions.lossFunction(DEFAULT_LOSS_FUNCTIONS.NLL_LOSS_FUNCTION, new int[]{0,1,1}, new double[][]{{0.7,0.1,0.2}, {0.1,0.5,0.4}, {0.02,0.9,0.08}}, false);
+        PrintUtils.printNegative(loss);
     }
 
     @Test

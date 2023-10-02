@@ -35,6 +35,7 @@ public class DenseLayer implements Layer {
     private int[][] batchHotOneVecs;
     private double[] batchLayerLoss;
     private double[] layerLoss;
+    private boolean isUsingHotEncodedVec;
 
     public DenseLayer() {
         this.neuronList = new ArrayList<>();
@@ -49,10 +50,11 @@ public class DenseLayer implements Layer {
         this.batchTrueValues = new int[0];
         this.batchHotOneVecs = new int[0][0];
         this.batchLayerLoss = new double[0];
+        this.isUsingHotEncodedVec = false;
         printInfo("Values set in DenseLayer()");
     }
 
-    public DenseLayer(double[][] weights, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue) {
+    public DenseLayer(double[][] weights, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue, boolean isUsingHotEncodedVec) {
         this.neuronList = new ArrayList<>();
         this.neuronWeights = new double[0][0];
         this.neuronBiases = new double[0];
@@ -65,6 +67,7 @@ public class DenseLayer implements Layer {
         this.lossFunction = lossFunction;
         this.batchTrueValues = batchTrueValue;
         this.batchHotOneVecs = batchHotOneVec;
+        this.isUsingHotEncodedVec = isUsingHotEncodedVec;
         printInfo("Values set in DenseLayer(double[][] weights, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue)");
         printInfo("Beginning generation of individual layer and layer outputs...");
         this.generateLayer(weights);
@@ -72,7 +75,7 @@ public class DenseLayer implements Layer {
         printInfo("Generation of individual layer and layer outputs complete!");
     }
 
-    public DenseLayer(double[][] weights, double[] biases, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue) {
+    public DenseLayer(double[][] weights, double[] biases, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue, boolean isUsingHotEncodedVec) {
         this.neuronList = new ArrayList<>();
         this.neuronWeights = new double[0][0];
         this.neuronBiases = new double[0];
@@ -85,6 +88,7 @@ public class DenseLayer implements Layer {
         this.lossFunction = lossFunction;
         this.batchTrueValues = batchTrueValue;
         this.batchHotOneVecs = batchHotOneVec;
+        this.isUsingHotEncodedVec = isUsingHotEncodedVec;
         printInfo("Values set in DenseLayer(double[][] weights, double[] biases, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue)");
         printInfo("Beginning generation of individual layer and layer outputs...");
         this.generateLayer(weights, biases);
@@ -92,7 +96,7 @@ public class DenseLayer implements Layer {
         printInfo("Generation of individual layer and layer outputs complete!");
     }
 
-    public DenseLayer(double[][] weights, double[][] batchInputs, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue) {
+    public DenseLayer(double[][] weights, double[][] batchInputs, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue, boolean isUsingHotEncodedVec) {
         this.neuronList = new ArrayList<>();
         this.neuronWeights = new double[0][0];
         this.neuronBiases = new double[0];
@@ -105,6 +109,7 @@ public class DenseLayer implements Layer {
         this.lossFunction = lossFunction;
         this.batchTrueValues = batchTrueValue;
         this.batchHotOneVecs = batchHotOneVec;
+        this.isUsingHotEncodedVec = isUsingHotEncodedVec;
         printInfo("Values set in DenseLayer(double[][] weights, double[][] batchInputs, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue)");
         printInfo("Beginning generation of individual layer and layer outputs...");
         this.generateLayer(weights, batchInputs);
@@ -112,7 +117,7 @@ public class DenseLayer implements Layer {
         printInfo("Generation of individual layer and layer outputs complete!");
     }
 
-    public DenseLayer(double[][] weights, double[] biases, double[] inputs, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue) {
+    public DenseLayer(double[][] weights, double[] biases, double[] inputs, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue, boolean isUsingHotEncodedVec) {
         this.neuronList = new ArrayList<>();
         this.neuronWeights = new double[0][0];
         this.neuronBiases = new double[0];
@@ -125,6 +130,7 @@ public class DenseLayer implements Layer {
         this.lossFunction = lossFunction;
         this.batchTrueValues = batchTrueValue;
         this.batchHotOneVecs = batchHotOneVec;
+        this.isUsingHotEncodedVec = isUsingHotEncodedVec;
         printInfo("Values set in DenseLayer(double[][] weights, double[] biases, double[] inputs, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue)");
         printInfo("Beginning generation of individual layer and layer outputs...");
         this.generateLayer(weights, biases, inputs);
@@ -132,7 +138,7 @@ public class DenseLayer implements Layer {
         printInfo("Generation of individual layer and layer outputs complete!");
     }
 
-    public DenseLayer(double[][] weights, double[] biases, double[][] batchInputs, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue) {
+    public DenseLayer(double[][] weights, double[] biases, double[][] batchInputs, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue, boolean isUsingHotEncodedVec) {
         this.neuronList = new ArrayList<>();
         this.neuronWeights = new double[0][0];
         this.neuronBiases = new double[0];
@@ -145,6 +151,7 @@ public class DenseLayer implements Layer {
         this.lossFunction = lossFunction;
         this.batchTrueValues = batchTrueValue;
         this.batchHotOneVecs = batchHotOneVec;
+        this.isUsingHotEncodedVec = isUsingHotEncodedVec;
         printInfo("Values set in DenseLayer(double[][] weights, double[] biases, double[][] batchInputs, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue)");
         printInfo("Beginning generation of individual layer and layer outputs...");
         this.generateLayer(weights, biases, batchInputs);
@@ -152,7 +159,7 @@ public class DenseLayer implements Layer {
         printInfo("Generation of individual layer and layer outputs complete!");
     }
 
-    public DenseLayer(int numberOfNeurons, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue) {
+    public DenseLayer(int numberOfNeurons, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue, boolean isUsingHotEncodedVec) {
         this.neuronList = new ArrayList<>();
         this.neuronWeights = new double[0][0];
         this.neuronBiases = new double[0];
@@ -165,6 +172,7 @@ public class DenseLayer implements Layer {
         this.lossFunction = lossFunction;
         this.batchTrueValues = batchTrueValue;
         this.batchHotOneVecs = batchHotOneVec;
+        this.isUsingHotEncodedVec = isUsingHotEncodedVec;
         printInfo("Values set in DenseLayer(int numberOfNeurons, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue)");
         printInfo("Beginning generation of individual layer and layer outputs...");
         this.generateLayer(numberOfNeurons);
@@ -382,7 +390,7 @@ public class DenseLayer implements Layer {
         if(this.batchTrueValues.length == 0){
             IntStream.range(0, batchLayerOutputs.length).parallel().forEachOrdered(i -> {
                 try {
-                    this.batchLayerLoss =  ErrorLossFunctions.lossFunction(this.lossFunction, batchHotOneVecs[i], batchLayerOutputs[i]);
+                    this.batchLayerLoss =  ErrorLossFunctions.lossFunction(this.lossFunction, batchHotOneVecs[i], batchLayerOutputs[i], this.isUsingHotEncodedVec);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -390,7 +398,7 @@ public class DenseLayer implements Layer {
         }
         IntStream.range(0, batchLayerOutputs.length).parallel().forEachOrdered(i -> {
             try {
-                this.batchLayerLoss = ErrorLossFunctions.lossFunction(this.lossFunction, batchTrueValues, batchLayerOutputs);
+                this.batchLayerLoss = ErrorLossFunctions.lossFunction(this.lossFunction, batchTrueValues, batchLayerOutputs, this.isUsingHotEncodedVec);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

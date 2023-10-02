@@ -22,7 +22,7 @@ public class DenseLayers {
     public static final Random random = new Random(0);
 
     private DenseLayers(int layers, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap,
-                        DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap) {
+                        DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap, boolean isUsingHotEncodedVec) {
         if(!hotOneVecMap.isEmpty() && !trueValuesMap.isEmpty()) throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!");
         if(hotOneVecMap.isEmpty() && trueValuesMap.isEmpty() && trueValues.length == 0 && hotOneVec.length == 0) throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!");
         this.layerList = new ArrayList<>();
@@ -36,13 +36,13 @@ public class DenseLayers {
             if (trueValueToUse.length == 0) hotOneVecMap.getOrDefault(i, hotOneVec);
 
             double[][] weights = randn(layers, layers);
-            if(i != 0) layerList.add(new DenseLayer(weights, layerList.get(i-1).getBatchLayerOutputs(), activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse));
-            else layerList.add(new DenseLayer(weights, initialInput, activationFunctionToUse, lossFunction, hotOneVecToUse, trueValueToUse));
+            if(i != 0) layerList.add(new DenseLayer(weights, layerList.get(i-1).getBatchLayerOutputs(), activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse, isUsingHotEncodedVec));
+            else layerList.add(new DenseLayer(weights, initialInput, activationFunctionToUse, lossFunction, hotOneVecToUse, trueValueToUse, isUsingHotEncodedVec));
         });
     }
 
     private DenseLayers(int layers, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap,
-                        DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap) {
+                        DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap, boolean isUsingHotEncodedVec) {
         if(!hotOneVecMap.isEmpty() && !trueValuesMap.isEmpty()) throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!");
         if(hotOneVecMap.isEmpty() && trueValuesMap.isEmpty() && trueValues.length == 0 && hotOneVec.length == 0) throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!");
         this.initialInput = initialInput;
@@ -56,13 +56,13 @@ public class DenseLayers {
             if (trueValueToUse.length == 0) hotOneVecMap.getOrDefault(i, hotOneVec);
 
             double[][] weights = randn(initialInput.length, initialInput[0].length);
-            if(i != 0) layerList.add(new DenseLayer(weights, layerList.get(i-1).getBatchLayerOutputs(), activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse));
-            else layerList.add(new DenseLayer(weights, initialInput, activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse));
+            if(i != 0) layerList.add(new DenseLayer(weights, layerList.get(i-1).getBatchLayerOutputs(), activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse, isUsingHotEncodedVec));
+            else layerList.add(new DenseLayer(weights, initialInput, activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse, isUsingHotEncodedVec));
         });
     }
 
     private DenseLayers(int layers, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap,
-                        DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap) {
+                        DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap, boolean isUsingHotEncodedVec) {
         if(!hotOneVecMap.isEmpty() && !trueValuesMap.isEmpty()) throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!");
         if(hotOneVecMap.isEmpty() && trueValuesMap.isEmpty() && trueValues.length == 0 && hotOneVec.length == 0) throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!");
         this.initialInput = initialInput;
@@ -77,15 +77,15 @@ public class DenseLayers {
 
             if(i != 0) {
                 double[][] weights = randn(initialWeights.length, initialInput[0].length);
-                layerList.add(new DenseLayer(weights, layerList.get(i - 1).getBatchLayerOutputs(), activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse));
+                layerList.add(new DenseLayer(weights, layerList.get(i - 1).getBatchLayerOutputs(), activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse, isUsingHotEncodedVec));
             } else {
-                layerList.add(new DenseLayer(initialWeights, initialInput, activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse));
+                layerList.add(new DenseLayer(initialWeights, initialInput, activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse, isUsingHotEncodedVec));
             }
         });
     }
 
     private DenseLayers(int layers, double[][] initialWeights, double[]biases, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap,
-                        DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap) {
+                        DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap, boolean isUsingHotEncodedVec) {
         if(!hotOneVecMap.isEmpty() && !trueValuesMap.isEmpty()) throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!");
         if(hotOneVecMap.isEmpty() && trueValuesMap.isEmpty() && trueValues.length == 0 && hotOneVec.length == 0) throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!");
         this.layerList = new ArrayList<>();
@@ -100,15 +100,15 @@ public class DenseLayers {
 
             if(i != 0) {
                 double[][] weights = randn(initialWeights.length, initialInput[0].length);
-                layerList.add(new DenseLayer(weights, layerList.get(i - 1).getBatchLayerOutputs(), activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse));
+                layerList.add(new DenseLayer(weights, layerList.get(i - 1).getBatchLayerOutputs(), activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse, isUsingHotEncodedVec));
             } else {
-                layerList.add(new DenseLayer(initialWeights, biases, initialInput, activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse));
+                layerList.add(new DenseLayer(initialWeights, biases, initialInput, activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse, isUsingHotEncodedVec));
             }
         });
     }
 
     private DenseLayers(int layers, int numberOfNeurons, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap,
-                        DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap) {
+                        DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap, boolean isUsingHotEncodedVec) {
         if(!hotOneVecMap.isEmpty() && !trueValuesMap.isEmpty()) throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!");
         if(hotOneVecMap.isEmpty() && trueValuesMap.isEmpty() && trueValues.length == 0 && hotOneVec.length == 0) throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!");
         this.layerList = new ArrayList<>();
@@ -123,13 +123,13 @@ public class DenseLayers {
             if (trueValueToUse.length == 0) hotOneVecMap.getOrDefault(i, hotOneVec);
 
             double[][] weights = randn(numberOfNeurons, numberOfNeurons);
-            if(i != 0) layerList.add(new DenseLayer(weights, layerList.get(i-1).getBatchLayerOutputs(), activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse));
-            else layerList.add(new DenseLayer(weights, initialInput, activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse));
+            if(i != 0) layerList.add(new DenseLayer(weights, layerList.get(i-1).getBatchLayerOutputs(), activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse, isUsingHotEncodedVec));
+            else layerList.add(new DenseLayer(weights, initialInput, activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse, isUsingHotEncodedVec));
         });
     }
 
     private DenseLayers(int layers, int numberOfNeurons, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap,
-                        DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap) {
+                        DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap, boolean isUsingHotEncodedVec) {
         if(!hotOneVecMap.isEmpty() && !trueValuesMap.isEmpty()) throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!");
         if(hotOneVecMap.isEmpty() && trueValuesMap.isEmpty() && trueValues.length == 0 && hotOneVec.length == 0) throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!");
         if(numberOfNeurons != initialInput.length) {
@@ -146,13 +146,13 @@ public class DenseLayers {
             if (trueValueToUse.length == 0) hotOneVecMap.getOrDefault(i, hotOneVec);
 
             double[][] weights = randn(numberOfNeurons, initialInput[0].length);
-            if(i != 0) layerList.add(new DenseLayer(weights, layerList.get(i-1).getBatchLayerOutputs(), activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse));
-            else layerList.add(new DenseLayer(weights, initialInput, activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse));
+            if(i != 0) layerList.add(new DenseLayer(weights, layerList.get(i-1).getBatchLayerOutputs(), activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse, isUsingHotEncodedVec));
+            else layerList.add(new DenseLayer(weights, initialInput, activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse, isUsingHotEncodedVec));
         });
     }
 
     private DenseLayers(int layers, int numberOfNeurons, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap,
-                        DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap) {
+                        DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap, boolean isUsingHotEncodedVec) {
         if(!hotOneVecMap.isEmpty() && !trueValuesMap.isEmpty()) throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!");
         if(hotOneVecMap.isEmpty() && trueValuesMap.isEmpty() && trueValues.length == 0 && hotOneVec.length == 0) throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!");
         this.initialInput = initialInput;
@@ -167,15 +167,15 @@ public class DenseLayers {
 
             if(i != 0) {
                 double[][] weights = randn(numberOfNeurons, numberOfNeurons);
-                layerList.add(new DenseLayer(weights, layerList.get(i - 1).getBatchLayerOutputs(), activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse));
+                layerList.add(new DenseLayer(weights, layerList.get(i - 1).getBatchLayerOutputs(), activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse, isUsingHotEncodedVec));
             } else {
-                layerList.add(new DenseLayer(initialWeights, initialInput, activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse));
+                layerList.add(new DenseLayer(initialWeights, initialInput, activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse, isUsingHotEncodedVec));
             }
         });
     }
 
     private DenseLayers(int layers, int numberOfNeurons, double[][] initialWeights, double[]biases, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap,
-                        DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap) {
+                        DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap, boolean isUsingHotEncodedVec) {
         if(!hotOneVecMap.isEmpty() && !trueValuesMap.isEmpty()) throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!");
         if(hotOneVecMap.isEmpty() && trueValuesMap.isEmpty() && trueValues.length == 0 && hotOneVec.length == 0) throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!");
         this.layerList = new ArrayList<>();
@@ -190,15 +190,15 @@ public class DenseLayers {
 
             if(i != 0) {
                 double[][] weights = randn(numberOfNeurons, numberOfNeurons);
-                layerList.add(new DenseLayer(weights, layerList.get(i - 1).getBatchLayerOutputs(), activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse));
+                layerList.add(new DenseLayer(weights, layerList.get(i - 1).getBatchLayerOutputs(), activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse, isUsingHotEncodedVec));
             } else {
-                layerList.add(new DenseLayer(initialWeights, biases, initialInput, activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse));
+                layerList.add(new DenseLayer(initialWeights, biases, initialInput, activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse, isUsingHotEncodedVec));
             }
         });
     }
 
     private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap,
-                        DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap) {
+                        DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap, boolean isUsingHotEncodedVec) {
         if(!hotOneVecMap.isEmpty() && !trueValuesMap.isEmpty()) throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!");
         if(hotOneVecMap.isEmpty() && trueValuesMap.isEmpty() && trueValues.length == 0 && hotOneVec.length == 0) throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!");
         if(layers != numberOfNeuronsPerLayer.length) {
@@ -218,17 +218,17 @@ public class DenseLayers {
             double[][] weights;
             if(i != 0) {
                 weights = randn(numberOfNeuronsPerLayer[i], numberOfNeuronsPerLayer[i-1]);
-                layerList.add(new DenseLayer(weights, layerList.get(i-1).getBatchLayerOutputs(), activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse));
+                layerList.add(new DenseLayer(weights, layerList.get(i-1).getBatchLayerOutputs(), activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse, isUsingHotEncodedVec));
             }
             else {
                 weights = randn(numberOfNeuronsPerLayer[i], numberOfNeuronsPerLayer[i]);
-                layerList.add(new DenseLayer(weights, initialInput, activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse));
+                layerList.add(new DenseLayer(weights, initialInput, activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse, isUsingHotEncodedVec));
             }
         });
     }
 
     private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap,
-                        DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap) {
+                        DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap, boolean isUsingHotEncodedVec) {
         if(!hotOneVecMap.isEmpty() && !trueValuesMap.isEmpty()) throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!");
         if(hotOneVecMap.isEmpty() && trueValuesMap.isEmpty() && trueValues.length == 0 && hotOneVec.length == 0) throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!");
         this.initialInput = initialInput;
@@ -244,17 +244,17 @@ public class DenseLayers {
             double[][] weights;
             if(i != 0) {
                 weights = randn(numberOfNeuronsPerLayer[i], numberOfNeuronsPerLayer[i-1]);
-                layerList.add(new DenseLayer(weights, layerList.get(i-1).getBatchLayerOutputs(), activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse));
+                layerList.add(new DenseLayer(weights, layerList.get(i-1).getBatchLayerOutputs(), activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse, isUsingHotEncodedVec));
             }
             else {
                 weights = randn(numberOfNeuronsPerLayer[i], initialInput[0].length);
-                layerList.add(new DenseLayer(weights, initialInput, activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse));
+                layerList.add(new DenseLayer(weights, initialInput, activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse, isUsingHotEncodedVec));
             }
         });
     }
 
     private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap,
-                        DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap) {
+                        DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap, boolean isUsingHotEncodedVec) {
         if(!hotOneVecMap.isEmpty() && !trueValuesMap.isEmpty()) throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!");
         if(hotOneVecMap.isEmpty() && trueValuesMap.isEmpty() && trueValues.length == 0 && hotOneVec.length == 0) throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!");
         this.layerList = new ArrayList<>();
@@ -269,15 +269,15 @@ public class DenseLayers {
 
             if(i != 0) {
                 double[][] weights = randn(numberOfNeuronsPerLayer[i], numberOfNeuronsPerLayer[i-1]);
-                layerList.add(new DenseLayer(weights, layerList.get(i - 1).getBatchLayerOutputs(), activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse));
+                layerList.add(new DenseLayer(weights, layerList.get(i - 1).getBatchLayerOutputs(), activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse, isUsingHotEncodedVec));
             } else {
-                layerList.add(new DenseLayer(initialWeights, initialInput, activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse));
+                layerList.add(new DenseLayer(initialWeights, initialInput, activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse, isUsingHotEncodedVec));
             }
         });
     }
 
     private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialWeights, double[]biases, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap,
-                        DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap) {
+                        DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap, boolean isUsingHotEncodedVec) {
         if(!hotOneVecMap.isEmpty() && !trueValuesMap.isEmpty()) throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!");
         if(hotOneVecMap.isEmpty() && trueValuesMap.isEmpty() && trueValues.length == 0 && hotOneVec.length == 0) throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!");
         this.layerList = new ArrayList<>();
@@ -292,9 +292,9 @@ public class DenseLayers {
 
             if(i != 0) {
                 double[][] weights = randn(numberOfNeuronsPerLayer[i], numberOfNeuronsPerLayer[i-1]);
-                layerList.add(new DenseLayer(weights, layerList.get(i - 1).getBatchLayerOutputs(), activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse));
+                layerList.add(new DenseLayer(weights, layerList.get(i - 1).getBatchLayerOutputs(), activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse, isUsingHotEncodedVec));
             } else {
-                layerList.add(new DenseLayer(initialWeights, biases, initialInput, activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse));
+                layerList.add(new DenseLayer(initialWeights, biases, initialInput, activationFunctionToUse, lossFunctionToUse, hotOneVecToUse, trueValueToUse, isUsingHotEncodedVec));
             }
         });
     }
@@ -361,6 +361,7 @@ public class DenseLayers {
         private final Map<Integer, int[]> trueValueIndexMap = new HashMap<>();
         private boolean hasSetSpecificLayerLossFunctions = false;
         private boolean isUsingTrueValueIndex = false;
+        private boolean isUsingHotEncodedVec = true;
 
         private int numberOfLayers = 1;
         private boolean isUsingNumberOfLayers = false;
@@ -475,11 +476,13 @@ public class DenseLayers {
         }
         public DenseLayersBuilder withTrueValue(int[] trueValueIndex){
             this.isUsingTrueValueIndex = true;
+            this.isUsingHotEncodedVec = false;
             this.trueValueIndex = trueValueIndex;
             return this;
         }
         public DenseLayersBuilder withHotOneVector(int[][] hotOneVec){
             this.isUsingTrueValueIndex = false;
+            this.isUsingHotEncodedVec = true;
             this.hotOneVec = hotOneVec;
             return this;
         }
@@ -524,13 +527,11 @@ public class DenseLayers {
         public DenseLayers build(){
             DenseLayers built = null;
             if(!this.isUsingNumberOfLayers && !this.isUsingListOfLayers) throw new IllegalArgumentException("Please use the numberOfLayers() builder method to initialize, or provide an ArrayList<DenseLayer> using the withLayerList() builder method!");
-
-
             if(!this.isUsingSpecificNeurons && !this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingBatchInputs){
                 if(this.isUsingFileAsInput && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     printInfo("Using construct 1.1");
                     built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap,
-                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights set to", this.initialWeights);
@@ -549,7 +550,7 @@ public class DenseLayers {
                 else if(this.isUsingFileAsInput && this.isUsingSpecificWeights) {
                     printInfo("Using construct 1.2");
                     built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap,
-                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights set to", this.initialWeights);
@@ -567,7 +568,7 @@ public class DenseLayers {
                 else if(this.isUsingFileAsInput) {
                     printInfo("Using construct 1.3");
                     built = new DenseLayers(this.numberOfLayers, this.initialInput, this.activationFunction, this.activationFunctionsMap,
-                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights not set!");
@@ -586,7 +587,7 @@ public class DenseLayers {
                 else if(!this.isUsingFileAsInput && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printInfo("Using construct 1.4");
                     built = new DenseLayers(this.numberOfLayers, this.activationFunction, this.activationFunctionsMap,
-                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights not set!");
@@ -607,7 +608,7 @@ public class DenseLayers {
                 if(this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     printInfo("Using construct 2.1");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap,
-                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights set to", this.initialWeights);
@@ -626,7 +627,7 @@ public class DenseLayers {
                 else if(this.isUsingFileAsInput  && this.isUsingSpecificWeights) {
                     printInfo("Using construct 2.2");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap,
-                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights set to", this.initialWeights);
@@ -645,7 +646,7 @@ public class DenseLayers {
                 else if(this.isUsingFileAsInput) {
                     printInfo("Using construct 2.3");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialInput, this.activationFunction, this.activationFunctionsMap,
-                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights not set!");
@@ -664,7 +665,7 @@ public class DenseLayers {
                 else if(!this.isUsingFileAsInput && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printInfo("Using construct 2.4");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.activationFunction, this.activationFunctionsMap,
-                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights not set!");
@@ -685,7 +686,7 @@ public class DenseLayers {
                 if(this.isUsingFileAsInput && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     printInfo("Using construct 3.1");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap,
-                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights set to", this.initialWeights);
@@ -704,7 +705,7 @@ public class DenseLayers {
                 else if(this.isUsingFileAsInput && this.isUsingSpecificWeights) {
                     printInfo("Using construct 3.2");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap,
-                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights set to", this.initialWeights);
@@ -723,7 +724,7 @@ public class DenseLayers {
                 else if(this.isUsingFileAsInput) {
                     printInfo("Using construct 3.3");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialInput, this.activationFunction, this.activationFunctionsMap,
-                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights not set!");
@@ -742,7 +743,7 @@ public class DenseLayers {
                 else if(!this.isUsingFileAsInput && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printInfo("Using construct 3.4");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.activationFunction, this.activationFunctionsMap,
-                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights not set!");
@@ -763,7 +764,7 @@ public class DenseLayers {
                 if(this.isUsingBatchInputs && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     printInfo("Using construct 4.1");
                     built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap,
-                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights set to", this.initialWeights);
@@ -782,7 +783,7 @@ public class DenseLayers {
                 else if(this.isUsingBatchInputs  && this.isUsingSpecificWeights) {
                     printInfo("Using construct 4.2");
                     built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap,
-                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights set to", this.initialWeights);
@@ -801,7 +802,7 @@ public class DenseLayers {
                 else if(this.isUsingBatchInputs) {
                     printInfo("Using construct 4.3");
                     built = new DenseLayers(this.numberOfLayers, this.initialInput, this.activationFunction, this.activationFunctionsMap,
-                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights not set!");
@@ -820,7 +821,7 @@ public class DenseLayers {
                 else if(!this.isUsingBatchInputs && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printInfo("Using construct 4.4");
                     built = new DenseLayers(this.numberOfLayers, this.activationFunction, this.activationFunctionsMap,
-                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights not set!");
@@ -841,7 +842,7 @@ public class DenseLayers {
                 if(this.isUsingBatchInputs && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     printInfo("Using construct 5.1");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap,
-                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights set to", this.initialWeights);
@@ -860,7 +861,7 @@ public class DenseLayers {
                 else if(this.isUsingBatchInputs  && this.isUsingSpecificWeights) {
                     printInfo("Using construct 5.2");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap,
-                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights set to", this.initialWeights);
@@ -879,7 +880,7 @@ public class DenseLayers {
                 else if(this.isUsingBatchInputs) {
                     printInfo("Using construct 5.3");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialInput, this.activationFunction, this.activationFunctionsMap,
-                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights not set!");
@@ -898,7 +899,7 @@ public class DenseLayers {
                 else if(!this.isUsingBatchInputs && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printInfo("Using construct 5.4");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.activationFunction, this.activationFunctionsMap,
-                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights not set!");
@@ -919,7 +920,7 @@ public class DenseLayers {
                 if(this.isUsingBatchInputs && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     printInfo("Using construct 6.1");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap,
-                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights set to", this.initialWeights);
@@ -938,7 +939,7 @@ public class DenseLayers {
                 else if(this.isUsingBatchInputs  && this.isUsingSpecificWeights) {
                     printInfo("Using construct 6.2");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap,
-                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights set to", this.initialWeights);
@@ -957,7 +958,7 @@ public class DenseLayers {
                 else if(this.isUsingBatchInputs) {
                     printInfo("Using construct 6.3");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialInput, this.activationFunction, this.activationFunctionsMap,
-                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights not set!");
@@ -976,7 +977,7 @@ public class DenseLayers {
                 else if(!this.isUsingBatchInputs && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printInfo("Using construct 6.4");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.activationFunction, this.activationFunctionsMap,
-                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                            this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights not set!");
@@ -995,7 +996,7 @@ public class DenseLayers {
             }
             else {
                 built = new DenseLayers(2, DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION, this.activationFunctionsMap,
-                        this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap);
+                        this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
                 if(this.isUsingBatchInputs && this.isUsingFileAsInput){
                     throw new RuntimeException(bold(red("Builder Not Configured Properly! Do Not Use File As Input and Batch Input Together!")));
                 }

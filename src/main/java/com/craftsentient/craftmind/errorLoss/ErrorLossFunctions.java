@@ -1,5 +1,7 @@
 package com.craftsentient.craftmind.errorLoss;
 
+import com.craftsentient.craftmind.utils.PrintUtils;
+
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
@@ -56,21 +58,27 @@ public class ErrorLossFunctions {
         }
     }
 
-    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueClass, double[] predictedValues) throws Exception {
+    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueClass, double[] predictedValues, boolean usingHotEncodedVec) throws Exception {
         switch (lossFunction) {
             case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues); }
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
-    public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueClass, double[][] predictedValues) throws Exception {
+    public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueClass, double[][] predictedValues, boolean usingHotEncodedVec) throws Exception {
         switch (lossFunction) {
-            case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues); }
+            case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues, usingHotEncodedVec); }
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
-    public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueClass, double[] predictedValues) throws Exception {
+    public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueClass, double[] predictedValues, boolean usingHotEncodedVec) throws Exception {
         switch (lossFunction) {
-            case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues); }
+            case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues, usingHotEncodedVec); }
+            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+        }
+    }
+    public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] trueClass, double[][] predictedValues, boolean usingHotEncodedVec) throws Exception {
+        switch (lossFunction) {
+            case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues, usingHotEncodedVec); }
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
@@ -347,14 +355,15 @@ public class ErrorLossFunctions {
         }
         return -Math.log(predictedProbability);
     }
-    private static double[] negativeLogLikelihood(int[] trueValues, double[] predictedValues){
+    private static double[] negativeLogLikelihood(int[] trueValues, double[] predictedValues, boolean usingHotEncodedVec){
         double[] loss = new double[trueValues.length];
         int trueClass = 0;
         for(int i = 0; i < trueValues.length; i++){
             if(trueValues[i] == 1) trueClass = i;
         }
         int finalTrueClass = trueClass;
-        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = negativeLogLikelihood(finalTrueClass, predictedValues));
+        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i ->
+                loss[i] = negativeLogLikelihood(usingHotEncodedVec ? finalTrueClass : trueValues[i], predictedValues));
         return loss;
     }
     /**
@@ -364,13 +373,15 @@ public class ErrorLossFunctions {
      * @param trueValues The actual class indices.
      * @return The NLL value for the given observation.
      */
-    private static double[] negativeLogLikelihood(int[] trueValues, double[][] predictedValues) {
+    private static double[] negativeLogLikelihood(int[] trueValues, double[][] predictedValues, boolean usingHotEncodedVec) {
         double[] loss = new double[trueValues.length];
         int[] trueClasses = new int[trueValues.length];
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> {
-             if(trueValues[i] == 1) trueClasses[i] = i;
+             if(trueValues[i] == 1 && usingHotEncodedVec) trueClasses[i] = i;
         });
-        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = negativeLogLikelihood(trueClasses[i], predictedValues[i]));
+        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> {
+            loss[i] = negativeLogLikelihood(usingHotEncodedVec ? trueClasses[i] : trueValues[i], predictedValues[i]);
+        });
         return loss;
     }
     /**
@@ -380,11 +391,13 @@ public class ErrorLossFunctions {
      * @param trueValues The actual class of batch indices.
      * @return The NLL value for the given observation.
      */
-    private static double[] negativeLogLikelihood(int[][] trueValues, double[][] predictedValues) {
+    private static double[] negativeLogLikelihood(int[][] trueValues, double[][] predictedValues, boolean usingHotEncodedVec) {
         double[] loss = new double[trueValues.length];
         int[] trueClasses = new int[trueValues.length];
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> {
-            IntStream.range(0, trueValues[i].length).parallel().forEachOrdered(j -> { if(trueValues[i][j] == 1) trueClasses[i] = j; });
+            IntStream.range(0, trueValues[i].length).parallel().forEachOrdered(j -> {
+                if(trueValues[i][j] == 1 && usingHotEncodedVec) trueClasses[i] = j;
+            });
         });
         IntStream.range(0, trueClasses.length).parallel().forEachOrdered(i -> loss[i] = negativeLogLikelihood(trueClasses[i], predictedValues[i]));
         return loss;
