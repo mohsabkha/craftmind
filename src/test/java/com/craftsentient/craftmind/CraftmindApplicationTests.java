@@ -38,7 +38,7 @@ class CraftmindApplicationTests {
 
         //builtLayer.printLayers("BUILD WITHOUT FILE");
         builtLayerWithFile.printLayers("BUILT WITH FILE NETWORK");
-        PrintUtils.printGeneric(builtLayerWithFile.generateLoss(), "Layer Loss");
+        //PrintUtils.printGeneric(builtLayerWithFile.generateLoss(), "Layer Loss");
     }
 
     @Test

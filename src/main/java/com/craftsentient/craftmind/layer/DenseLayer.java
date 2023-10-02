@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 import static com.craftsentient.craftmind.activation.ActivationFunctions.activationFunction;
+import static com.craftsentient.craftmind.utils.PrintUtils.printInfo;
 
 @Getter
 @AllArgsConstructor
@@ -48,6 +49,7 @@ public class DenseLayer implements Layer {
         this.batchTrueValues = new int[0];
         this.batchHotOneVecs = new int[0][0];
         this.batchLayerLoss = new double[0];
+        printInfo("Values set in DenseLayer()");
     }
 
     public DenseLayer(double[][] weights, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue) {
@@ -63,9 +65,11 @@ public class DenseLayer implements Layer {
         this.lossFunction = lossFunction;
         this.batchTrueValues = batchTrueValue;
         this.batchHotOneVecs = batchHotOneVec;
-
+        printInfo("Values set in DenseLayer(double[][] weights, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue)");
+        printInfo("Beginning generation of individual layer and layer outputs...");
         this.generateLayer(weights);
         this.generateBatchedLayerOutput(weights.length);
+        printInfo("Generation of individual layer and layer outputs complete!");
     }
 
     public DenseLayer(double[][] weights, double[] biases, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue) {
@@ -81,8 +85,11 @@ public class DenseLayer implements Layer {
         this.lossFunction = lossFunction;
         this.batchTrueValues = batchTrueValue;
         this.batchHotOneVecs = batchHotOneVec;
+        printInfo("Values set in DenseLayer(double[][] weights, double[] biases, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue)");
+        printInfo("Beginning generation of individual layer and layer outputs...");
         this.generateLayer(weights, biases);
         this.generateBatchedLayerOutput(weights.length);
+        printInfo("Generation of individual layer and layer outputs complete!");
     }
 
     public DenseLayer(double[][] weights, double[][] batchInputs, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue) {
@@ -98,8 +105,11 @@ public class DenseLayer implements Layer {
         this.lossFunction = lossFunction;
         this.batchTrueValues = batchTrueValue;
         this.batchHotOneVecs = batchHotOneVec;
+        printInfo("Values set in DenseLayer(double[][] weights, double[][] batchInputs, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue)");
+        printInfo("Beginning generation of individual layer and layer outputs...");
         this.generateLayer(weights, batchInputs);
         this.generateBatchedLayerOutput(weights.length);
+        printInfo("Generation of individual layer and layer outputs complete!");
     }
 
     public DenseLayer(double[][] weights, double[] biases, double[] inputs, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue) {
@@ -115,8 +125,11 @@ public class DenseLayer implements Layer {
         this.lossFunction = lossFunction;
         this.batchTrueValues = batchTrueValue;
         this.batchHotOneVecs = batchHotOneVec;
+        printInfo("Values set in DenseLayer(double[][] weights, double[] biases, double[] inputs, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue)");
+        printInfo("Beginning generation of individual layer and layer outputs...");
         this.generateLayer(weights, biases, inputs);
         this.generateBatchedLayerOutput(weights.length);
+        printInfo("Generation of individual layer and layer outputs complete!");
     }
 
     public DenseLayer(double[][] weights, double[] biases, double[][] batchInputs, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue) {
@@ -132,8 +145,11 @@ public class DenseLayer implements Layer {
         this.lossFunction = lossFunction;
         this.batchTrueValues = batchTrueValue;
         this.batchHotOneVecs = batchHotOneVec;
+        printInfo("Values set in DenseLayer(double[][] weights, double[] biases, double[][] batchInputs, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue)");
+        printInfo("Beginning generation of individual layer and layer outputs...");
         this.generateLayer(weights, biases, batchInputs);
         this.generateBatchedLayerOutput(weights.length);
+        printInfo("Generation of individual layer and layer outputs complete!");
     }
 
     public DenseLayer(int numberOfNeurons, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue) {
@@ -149,11 +165,15 @@ public class DenseLayer implements Layer {
         this.lossFunction = lossFunction;
         this.batchTrueValues = batchTrueValue;
         this.batchHotOneVecs = batchHotOneVec;
+        printInfo("Values set in DenseLayer(int numberOfNeurons, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue)");
+        printInfo("Beginning generation of individual layer and layer outputs...");
         this.generateLayer(numberOfNeurons);
         this.generateBatchedLayerOutput(numberOfNeurons);
+        printInfo("Generation of individual layer and layer outputs complete!");
     }
 
     public Object generateLayerOutput() throws Exception {
+        printInfo("Entered generateLayerOutput()");
         if (this.inputs.length == 0) {
             return generateBatchedLayerOutput(this.batchInputs.length);
         }
@@ -161,6 +181,7 @@ public class DenseLayer implements Layer {
     }
 
     public double[][] generateBatchedLayerOutput(int batchSize) {
+        printInfo("Entered generateBatchedLayerOutput(int batchSize)");
         this.batchLayerOutputs = new double[0][0];
         if (this.isHiddenLayer) {
             if (this.neuronWeights[0].length != this.batchInputs[0].length) {
@@ -175,6 +196,7 @@ public class DenseLayer implements Layer {
     }
 
     public double[] generateNonBatchedLayerOutput(double[] inputs) throws Exception {
+        printInfo("Entered generateNonBatchedLayerOutput(double[] inputs)");
         this.layerOutputs = new double[0];
         IntStream.range(0, this.neuronBiases.length).forEach(i -> {
             try {
@@ -192,6 +214,7 @@ public class DenseLayer implements Layer {
     }
 
     public void generateOutput(int batchSize) {
+        printInfo("Entered generateOutput(int batchSize)");
         IntStream.range(0, batchSize).forEach(i -> {
             try {
                 this.generateNonBatchedLayerOutput(this.batchInputs[i]);
@@ -203,28 +226,34 @@ public class DenseLayer implements Layer {
     }
 
     public void addOutput(double value) throws Exception {
+        printInfo("Entered addOutput(double value)");
         this.layerOutputs = MathUtils.addToDoubleArray(this.layerOutputs, value);
     }
 
     public void addOutput(double[] values) throws Exception {
+        printInfo("Entered addOutput(double[] values)");
         this.batchLayerOutputs = MathUtils.addToDoubleArray(this.batchLayerOutputs, values);
     }
 
     public void addOutput(double value, double alpha, double beta) throws Exception {
+        printInfo("Entered addOutput(double value, double alpha, double beta)");
         this.layerOutputs = MathUtils.addToDoubleArray(this.layerOutputs, value);
     }
 
     public void addOutput(double[] values, double[] alphas, double[] betas) throws Exception {
+        printInfo("Entered addOutput(double[] values, double[] alphas, double[] betas)");
         this.batchLayerOutputs = MathUtils.addToDoubleArray(this.batchLayerOutputs,  activationFunction(this.activationFunction, values, alphas, betas));
     }
 
     public void addNeuron(Neuron neuron) {
+        printInfo("Entered addNeuron(Neuron neuron)");
         this.neuronList.add(neuron);
         this.neuronWeights = MathUtils.addToDoubleArray(this.neuronWeights, neuron.getWeights());
         this.neuronBiases = MathUtils.addToDoubleArray(this.neuronBiases, neuron.getBias());
     }
 
     public void addNeurons(ArrayList<Neuron> neurons) {
+        printInfo("Entered addNeurons(ArrayList<Neuron> neurons)");
         this.neuronList = neurons;
         IntStream.range(0, neurons.size()).parallel().forEachOrdered(i -> {
             this.neuronWeights = MathUtils.addToDoubleArray(this.neuronWeights, neurons.get(i).getWeights());
@@ -233,6 +262,7 @@ public class DenseLayer implements Layer {
     }
 
     public void addWeights(double[][] weights) {
+        printInfo("Entered addWeights(double[][] weights)");
         this.neuronWeights = weights;
         IntStream.range(0, weights.length).parallel().forEachOrdered(i -> {
             this.neuronList.add(new Neuron(weights[i], 1));
@@ -241,6 +271,7 @@ public class DenseLayer implements Layer {
     }
 
     public void addWeightsAndBiases(double[][] weights, double[] biases) {
+        printInfo("Entered addWeightsAndBiases(double[][] weights, double[] biases)");
         this.neuronWeights = weights;
         this.neuronBiases = biases;
         IntStream.range(0, weights.length).parallel().forEachOrdered(i -> {
@@ -252,29 +283,35 @@ public class DenseLayer implements Layer {
     }
 
     public void addInput(double inputValue) {
+        printInfo("Entered addInput(double inputValue)");
         this.inputs = MathUtils.addToDoubleArray(this.inputs, inputValue);
     }
 
     public void addInput(double[] inputsValues) {
+        printInfo("Entered addInput(double[] inputsValues)");
         this.batchInputs = MathUtils.addToDoubleArray(this.batchInputs, inputsValues);
     }
 
     public void addInput(double[][] inputValues) {
+        printInfo("Entered addInput(double[][] inputValues)");
         IntStream.range(0, inputValues.length).forEach(i -> addInput(inputValues[i]));
     }
 
     @Override
     public void useOutputFromPreviousLayerAsInput(Layer layer) throws Exception {
+        printInfo("Entered useOutputFromPreviousLayerAsInput(Layer layer)");
         useOutputFromPreviousLayerAsInput((DenseLayer) layer);
     }
 
     public void useOutputFromPreviousLayerAsInput(DenseLayer layer) throws Exception {
+        printInfo("Entered useOutputFromPreviousLayerAsInput(DenseLayer layer)");
         this.isHiddenLayer = true;
         if (inputs.length != 0) this.inputs = (double[]) layer.generateLayerOutput();
         else this.batchInputs = layer.getBatchLayerOutputs();
     }
 
     public void generateLayer(int numberOfNeurons) {
+        printInfo("Entered generateLayer(int numberOfNeurons)");
         this.neuronList = new ArrayList<>();
         for (int i = 0; i < numberOfNeurons; i++) {
             this.neuronList.add(new Neuron(numberOfNeurons, 1.0));
@@ -285,6 +322,7 @@ public class DenseLayer implements Layer {
     }
 
     public void generateLayer(double[][] weights) {
+        printInfo("Entered generateLayer(double[][] weights)");
         this.neuronList = new ArrayList<>();
         this.neuronWeights = weights;
         for (double[] weight : weights) {
@@ -294,6 +332,7 @@ public class DenseLayer implements Layer {
     }
 
     public void generateLayer(double[][] weights, double[][] batchInputs) {
+        printInfo("Entered generateLayer(double[][] weights, double[][] batchInputs)");
         this.neuronList = new ArrayList<>();
         this.neuronWeights = weights;
         this.batchInputs = batchInputs;
@@ -305,6 +344,7 @@ public class DenseLayer implements Layer {
     }
 
     public void generateLayer(double[][] weights, double[] biases) {
+        printInfo("Entered generateLayer(double[][] weights, double[] biases)");
         this.neuronList = new ArrayList<>();
         this.neuronWeights = weights;
         this.neuronBiases = biases;
@@ -314,16 +354,19 @@ public class DenseLayer implements Layer {
     }
 
     public void generateLayer(double[][] weights, double[] biases, double[] inputs) {
+        printInfo("Entered generateLayer(double[][] weights, double[] biases, double[] inputs)");
         this.neuronList = new ArrayList<>();
         this.neuronWeights = weights;
         this.neuronBiases = biases;
         this.inputs = inputs;
+        printInfo("Adding neurons to neuron list...");
         for (int i = 0; i < weights.length; i++) {
             this.neuronList.add(new Neuron(weights[i], biases[i]));
         }
     }
 
     public void generateLayer(double[][] weights, double[] biases, double[][] batchInputs) {
+        printInfo("Entered generateLayer(double[][] weights, double[] biases, double[][] batchInputs)");
         this.neuronList = new ArrayList<>();
         this.neuronWeights = weights;
         this.neuronBiases = biases;
@@ -334,6 +377,7 @@ public class DenseLayer implements Layer {
     }
 
     public double[] generateLoss(){
+        printInfo("Entered generateLoss()");
         this.batchLayerLoss = new double[this.batchLayerOutputs.length];
         if(this.batchTrueValues.length == 0){
             IntStream.range(0, batchLayerOutputs.length).parallel().forEachOrdered(i -> {

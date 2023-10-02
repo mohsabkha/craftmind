@@ -5,8 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class FileUtils {
 
@@ -26,7 +25,7 @@ public class FileUtils {
             }
             bufferedReader.close();
             double[][] finalInputs = new double[inputs.size()][];
-            for(int i = 0; i < inputs.size(); i++) finalInputs[i] = inputs.get(i);
+            IntStream.range(0, inputs.size()).parallel().forEachOrdered( i -> finalInputs[i] = inputs.get(i));
             return finalInputs;
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
@@ -51,7 +50,7 @@ public class FileUtils {
             }
             bufferedReader.close();
             double[][] finalInputs = new double[inputs.size()][];
-            for(int i = 0; i < inputs.size(); i++) finalInputs[i] = inputs.get(i);
+            IntStream.range(0, inputs.size()).parallel().forEachOrdered( i -> finalInputs[i] = inputs.get(i));
             return finalInputs;
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
