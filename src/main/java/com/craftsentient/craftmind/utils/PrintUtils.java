@@ -1,5 +1,6 @@
 package com.craftsentient.craftmind.utils;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
@@ -78,7 +79,6 @@ public class PrintUtils {
     public static String bold(String str){
         return BOLD + str + RESET;
     }
-
 
     public static void printGeneric(double[] vec, String label){
         System.out.println(bold(cyan(":::: " + label + " ::::")));
@@ -287,6 +287,24 @@ public class PrintUtils {
     public static void printInfo(String data){
         System.out.println(blue(bold("[INFO] ")) + data);
     }
+    public static void printInfo(double data){
+        System.out.println(blue(bold("[INFO] ")) + data);
+    }
+    public static void printInfo(int data){
+        System.out.println(blue(bold("[INFO] ")) + data);
+    }
+    public static void printInfo(long data){
+        System.out.println(blue(bold("[INFO] ")) + data);
+    }
+    public static void printInfo(String info, double data){
+        System.out.println(blue(bold("[INFO] ")) + info + " " + data);
+    }
+    public static void printInfo(String info, int data){
+        System.out.println(blue(bold("[INFO] ")) + info + " " + data);
+    }
+    public static void printInfo(String info, long data){
+        System.out.println(blue(bold("[INFO] ")) + info + " " + data);
+    }
     public static void printInfo(double[] vec){
         System.out.print(bold(blue("[INFO] ")));
         IntStream.range(0, vec.length).forEach(i-> {
@@ -450,6 +468,29 @@ public class PrintUtils {
                 else System.out.print(matrix[i][j] + ", ");
             });
             if(i != matrix.length - 1) System.out.print(",");
+        });
+        System.out.print("\n");
+    }
+
+    public static <K, V> void printInfo(Map<K, V> map){
+        System.out.print(bold(blue("[INFO] ")));
+        IntStream.range(0, map.size()).forEach(i-> {
+            System.out.print(String.valueOf(i) + map.get(i));
+        });
+        System.out.print("\n");
+    }
+
+    public static <Integer, V> void printInfo(String info, Map<Integer, V> map){
+        System.out.print(bold(blue("[INFO] ")) + info + " ");
+        map.forEach((i, v) -> {
+            if (map.size() == 1) {
+                System.out.print(blue(bold("<")) + i + ": " + v + blue(bold(">")));
+                System.out.print("\n");
+                return;
+            }
+            if (i.equals(0)) System.out.print(blue(bold("<")) + i + ": " + v + ",  ");
+            else if (i.equals(map.size()-1)) System.out.print(i + ": " + v + blue(bold(">")));
+            else System.out.print(i + ": " + map.get(i) + ",  ");
         });
         System.out.print("\n");
     }

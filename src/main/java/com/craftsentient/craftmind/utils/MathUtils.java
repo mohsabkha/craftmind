@@ -3,6 +3,7 @@ package com.craftsentient.craftmind.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -245,6 +246,40 @@ public class MathUtils {
         return values;
     }
 
+    public static double mean(double[] values){
+        double meanLoss = 0;
+        for(int i = 0; i < values.length; i++){
+            meanLoss += values[i];
+        }
+        return meanLoss/3.0;
+    }
+
+    public static double[] mean(double[][] values){
+        double[] meanLoss = new double[values.length];
+        for(int i = 0; i < values.length; i++){
+            meanLoss[i] = mean(values[i]);
+        }
+        return meanLoss;
+    }
+
+    public static double max(double[] values){
+        double max = 0;
+        for(int i = 0; i < values.length; i++){
+            if(max < values[i]) max = values[i];
+        }
+        return max;
+    }
+
+    public static double[] indexAndMax(double[] values){
+        double[] indexAndMax = new double[2];
+        for(int i = 0; i < values.length; i++){
+            if(indexAndMax[1] < values[i]) {
+                indexAndMax[0] = i;
+                indexAndMax[1] = values[i];
+            };
+        }
+        return indexAndMax;
+    }
 
     public static void print(double[][] matrix) {
         System.out.println("Matrix (" + matrix.length +" x " + matrix[0].length + ")");

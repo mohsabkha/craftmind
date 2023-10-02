@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
 import static com.craftsentient.craftmind.utils.PrintUtils.*;
@@ -19,6 +20,9 @@ import static com.craftsentient.craftmind.utils.PrintUtils.*;
 public class DenseLayers {
     private final ArrayList<DenseLayer> layerList;
     private final double[][] initialInput;
+    private Map<Integer, Double> decisions;
+    private int[] decisionsIndex;
+    private double accuracy;
     public static final Random random = new Random(0);
 
     private DenseLayers(int layers, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap,
@@ -299,7 +303,6 @@ public class DenseLayers {
         });
     }
 
-
     public void printLayers(String label) {
         System.out.println(bold(green(":::: " + label + " ::::")));
         AtomicInteger counter = new AtomicInteger(1);
@@ -312,24 +315,40 @@ public class DenseLayers {
 
     static double[][] getDoubles(int rows, int cols) {
         double[][] output = new double[rows][cols];
-        for (int i = 0; i < output.length; i++) {
-            for (int j = 0; j < output[0].length; j++) {
+        for (int i = 0; i < output.length; i++)
+            for (int j = 0; j < output[0].length; j++)
                 output[i][j] = (0.1 * random.nextGaussian());
-            }
-        }
         return output;
     }
 
     public DenseLayer getLayerAt(int index){
         return this.getLayerList().get(index);
     }
-    public DenseLayer getFirstLayer() { return this.getLayerAt(0); }
-    public DenseLayer getLastLayer() { return this.getLayerAt(this.getLayerList().size()-1);}
-    public double[] generateLoss() { return this.getLastLayer().generateLoss(); }
+
+    public DenseLayer getFirstLayer() {
+        return this.getLayerAt(0);
+    }
+
+    public DenseLayer getLastLayer() {
+        return this.getLayerAt(this.getLayerList().size()-1);
+    }
+
+    public double[] generateLoss() {
+        return this.getLastLayer().generateLoss();
+    }
+
     public double[][] generateFullLoss() {
         double[][] fullLoss = new double[this.getLayerList().size()][];
         IntStream.range(0, fullLoss.length).parallel().forEach(i -> fullLoss[i] = this.getLayerAt(i).generateLoss());
         return fullLoss;
+    }
+
+    public double generateMeanLoss() {
+        return MathUtils.mean(generateLoss());
+    }
+
+    public double[] generateMeanFullLoss() {
+        return MathUtils.mean(generateFullLoss());
     }
 
     public double[][] getBatchOutputs(){
@@ -342,6 +361,47 @@ public class DenseLayers {
 
     public Neuron getNeuronFromLayerAt(int layerIndex, int nueronIndex){
         return this.getLayerList().get(layerIndex).getNeuronList().get(nueronIndex);
+    }
+
+    public double[] batchDecisions(){
+        double[] decisions = new double[this.getLastLayer().getBatchLayerOutputs().length];
+        IntStream.range(0, decisions.length).parallel().forEachOrdered( i -> {
+            decisions[i] = decision(this.getLastLayer().getBatchLayerOutputs()[i])[1];
+        });
+        return decisions;
+    }
+
+    public void batchDecisionsMap(){
+        this.decisions = new HashMap<>();
+        this.decisionsIndex = new int[this.getLastLayer().getBatchLayerOutputs().length];
+        IntStream.range(0, this.decisionsIndex.length).parallel().forEachOrdered( i -> {
+            double[] indexAndMax = decision(this.getLastLayer().getBatchLayerOutputs()[i]);
+            this.decisionsIndex[i] = (int)indexAndMax[0];
+            this.decisions.put(i, indexAndMax[1]);
+        });
+        if(this.getLastLayer().getBatchTrueValues().length > 0){
+            AtomicReference<Double> totalCorrect = new AtomicReference<>((double) 0);
+            IntStream.range(0, this.getLastLayer().getBatchTrueValues().length).forEachOrdered(i -> {
+                printInfo("batchLayer true value: ", this.getLastLayer().getBatchTrueValues()[i]);
+                printInfo("decisions made: ", decisions.get(i));
+                if (this.getLastLayer().getBatchTrueValues()[i] == decisionsIndex[i]) totalCorrect.updateAndGet(v-> v+1); });
+            printInfo("Total Correct: ", totalCorrect.get());
+            this.accuracy = totalCorrect.get()/this.getLastLayer().getBatchTrueValues().length;
+            printInfo("Accuracy: ", this.accuracy);
+        } else if(this.getLastLayer().getBatchHotOneVecs().length > 0){
+            AtomicReference<Double> totalCorrect = new AtomicReference<>((double) 0);
+            IntStream.range(0, this.getLastLayer().getBatchHotOneVecs().length).forEachOrdered(i -> {
+                printInfo("batchLayer hot one vec values: ", this.getLastLayer().getBatchHotOneVecs()[i]);
+                printInfo("decisions made: ", decisions.get(i));
+                if (this.getLastLayer().getBatchHotOneVecs()[i] == decisionsIndex[i]) totalCorrect.updateAndGet(v-> v+1); });
+            printInfo("Total Correct: ", totalCorrect.get());
+            this.accuracy = totalCorrect.get()/this.getLastLayer().getBatchTrueValues().length;
+            printInfo("Accuracy: ", this.accuracy);
+        }
+    }
+
+    public double[] decision(double[] values){
+        return MathUtils.indexAndMax(values);
     }
 
     @NoArgsConstructor
@@ -532,76 +592,80 @@ public class DenseLayers {
                     printInfo("Using construct 1.1");
                     built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap,
                             this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
+                    printPositive("Neural network successfully build!");
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights set to", this.initialWeights);
                     printInfo("Initial biases set to", this.initialBiases);
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    //printInfo("Initial weights set to", this.activationFunctionsMap);
+                    printInfo("Initial activation function set to " + this.activationFunction.name());
+                    printInfo("Initial activation function map set to", this.activationFunctionsMap);
                     //printInfo("Initial weights set to", this.lossFunction);
-                    //printInfo("Initial weights set to", this.lossFunctionsMap);
+                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    //printInfo("Initial weights set to", this.hotOneMap);
-
-                    //printInfo("Initial weights set to", this.trueValueIndexMap);
+                    printInfo("Initial hot one map set to", this.hotOneMap);
+                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(this.isUsingFileAsInput && this.isUsingSpecificWeights) {
                     printInfo("Using construct 1.2");
                     built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap,
                             this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
+                    printPositive("Neural network successfully build!");
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights set to", this.initialWeights);
                     printInfo("Initial biases not set!");
                     printInfo("Initial weights set to", this.initialInput);
                     printInfo("Initial weights set to " + this.activationFunction.name());
-                    //printInfo("Initial weights set to", this.activationFunctionsMap);
+                    printInfo("Initial activation function set to " + this.activationFunction.name());
+                    printInfo("Initial activation function map set to", this.activationFunctionsMap);
                     //printInfo("Initial weights set to", this.lossFunction);
-                    //printInfo("Initial weights set to", this.lossFunctionsMap);
-                    printInfo("Initial weights set to", this.hotOneVec);
-                    //printInfo("Initial weights set to", this.hotOneMap);
-                    printInfo("Initial weights set to", this.trueValueIndex);
-                    //printInfo("Initial weights set to", this.trueValueIndexMap);
+                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
+                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
+                    else {printInfo("Initial hot one vector set to", this.hotOneVec);}
+                    printInfo("Initial hot one map set to", this.hotOneMap);
+                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(this.isUsingFileAsInput) {
                     printInfo("Using construct 1.3");
                     built = new DenseLayers(this.numberOfLayers, this.initialInput, this.activationFunction, this.activationFunctionsMap,
                             this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
+                    printPositive("Neural network successfully build!");
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights not set!");
                     printInfo("Initial biases not set!");
                     printInfo("Initial weights set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    //printInfo("Initial weights set to", this.activationFunctionsMap);
+                    printInfo("Initial activation function set to " + this.activationFunction.name());
+                    printInfo("Initial activation function map set to", this.activationFunctionsMap);
                     //printInfo("Initial weights set to", this.lossFunction);
-                    //printInfo("Initial weights set to", this.lossFunctionsMap);
+                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    //printInfo("Initial weights set to", this.hotOneMap);
-
-                    //printInfo("Initial weights set to", this.trueValueIndexMap);
+                    printInfo("Initial hot one map set to", this.hotOneMap);
+                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(!this.isUsingFileAsInput && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printInfo("Using construct 1.4");
                     built = new DenseLayers(this.numberOfLayers, this.activationFunction, this.activationFunctionsMap,
                             this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
+                    printPositive("Neural network successfully build!");
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights not set!");
                     printInfo("Initial biases not set!");
                     printInfo("Initial inputs not set!");
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    //printInfo("Initial weights set to", this.activationFunctionsMap);
+                    printInfo("Initial activation function map set to", this.activationFunctionsMap);
                     //printInfo("Initial weights set to", this.lossFunction);
-                    //printInfo("Initial weights set to", this.lossFunctionsMap);
+                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    //printInfo("Initial weights set to", this.hotOneMap);
-
-                    //printInfo("Initial weights set to", this.trueValueIndexMap);
+                    printInfo("Initial hot one map set to", this.hotOneMap);
+                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
             }
             else if(this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingBatchInputs) {
@@ -609,77 +673,77 @@ public class DenseLayers {
                     printInfo("Using construct 2.1");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap,
                             this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
+                    printPositive("Neural network successfully build!");
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights set to", this.initialWeights);
                     printInfo("Initial biases set to", this.initialBiases);
                     printInfo("Initial input set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    //printInfo("Initial weights set to", this.activationFunctionsMap);
+                    printInfo("Initial activation function map set to", this.activationFunctionsMap);
                     //printInfo("Initial weights set to", this.lossFunction);
-                    //printInfo("Initial weights set to", this.lossFunctionsMap);
+                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    //printInfo("Initial weights set to", this.hotOneMap);
-
-                    //printInfo("Initial weights set to", this.trueValueIndexMap);
+                    printInfo("Initial hot one map set to", this.hotOneMap);
+                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(this.isUsingFileAsInput  && this.isUsingSpecificWeights) {
                     printInfo("Using construct 2.2");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap,
                             this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
+                    printPositive("Neural network successfully build!");
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights set to", this.initialWeights);
                     printInfo("Initial biases not set!");
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    //printInfo("Initial weights set to", this.activationFunctionsMap);
+                    printInfo("Initial activation function map set to", this.activationFunctionsMap);
                     //printInfo("Initial weights set to", this.lossFunction);
-                    //printInfo("Initial weights set to", this.lossFunctionsMap);
+                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    //printInfo("Initial weights set to", this.hotOneMap);
-
-                    //printInfo("Initial weights set to", this.trueValueIndexMap);
+                    printInfo("Initial hot one map set to", this.hotOneMap);
+                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(this.isUsingFileAsInput) {
                     printInfo("Using construct 2.3");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialInput, this.activationFunction, this.activationFunctionsMap,
                             this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
+                    printPositive("Neural network successfully build!");
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights not set!");
                     printInfo("Initial biases not set!");
                     printInfo("Initial weights set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    //printInfo("Initial weights set to", this.activationFunctionsMap);
+                    printInfo("Initial activation function map set to", this.activationFunctionsMap);
                     //printInfo("Initial weights set to", this.lossFunction);
-                    //printInfo("Initial weights set to", this.lossFunctionsMap);
+                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    //printInfo("Initial weights set to", this.hotOneMap);
-
-                    //printInfo("Initial weights set to", this.trueValueIndexMap);
+                    printInfo("Initial hot one map set to", this.hotOneMap);
+                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(!this.isUsingFileAsInput && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printInfo("Using construct 2.4");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.activationFunction, this.activationFunctionsMap,
                             this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
+                    printPositive("Neural network successfully build!");
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights not set!");
                     printInfo("Initial biases not set!");
                     printInfo("Initial inputs not set!");
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    //printInfo("Initial weights set to", this.activationFunctionsMap);
+                    printInfo("Initial activation function map set to", this.activationFunctionsMap);
                     //printInfo("Initial weights set to", this.lossFunction);
-                    //printInfo("Initial weights set to", this.lossFunctionsMap);
+                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    //printInfo("Initial weights set to", this.hotOneMap);
-
-                    //printInfo("Initial weights set to", this.trueValueIndexMap);
+                    printInfo("Initial hot one map set to", this.hotOneMap);
+                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
             }
             else if(this.isUsingSpecificNeurons && this.isUsingNumberOfLayers && !this.isUsingBatchInputs) {
@@ -687,77 +751,77 @@ public class DenseLayers {
                     printInfo("Using construct 3.1");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap,
                             this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
+                    printPositive("Neural network successfully build!");
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights set to", this.initialWeights);
                     printInfo("Initial biases set to", this.initialBiases);
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    //printInfo("Initial weights set to", this.activationFunctionsMap);
+                    printInfo("Initial activation function map set to", this.activationFunctionsMap);
                     //printInfo("Initial weights set to", this.lossFunction);
-                    //printInfo("Initial weights set to", this.lossFunctionsMap);
+                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    //printInfo("Initial weights set to", this.hotOneMap);
-
-                    //printInfo("Initial weights set to", this.trueValueIndexMap);
+                    printInfo("Initial hot one map set to", this.hotOneMap);
+                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(this.isUsingFileAsInput && this.isUsingSpecificWeights) {
                     printInfo("Using construct 3.2");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap,
                             this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
+                    printPositive("Neural network successfully build!");
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights set to", this.initialWeights);
                     printInfo("Initial biases not set!");
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    //printInfo("Initial weights set to", this.activationFunctionsMap);
+                    printInfo("Initial activation function map set to", this.activationFunctionsMap);
                     //printInfo("Initial weights set to", this.lossFunction);
-                    //printInfo("Initial weights set to", this.lossFunctionsMap);
+                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    //printInfo("Initial weights set to", this.hotOneMap);
-
-                    //printInfo("Initial weights set to", this.trueValueIndexMap);
+                    printInfo("Initial hot one map set to", this.hotOneMap);
+                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(this.isUsingFileAsInput) {
                     printInfo("Using construct 3.3");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialInput, this.activationFunction, this.activationFunctionsMap,
                             this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
+                    printPositive("Neural network successfully build!");
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights not set!");
                     printInfo("Initial biases not set!");
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    //printInfo("Initial weights set to", this.activationFunctionsMap);
+                    printInfo("Initial activation function map set to", this.activationFunctionsMap);
                     //printInfo("Initial weights set to", this.lossFunction);
-                    //printInfo("Initial weights set to", this.lossFunctionsMap);
+                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    //printInfo("Initial weights set to", this.hotOneMap);
-
-                    //printInfo("Initial weights set to", this.trueValueIndexMap);
+                    printInfo("Initial hot one map set to", this.hotOneMap);
+                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(!this.isUsingFileAsInput && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printInfo("Using construct 3.4");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.activationFunction, this.activationFunctionsMap,
                             this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
+                    printPositive("Neural network successfully build!");
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights not set!");
                     printInfo("Initial biases not set!");
                     printInfo("Initial inputs not set!");
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    //printInfo("Initial weights set to", this.activationFunctionsMap);
+                    printInfo("Initial activation function map set to", this.activationFunctionsMap);
                     //printInfo("Initial weights set to", this.lossFunction);
-                    //printInfo("Initial weights set to", this.lossFunctionsMap);
+                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    //printInfo("Initial weights set to", this.hotOneMap);
-
-                    //printInfo("Initial weights set to", this.trueValueIndexMap);
+                    printInfo("Initial hot one map set to", this.hotOneMap);
+                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
             }
             else if(!this.isUsingSpecificNeurons && !this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingFileAsInput){
@@ -765,77 +829,77 @@ public class DenseLayers {
                     printInfo("Using construct 4.1");
                     built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap,
                             this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
+                    printPositive("Neural network successfully build!");
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights set to", this.initialWeights);
                     printInfo("Initial biases set to", this.initialBiases);
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    //printInfo("Initial weights set to", this.activationFunctionsMap);
+                    printInfo("Initial activation function map set to", this.activationFunctionsMap);
                     //printInfo("Initial weights set to", this.lossFunction);
-                    //printInfo("Initial weights set to", this.lossFunctionsMap);
+                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    //printInfo("Initial weights set to", this.hotOneMap);
-
-                    //printInfo("Initial weights set to", this.trueValueIndexMap);
+                    printInfo("Initial hot one map set to", this.hotOneMap);
+                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(this.isUsingBatchInputs  && this.isUsingSpecificWeights) {
                     printInfo("Using construct 4.2");
                     built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap,
                             this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
+                    printPositive("Neural network successfully build!");
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights set to", this.initialWeights);
                     printInfo("Initial biases not set!");
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    //printInfo("Initial weights set to", this.activationFunctionsMap);
+                    printInfo("Initial activation function map set to", this.activationFunctionsMap);
                     //printInfo("Initial weights set to", this.lossFunction);
-                    //printInfo("Initial weights set to", this.lossFunctionsMap);
+                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    //printInfo("Initial weights set to", this.hotOneMap);
-
-                    //printInfo("Initial weights set to", this.trueValueIndexMap);
+                    printInfo("Initial hot one map set to", this.hotOneMap);
+                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(this.isUsingBatchInputs) {
                     printInfo("Using construct 4.3");
                     built = new DenseLayers(this.numberOfLayers, this.initialInput, this.activationFunction, this.activationFunctionsMap,
                             this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
+                    printPositive("Neural network successfully build!");
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights not set!");
                     printInfo("Initial biases not set!");
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    //printInfo("Initial weights set to", this.activationFunctionsMap);
+                    printInfo("Initial activation function map set to", this.activationFunctionsMap);
                     //printInfo("Initial weights set to", this.lossFunction);
-                    //printInfo("Initial weights set to", this.lossFunctionsMap);
+                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    //printInfo("Initial weights set to", this.hotOneMap);
-
-                    //printInfo("Initial weights set to", this.trueValueIndexMap);
+                    printInfo("Initial hot one map set to", this.hotOneMap);
+                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(!this.isUsingBatchInputs && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printInfo("Using construct 4.4");
                     built = new DenseLayers(this.numberOfLayers, this.activationFunction, this.activationFunctionsMap,
                             this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
+                    printPositive("Neural network successfully build!");
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights not set!");
                     printInfo("Initial biases not set!");
                     printInfo("Initial inputs not set!");
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    //printInfo("Initial weights set to", this.activationFunctionsMap);
+                    printInfo("Initial activation function map set to", this.activationFunctionsMap);
                     //printInfo("Initial weights set to", this.lossFunction);
-                    //printInfo("Initial weights set to", this.lossFunctionsMap);
+                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    //printInfo("Initial weights set to", this.hotOneMap);
-
-                    //printInfo("Initial weights set to", this.trueValueIndexMap);
+                    printInfo("Initial hot one map set to", this.hotOneMap);
+                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
             }
             else if(this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingFileAsInput) {
@@ -843,77 +907,77 @@ public class DenseLayers {
                     printInfo("Using construct 5.1");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap,
                             this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
+                    printPositive("Neural network successfully build!");
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights set to", this.initialWeights);
                     printInfo("Initial biases set to", this.initialBiases);
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    //printInfo("Initial weights set to", this.activationFunctionsMap);
+                    printInfo("Initial activation function map set to", this.activationFunctionsMap);
                     //printInfo("Initial weights set to", this.lossFunction);
-                    //printInfo("Initial weights set to", this.lossFunctionsMap);
+                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    //printInfo("Initial weights set to", this.hotOneMap);
-
-                    //printInfo("Initial weights set to", this.trueValueIndexMap);
+                    printInfo("Initial hot one map set to", this.hotOneMap);
+                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(this.isUsingBatchInputs  && this.isUsingSpecificWeights) {
                     printInfo("Using construct 5.2");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap,
                             this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
+                    printPositive("Neural network successfully build!");
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights set to", this.initialWeights);
                     printInfo("Initial biases not set!");
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    //printInfo("Initial weights set to", this.activationFunctionsMap);
+                    printInfo("Initial activation function map set to", this.activationFunctionsMap);
                     //printInfo("Initial weights set to", this.lossFunction);
-                    //printInfo("Initial weights set to", this.lossFunctionsMap);
+                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    //printInfo("Initial weights set to", this.hotOneMap);
-
-                    //printInfo("Initial weights set to", this.trueValueIndexMap);
+                    printInfo("Initial hot one map set to", this.hotOneMap);
+                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(this.isUsingBatchInputs) {
                     printInfo("Using construct 5.3");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialInput, this.activationFunction, this.activationFunctionsMap,
                             this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
+                    printPositive("Neural network successfully build!");
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights not set!");
                     printInfo("Initial biases not set!");
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    //printInfo("Initial weights set to", this.activationFunctionsMap);
+                    printInfo("Initial activation function map set to", this.activationFunctionsMap);
                     //printInfo("Initial weights set to", this.lossFunction);
-                    //printInfo("Initial weights set to", this.lossFunctionsMap);
+                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    //printInfo("Initial weights set to", this.hotOneMap);
-
-                    //printInfo("Initial weights set to", this.trueValueIndexMap);
+                    printInfo("Initial hot one map set to", this.hotOneMap);
+                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(!this.isUsingBatchInputs && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printInfo("Using construct 5.4");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.activationFunction, this.activationFunctionsMap,
                             this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
+                    printPositive("Neural network successfully build!");
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights not set!");
                     printInfo("Initial biases not set!");
                     printInfo("Initial inputs not set!");
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    //printInfo("Initial weights set to", this.activationFunctionsMap);
+                    printInfo("Initial activation function map set to", this.activationFunctionsMap);
                     //printInfo("Initial weights set to", this.lossFunction);
-                    //printInfo("Initial weights set to", this.lossFunctionsMap);
+                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    //printInfo("Initial weights set to", this.hotOneMap);
-
-                    //printInfo("Initial weights set to", this.trueValueIndexMap);
+                    printInfo("Initial hot one map set to", this.hotOneMap);
+                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
             }
             else if(this.isUsingSpecificNeurons && this.isUsingNumberOfLayers && !this.isUsingFileAsInput) {
@@ -921,77 +985,77 @@ public class DenseLayers {
                     printInfo("Using construct 6.1");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap,
                             this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
+                    printPositive("Neural network successfully build!");
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights set to", this.initialWeights);
                     printInfo("Initial biases set to", this.initialBiases);
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    //printInfo("Initial weights set to", this.activationFunctionsMap);
+                    printInfo("Initial activation function map set to", this.activationFunctionsMap);
                     //printInfo("Initial weights set to", this.lossFunction);
-                    //printInfo("Initial weights set to", this.lossFunctionsMap);
+                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    //printInfo("Initial weights set to", this.hotOneMap);
-
-                    //printInfo("Initial weights set to", this.trueValueIndexMap);
+                    printInfo("Initial hot one map set to", this.hotOneMap);
+                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(this.isUsingBatchInputs  && this.isUsingSpecificWeights) {
                     printInfo("Using construct 6.2");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap,
                             this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
+                    printPositive("Neural network successfully build!");
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights set to", this.initialWeights);
                     printInfo("Initial biases not set!");
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    //printInfo("Initial weights set to", this.activationFunctionsMap);
+                    printInfo("Initial activation function map set to", this.activationFunctionsMap);
                     //printInfo("Initial weights set to", this.lossFunction);
-                    //printInfo("Initial weights set to", this.lossFunctionsMap);
+                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    //printInfo("Initial weights set to", this.hotOneMap);
-
-                    //printInfo("Initial weights set to", this.trueValueIndexMap);
+                    printInfo("Initial hot one map set to", this.hotOneMap);
+                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(this.isUsingBatchInputs) {
                     printInfo("Using construct 6.3");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialInput, this.activationFunction, this.activationFunctionsMap,
                             this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
+                    printPositive("Neural network successfully build!");
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights not set!");
                     printInfo("Initial biases not set!");
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    //printInfo("Initial weights set to", this.activationFunctionsMap);
+                    printInfo("Initial activation function map set to", this.activationFunctionsMap);
                     //printInfo("Initial weights set to", this.lossFunction);
-                    //printInfo("Initial weights set to", this.lossFunctionsMap);
+                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    //printInfo("Initial weights set to", this.hotOneMap);
-
-                    //printInfo("Initial weights set to", this.trueValueIndexMap);
+                    printInfo("Initial hot one map set to", this.hotOneMap);
+                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(!this.isUsingBatchInputs && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printInfo("Using construct 6.4");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.activationFunction, this.activationFunctionsMap,
                             this.lossFunction, this.lossFunctionsMap, this.hotOneVec, this.hotOneMap, this.trueValueIndex, this.trueValueIndexMap, this.isUsingHotEncodedVec);
+                    printPositive("Neural network successfully build!");
                     printInfo("Created dense layer neural network: " + built);
                     printInfo("Number of layers set to " + this.numberOfLayers);
                     printInfo("Initial weights not set!");
                     printInfo("Initial biases not set!");
                     printInfo("Initial inputs not set!");
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    //printInfo("Initial weights set to", this.activationFunctionsMap);
+                    printInfo("Initial activation function map set to", this.activationFunctionsMap);
                     //printInfo("Initial weights set to", this.lossFunction);
-                    //printInfo("Initial weights set to", this.lossFunctionsMap);
+                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    //printInfo("Initial weights set to", this.hotOneMap);
-
-                    //printInfo("Initial weights set to", this.trueValueIndexMap);
+                    printInfo("Initial hot one map set to", this.hotOneMap);
+                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
             }
             else {
