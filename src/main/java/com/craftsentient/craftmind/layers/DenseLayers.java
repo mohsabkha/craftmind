@@ -11,9 +11,10 @@ import lombok.NoArgsConstructor;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
+import static com.craftsentient.craftmind.utils.MathUtils.accuracy;
+import static com.craftsentient.craftmind.utils.MathUtils.print;
 import static com.craftsentient.craftmind.utils.PrintUtils.*;
 
 @Getter
@@ -23,6 +24,7 @@ public class DenseLayers {
     private Map<Integer, Double> decisions;
     private int[] decisionsIndex;
     private double accuracy;
+    private double meanLoss;
     public static final Random random = new Random(0);
 
     private DenseLayers(int layers, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap,
@@ -30,7 +32,7 @@ public class DenseLayers {
         if(!hotOneVecMap.isEmpty() && !trueValuesMap.isEmpty()) throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!");
         if(hotOneVecMap.isEmpty() && trueValuesMap.isEmpty() && trueValues.length == 0 && hotOneVec.length == 0) throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!");
         this.layerList = new ArrayList<>();
-        this.initialInput = randn(layers,layers);
+        this.initialInput = randn(1,layers);
         IntStream.range(0, layers).forEach(i -> {
                 DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
                 DEFAULT_LOSS_FUNCTIONS lossFunctionToUse = lossFunctionsMap.getOrDefault(i, lossFunction);
@@ -114,7 +116,7 @@ public class DenseLayers {
     private DenseLayers(int layers, int numberOfNeurons, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap,
                         DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap, boolean isUsingHotEncodedVec) {
         if(!hotOneVecMap.isEmpty() && !trueValuesMap.isEmpty()) throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!");
-        if(hotOneVecMap.isEmpty() && trueValuesMap.isEmpty() && trueValues.length == 0 && hotOneVec.length == 0) throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!");
+        if(hotOneVecMap.isEmpty() && trueValuesMap.isEmpty() && trueValues == null && hotOneVec == null) throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!");
         this.layerList = new ArrayList<>();
         this.initialInput = randn(1,numberOfNeurons);
 
@@ -204,13 +206,13 @@ public class DenseLayers {
     private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap,
                         DEFAULT_LOSS_FUNCTIONS lossFunction, Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap, int[][] hotOneVec, Map<Integer, int[][]> hotOneVecMap, int[] trueValues, Map<Integer, int[]> trueValuesMap, boolean isUsingHotEncodedVec) {
         if(!hotOneVecMap.isEmpty() && !trueValuesMap.isEmpty()) throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!");
-        if(hotOneVecMap.isEmpty() && trueValuesMap.isEmpty() && trueValues.length == 0 && hotOneVec.length == 0) throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!");
+        if(hotOneVecMap.isEmpty() && trueValuesMap.isEmpty() && trueValues == null && hotOneVec == null) throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!");
         if(layers != numberOfNeuronsPerLayer.length) {
             throw new IllegalArgumentException(layers + " Layers given but only " + numberOfNeuronsPerLayer.length
                     + " layers described!\nAdjust neuronsPerLayer to be of same length as number of layers!");
         }
         this.layerList = new ArrayList<>();
-        this.initialInput = randn(numberOfNeuronsPerLayer[0], numberOfNeuronsPerLayer[0]);
+        this.initialInput = randn(1, numberOfNeuronsPerLayer[0]);
         IntStream.range(0, layers).forEach(i -> {
             DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             DEFAULT_LOSS_FUNCTIONS lossFunctionToUse = lossFunctionsMap.getOrDefault(i, lossFunction);
@@ -343,8 +345,8 @@ public class DenseLayers {
         return fullLoss;
     }
 
-    public double generateMeanLoss() {
-        return MathUtils.mean(generateLoss());
+    public void generateMeanLoss() {
+        this.meanLoss = MathUtils.mean(generateLoss());
     }
 
     public double[] generateMeanFullLoss() {
@@ -371,7 +373,11 @@ public class DenseLayers {
         return decisions;
     }
 
-    public void batchDecisionsMap(){
+    /**
+     * creates a map of decisions made in each layer, and notes the index of the node that was chosen in each layer
+     */
+    public void generateBatchDecisionsMap(){
+        // create the decision map
         this.decisions = new HashMap<>();
         this.decisionsIndex = new int[this.getLastLayer().getBatchLayerOutputs().length];
         IntStream.range(0, this.decisionsIndex.length).parallel().forEachOrdered( i -> {
@@ -380,22 +386,18 @@ public class DenseLayers {
             this.decisions.put(i, indexAndMax[1]);
         });
         if(this.getLastLayer().getBatchTrueValues().length > 0){
-            AtomicReference<Double> totalCorrect = new AtomicReference<>((double) 0);
-            IntStream.range(0, this.getLastLayer().getBatchTrueValues().length).forEachOrdered(i -> {
-                printInfo("batchLayer true value: ", this.getLastLayer().getBatchTrueValues()[i]);
-                printInfo("decisions made: ", decisions.get(i));
-                if (this.getLastLayer().getBatchTrueValues()[i] == decisionsIndex[i]) totalCorrect.updateAndGet(v-> v+1); });
-            printInfo("Total Correct: ", totalCorrect.get());
-            this.accuracy = totalCorrect.get()/this.getLastLayer().getBatchTrueValues().length;
+            this.accuracy = accuracy(this.getLastLayer().getBatchTrueValues(), this.decisionsIndex);
+            printInfo("Using Batch True Values");
+            printInfo("Decisions:", this.decisions);
+            printInfo("Decision Indices:", this.decisionsIndex);
+            printInfo("Batch True Values:", this.getLastLayer().getBatchTrueValues());
             printInfo("Accuracy: ", this.accuracy);
-        } else if(this.getLastLayer().getBatchHotOneVecs().length > 0){
-            AtomicReference<Double> totalCorrect = new AtomicReference<>((double) 0);
-            IntStream.range(0, this.getLastLayer().getBatchHotOneVecs().length).forEachOrdered(i -> {
-                printInfo("batchLayer hot one vec values: ", this.getLastLayer().getBatchHotOneVecs()[i]);
-                printInfo("decisions made: ", decisions.get(i));
-                if (this.getLastLayer().getBatchHotOneVecs()[i] == decisionsIndex[i]) totalCorrect.updateAndGet(v-> v+1); });
-            printInfo("Total Correct: ", totalCorrect.get());
-            this.accuracy = totalCorrect.get()/this.getLastLayer().getBatchTrueValues().length;
+        }
+        else if(this.getLastLayer().getBatchHotOneVecs().length > 0){
+            this.accuracy = accuracy(this.getLastLayer().getBatchHotOneVecs(), this.decisionsIndex);
+            printInfo("Using Batch Hot One Vectors");
+            printInfo("Decisions:", this.decisions);
+            printInfo("Decision Indices:", this.decisionsIndex);
             printInfo("Accuracy: ", this.accuracy);
         }
     }
@@ -409,7 +411,7 @@ public class DenseLayers {
         private ArrayList<DenseLayer> layerList;
         private boolean isUsingListOfLayers = true;
 
-        private DEFAULT_ACTIVATION_FUNCTIONS activationFunction = DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION;
+        private DEFAULT_ACTIVATION_FUNCTIONS activationFunction = DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION;
         private final Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap = new HashMap<>();
         private boolean hasSetSpecificLayerActivationFunctions = false;
 
@@ -601,7 +603,6 @@ public class DenseLayers {
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    //printInfo("Initial weights set to", this.lossFunction);
                     printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
@@ -621,7 +622,6 @@ public class DenseLayers {
                     printInfo("Initial weights set to " + this.activationFunction.name());
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    //printInfo("Initial weights set to", this.lossFunction);
                     printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
@@ -641,7 +641,6 @@ public class DenseLayers {
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    //printInfo("Initial weights set to", this.lossFunction);
                     printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
@@ -660,7 +659,6 @@ public class DenseLayers {
                     printInfo("Initial inputs not set!");
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    //printInfo("Initial weights set to", this.lossFunction);
                     printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
@@ -681,7 +679,6 @@ public class DenseLayers {
                     printInfo("Initial input set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    //printInfo("Initial weights set to", this.lossFunction);
                     printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
@@ -700,7 +697,6 @@ public class DenseLayers {
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    //printInfo("Initial weights set to", this.lossFunction);
                     printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
@@ -719,7 +715,6 @@ public class DenseLayers {
                     printInfo("Initial weights set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    //printInfo("Initial weights set to", this.lossFunction);
                     printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
@@ -738,7 +733,6 @@ public class DenseLayers {
                     printInfo("Initial inputs not set!");
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    //printInfo("Initial weights set to", this.lossFunction);
                     printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
@@ -759,7 +753,6 @@ public class DenseLayers {
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    //printInfo("Initial weights set to", this.lossFunction);
                     printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
@@ -778,7 +771,6 @@ public class DenseLayers {
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    //printInfo("Initial weights set to", this.lossFunction);
                     printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
@@ -797,7 +789,6 @@ public class DenseLayers {
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    //printInfo("Initial weights set to", this.lossFunction);
                     printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
@@ -816,7 +807,6 @@ public class DenseLayers {
                     printInfo("Initial inputs not set!");
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    //printInfo("Initial weights set to", this.lossFunction);
                     printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
@@ -837,7 +827,6 @@ public class DenseLayers {
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    //printInfo("Initial weights set to", this.lossFunction);
                     printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
@@ -856,7 +845,6 @@ public class DenseLayers {
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    //printInfo("Initial weights set to", this.lossFunction);
                     printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
@@ -875,7 +863,6 @@ public class DenseLayers {
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    //printInfo("Initial weights set to", this.lossFunction);
                     printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
@@ -894,7 +881,6 @@ public class DenseLayers {
                     printInfo("Initial inputs not set!");
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    //printInfo("Initial weights set to", this.lossFunction);
                     printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
@@ -915,7 +901,6 @@ public class DenseLayers {
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    //printInfo("Initial weights set to", this.lossFunction);
                     printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
@@ -934,7 +919,6 @@ public class DenseLayers {
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    //printInfo("Initial weights set to", this.lossFunction);
                     printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
@@ -953,7 +937,6 @@ public class DenseLayers {
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    //printInfo("Initial weights set to", this.lossFunction);
                     printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
@@ -972,7 +955,6 @@ public class DenseLayers {
                     printInfo("Initial inputs not set!");
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    //printInfo("Initial weights set to", this.lossFunction);
                     printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
@@ -993,7 +975,6 @@ public class DenseLayers {
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    //printInfo("Initial weights set to", this.lossFunction);
                     printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
@@ -1012,7 +993,6 @@ public class DenseLayers {
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    //printInfo("Initial weights set to", this.lossFunction);
                     printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
@@ -1031,7 +1011,6 @@ public class DenseLayers {
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    //printInfo("Initial weights set to", this.lossFunction);
                     printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
@@ -1050,7 +1029,6 @@ public class DenseLayers {
                     printInfo("Initial inputs not set!");
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    //printInfo("Initial weights set to", this.lossFunction);
                     printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
@@ -1066,6 +1044,13 @@ public class DenseLayers {
                 }
                 throw new RuntimeException(bold(red("Builder Not Configured Properly!")));
             }
+            built.generateMeanLoss();
+            built.generateBatchDecisionsMap();
+            printInfo("Predicited values", built.getDecisionsIndex());
+            printInfo("Loss is", built.getMeanLoss());
+            printInfo("Accuracy is", built.getAccuracy());
+            printInfo("Neuron indices per batch are", built.getDecisionsIndex());
+            printInfo("Actual output values of those neurons are", built.getDecisionsIndex());
             return built;
         }
     }

@@ -8,14 +8,6 @@ import java.util.ArrayList;
 
 @Component
 public interface Layer {
-    ArrayList<Neuron> neuronList = new ArrayList<>();
-    double[][] neuronWeights = new double[0][0];
-    double[] neuronBiases = new double[0];
-    double[] inputs = new double[0];
-    double[][] batchInputs = new double[0][0];
-    double[] layerOutputs = new double[0];
-    double[][] batchLayerOutputs = new double[0][0];
-    boolean isHiddenLayer = true;
 
     public Object generateLayerOutput() throws Exception;
 

@@ -22,20 +22,25 @@ public class DenseLayer implements Layer {
     private double[] neuronBiases;
     private double[] inputs;
     private double[][] batchInputs;
-    @Setter
-    private double[] layerOutputs;
-    @Setter
-    private double[][] batchLayerOutputs;
     private boolean isHiddenLayer = true;
-    @Setter
-    private DEFAULT_ACTIVATION_FUNCTIONS activationFunction;
-    @Setter
-    private DEFAULT_LOSS_FUNCTIONS lossFunction;
     private int[] batchTrueValues;
     private int[][] batchHotOneVecs;
     private double[] batchLayerLoss;
     private double[] layerLoss;
     private boolean isUsingHotEncodedVec;
+    private double alpha;
+    private double beta;
+    private double delta;
+    private double sigma;
+    private double outputMean;
+    @Setter
+    private double[] layerOutputs;
+    @Setter
+    private double[][] batchLayerOutputs;
+    @Setter
+    private DEFAULT_ACTIVATION_FUNCTIONS activationFunction;
+    @Setter
+    private DEFAULT_LOSS_FUNCTIONS lossFunction;
 
     public DenseLayer() {
         this.neuronList = new ArrayList<>();
@@ -45,7 +50,7 @@ public class DenseLayer implements Layer {
         this.layerOutputs = new double[0];
         this.batchInputs = new double[0][0];
         this.batchLayerOutputs = new double[0][0];
-        this.activationFunction = DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION;
+        this.activationFunction = DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION;
         this.lossFunction = DEFAULT_LOSS_FUNCTIONS.NLL_LOSS_FUNCTION;
         this.batchTrueValues = new int[0];
         this.batchHotOneVecs = new int[0][0];
@@ -180,6 +185,9 @@ public class DenseLayer implements Layer {
         printInfo("Generation of individual layer and layer outputs complete!");
     }
 
+    /**
+     * calls either batched or non-batched layer output generation function
+    */
     public Object generateLayerOutput() throws Exception {
         printInfo("Entered generateLayerOutput()");
         if (this.inputs.length == 0) {
@@ -188,6 +196,10 @@ public class DenseLayer implements Layer {
         return generateNonBatchedLayerOutput(this.inputs);
     }
 
+    /**
+     * determines if this a neural network generated layer or input then calls the generateOutput function
+     *  - Is called by generateLayerOutput()
+     */
     public double[][] generateBatchedLayerOutput(int batchSize) {
         printInfo("Entered generateBatchedLayerOutput(int batchSize)");
         this.batchLayerOutputs = new double[0][0];
@@ -203,6 +215,10 @@ public class DenseLayer implements Layer {
         return this.batchLayerOutputs;
     }
 
+    /**
+     * calls the generateNonBatchedLayerOutput for each entry in the batch of data, then calls the addOutput method to save the results
+     * - Is called by the generateBatchedLayerOutput function
+     */
     public double[] generateNonBatchedLayerOutput(double[] inputs) throws Exception {
         printInfo("Entered generateNonBatchedLayerOutput(double[] inputs)");
         this.layerOutputs = new double[0];
@@ -221,6 +237,10 @@ public class DenseLayer implements Layer {
         return this.layerOutputs;
     }
 
+    /**
+     * calls the generateNonBatchedLayerOutput for each entry in the batch of data, then calls the addOutput method to save the results
+     * - Is called by the generateBatchedLayerOutput function
+     */
     public void generateOutput(int batchSize) {
         printInfo("Entered generateOutput(int batchSize)");
         IntStream.range(0, batchSize).forEach(i -> {
@@ -390,7 +410,8 @@ public class DenseLayer implements Layer {
         if(this.batchTrueValues.length == 0){
             IntStream.range(0, batchLayerOutputs.length).parallel().forEachOrdered(i -> {
                 try {
-                    this.batchLayerLoss =  ErrorLossFunctions.lossFunction(this.lossFunction, batchHotOneVecs[i], batchLayerOutputs[i], this.isUsingHotEncodedVec);
+                    if(this.lossFunction == DEFAULT_LOSS_FUNCTIONS.NLL_LOSS_FUNCTION)
+                        this.batchLayerLoss =  ErrorLossFunctions.lossFunction(this.lossFunction, batchHotOneVecs[i], batchLayerOutputs[i]);
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -398,7 +419,7 @@ public class DenseLayer implements Layer {
         }
         IntStream.range(0, batchLayerOutputs.length).parallel().forEachOrdered(i -> {
             try {
-                this.batchLayerLoss = ErrorLossFunctions.lossFunction(this.lossFunction, batchTrueValues, batchLayerOutputs, this.isUsingHotEncodedVec);
+                this.batchLayerLoss = ErrorLossFunctions.lossFunction(this.lossFunction, batchTrueValues, batchLayerOutputs);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

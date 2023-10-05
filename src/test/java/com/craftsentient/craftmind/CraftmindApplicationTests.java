@@ -4,7 +4,6 @@ import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATION_FUNCTIONS;
 import com.craftsentient.craftmind.errorLoss.DEFAULT_LOSS_FUNCTIONS;
 import com.craftsentient.craftmind.errorLoss.ErrorLossFunctions;
 import com.craftsentient.craftmind.layers.DenseLayers;
-import com.craftsentient.craftmind.utils.MathUtils;
 import com.craftsentient.craftmind.utils.PrintUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,12 +37,11 @@ class CraftmindApplicationTests {
                 .withTrueValue(new int[] {0, 1, 2})
                 .build();
 
+
         builtLayerWithFile.printLayers("BUILT WITH FILE NETWORK");
-        PrintUtils.printInfo("Mean Loss", builtLayerWithFile.generateMeanLoss());
-        builtLayerWithFile.batchDecisionsMap();
+        builtLayerWithFile.generateBatchDecisionsMap();
         PrintUtils.printInfo("decisions per batch", builtLayerWithFile.getDecisions());
-        double[]loss = ErrorLossFunctions.lossFunction(DEFAULT_LOSS_FUNCTIONS.NLL_LOSS_FUNCTION, new int[]{0,1,1}, new double[][]{{0.7,0.1,0.2}, {0.1,0.5,0.4}, {0.02,0.9,0.08}}, false);
-        //PrintUtils.printPositive(MathUtils.mean(loss));
+        double[]loss = ErrorLossFunctions.lossFunction(DEFAULT_LOSS_FUNCTIONS.NLL_LOSS_FUNCTION, new int[]{0,1,1}, new double[][]{{0.7,0.1,0.2}, {0.1,0.5,0.4}, {0.02,0.9,0.08}});
     }
 
     @Test
