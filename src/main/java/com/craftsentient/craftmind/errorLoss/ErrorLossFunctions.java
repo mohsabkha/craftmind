@@ -6,9 +6,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
 public class ErrorLossFunctions {
-    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double trueValues, double predictedValues) throws Exception {
+    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double trueValues, double classifierOutput) throws Exception {
         switch (lossFunction){
-            case HINGE_LOSS_FUNCTION -> { return hinge(trueValues, predictedValues); }
+            case HINGE_LOSS_FUNCTION -> { return hinge(trueValues, classifierOutput); }
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
@@ -151,6 +151,7 @@ public class ErrorLossFunctions {
 
 
     private static double categoricalCrossEntropy(double[] trueValues, double[] predictedValues) {
+        if(trueValues.length < 1) { throw new IllegalArgumentException("True Values must at least have 1 value when passed to categorical cross entropy"); }
         AtomicReference<Double> loss = new AtomicReference<>((double) 0);
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss.updateAndGet(v ->  v + trueValues[i] * Math.log(predictedValues[i])));
         return loss.get() / trueValues.length;
