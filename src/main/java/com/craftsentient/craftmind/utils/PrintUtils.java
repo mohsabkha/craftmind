@@ -1,5 +1,6 @@
 package com.craftsentient.craftmind.utils;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
@@ -80,6 +81,25 @@ public class PrintUtils {
         return BOLD + str + RESET;
     }
 
+    // generic
+    public static void printGeneric(String data){
+        System.out.println(cyan(bold("[LOG] ") + data));
+    }
+    public static void printGeneric(double data){
+        System.out.println(cyan(bold("[LOG] ") + data));
+    }
+    public static void printGeneric(int data){
+        System.out.println(cyan(bold("[LOG] ") + data));
+    }
+    public static void printGeneric(float data){
+        System.out.println(cyan(bold("[LOG] ") + data));
+    }
+    public static void printGeneric(short data){
+        System.out.println(cyan(bold("[LOG] ") + data));
+    }
+    public static void printGeneric(long data){
+        System.out.println(cyan(bold("[LOG] ") + data));
+    }
     public static void printGeneric(double[] vec, String label){
         System.out.println(bold(cyan(":::: " + label + " ::::")));
         AtomicInteger counter = new AtomicInteger(1);
@@ -107,8 +127,33 @@ public class PrintUtils {
         });
         System.out.print("\n");
     }
+    public static void printGeneric(ArrayList<Object> vec, String label){
+        System.out.println(bold(green(":::: " + label + " ::::")));
+        AtomicInteger counter = new AtomicInteger(1);
+        IntStream.range(0, vec.size()).forEach(i-> {
+            if(i != vec.size()-1) System.out.print(cyan(bold(String.valueOf(i))) + ": " + vec.get(i) + ", ");
+            else System.out.print(cyan(bold(String.valueOf(i))) + ": " + vec.get(i));
+        });
+        System.out.print("\n");
+    }
 
+    // positive
     public static void printPositive(String data){
+        System.out.println(yellow(bold("[SUCCESS] ") + data));
+    }
+    public static void printPositive(double data){
+        System.out.println(yellow(bold("[SUCCESS] ") + data));
+    }
+    public static void printPositive(int data){
+        System.out.println(yellow(bold("[SUCCESS] ") + data));
+    }
+    public static void printPositive(float data){
+        System.out.println(yellow(bold("[SUCCESS] ") + data));
+    }
+    public static void printPositive(short data){
+        System.out.println(yellow(bold("[SUCCESS] ") + data));
+    }
+    public static void printPositive(long data){
         System.out.println(yellow(bold("[SUCCESS] ") + data));
     }
     public static void printPositive(double[] vec, String label){
@@ -141,12 +186,28 @@ public class PrintUtils {
         });
         System.out.print("\n");
     }
+    public static void printPositive(ArrayList<Object> vec, String label){
+        System.out.println(bold(green(":::: " + label + " ::::")));
+        System.out.print(bold(green("[SUCCESS] ")));
+        IntStream.range(0, vec.size()).forEach(i-> {
+            if(i == vec.size()-1) System.out.print(vec.get(i) + bold(green("]")));
+            else if(i == 0) System.out.print(bold(green("[")) + vec.get(i) + ", ");
+            else System.out.print(String.valueOf(vec.get(i)) + ", ");
+        });
+        System.out.print("\n");
+    }
 
 
     public static void printWarning(double data){
         System.out.println(yellow(bold("[WARNING] ") + data));
     }
+    public static void printWarning(float data){
+        System.out.println(yellow(bold("[WARNING] ") + data));
+    }
     public static void printWarning(int data){
+        System.out.println(yellow(bold("[WARNING] ") + data));
+    }
+    public static void printWarning(short data){
         System.out.println(yellow(bold("[WARNING] ") + data));
     }
     public static void printWarning(long data){
@@ -213,7 +274,21 @@ public class PrintUtils {
         });
         System.out.print("\n");
     }
+    public static void printWarning(ArrayList<Object> vec, String label){
+        System.out.println(bold(yellow(":::: " + label + " ::::")));
+        System.out.print(bold(yellow("[WARNING] ")));
+        IntStream.range(0, vec.size()).forEach(i-> {
+            if(i == vec.size()-1) System.out.print(vec.get(i) + bold(yellow("]")));
+            else if(i == 0) System.out.print(bold(yellow("[")) + vec.get(i) + ", ");
+            else System.out.print(String.valueOf(vec.get(i)) + ", ");
+        });
+        System.out.print("\n");
+    }
 
+
+    public static void printNegative(float data){
+        System.out.println(yellow(bold("[ERROR] ")) + data);
+    }
     public static void printNegative(double data){
         System.out.println(yellow(bold("[ERROR] ")) + data);
     }
@@ -223,6 +298,13 @@ public class PrintUtils {
     public static void printNegative(long data){
         System.out.println(yellow(bold("[ERROR] ")) + data);
     }
+    public static void printNegative(short data){
+        System.out.println(yellow(bold("[ERROR] ")) + data);
+    }
+    public static void printNegative(String data){
+        System.out.println(yellow(bold("[ERROR] ")) + data);
+    }
+
     public static void printNegative(String info, double data){
         System.out.println(yellow(bold("[ERROR] ")) + info + data);
     }
@@ -231,9 +313,6 @@ public class PrintUtils {
     }
     public static void printNegative(String info, long data){
         System.out.println(yellow(bold("[ERROR] ")) + info + data);
-    }
-    public static void printNegative(String data){
-        System.out.println(yellow(bold("[ERROR] ")) + data);
     }
     public static void printNegative(double[] vec){
         System.out.print(bold(red("[ERROR] ")));
@@ -292,19 +371,35 @@ public class PrintUtils {
         });
         System.out.print("\n");
     }
+    public static void printNegative(ArrayList<Object> vec, String label){
+        System.out.println(bold(red(":::: " + label + " ::::")));
+        System.out.print(bold(red("[ERROR] ")));
+        IntStream.range(0, vec.size()).forEach(i-> {
+            if(i == vec.size()-1) System.out.print(vec.get(i) + bold(red("]")));
+            else if(i == 0) System.out.print(bold(red("[")) + vec.get(i) + ", ");
+            else System.out.print(String.valueOf(vec.get(i)) + ", ");
+        });
+        System.out.print("\n");
+    }
+
 
     public static void printInfo(String data){
         System.out.println(blue(bold("[INFO] ")) + data);
     }
-    public static void printInfo(double data){
-        System.out.println(blue(bold("[INFO] ")) + data);
-    }
+    public static void printInfo(double data){ System.out.println(blue(bold("[INFO] ")) + data); }
     public static void printInfo(int data){
         System.out.println(blue(bold("[INFO] ")) + data);
     }
     public static void printInfo(long data){
         System.out.println(blue(bold("[INFO] ")) + data);
     }
+    public static void printInfo(float data){
+        System.out.println(blue(bold("[INFO] ")) + data);
+    }
+    public static void printInfo(short data){
+        System.out.println(blue(bold("[INFO] ")) + data);
+    }
+
     public static void printInfo(String info, double data){
         System.out.println(blue(bold("[INFO] ")) + info + " " + data);
     }
@@ -365,6 +460,15 @@ public class PrintUtils {
             if(i == vec.length-1) System.out.print(vec[i] + bold(blue("]")));
             else if(i == 0) System.out.print(blue(bold("[")) + vec[i] + ", ");
             else System.out.print(String.valueOf(vec[i]) + ", ");
+        });
+        System.out.print("\n");
+    }
+    public static void printInfo(String info, ArrayList<Object> vec){
+        System.out.print(bold(blue("[INFO] ") + info + " "));
+        IntStream.range(0, vec.size()).forEach(i-> {
+            if(i == vec.size()-1) System.out.print(vec.get(i) + bold(blue("]")));
+            else if(i == 0) System.out.print(blue(bold("[")) + vec.get(i) + ", ");
+            else System.out.print(String.valueOf(vec.get(i)) + ", ");
         });
         System.out.print("\n");
     }
