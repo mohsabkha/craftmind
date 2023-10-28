@@ -1,4 +1,4 @@
-package com.craftsentient.craftmind.mathUtils;
+package com.craftsentient.craftmind.utils.mathUtils;
 
 import com.craftsentient.craftmind.neuron.Neuron;
 import com.craftsentient.craftmind.utils.MathUtils;

@@ -215,16 +215,25 @@ public class PrintUtils {
     }
 
     public static void printNegative(double data){
-        System.out.println(yellow(bold("[ERROR] ") + data));
+        System.out.println(yellow(bold("[ERROR] ")) + data);
     }
     public static void printNegative(int data){
-        System.out.println(yellow(bold("[ERROR] ") + data));
+        System.out.println(yellow(bold("[ERROR] ")) + data);
     }
     public static void printNegative(long data){
-        System.out.println(yellow(bold("[ERROR] ") + data));
+        System.out.println(yellow(bold("[ERROR] ")) + data);
+    }
+    public static void printNegative(String info, double data){
+        System.out.println(yellow(bold("[ERROR] ")) + info + data);
+    }
+    public static void printNegative(String info, int data){
+        System.out.println(yellow(bold("[ERROR] ")) + info + data);
+    }
+    public static void printNegative(String info, long data){
+        System.out.println(yellow(bold("[ERROR] ")) + info + data);
     }
     public static void printNegative(String data){
-        System.out.println(yellow(bold("[ERROR] ") + data));
+        System.out.println(yellow(bold("[ERROR] ")) + data);
     }
     public static void printNegative(double[] vec){
         System.out.print(bold(red("[ERROR] ")));

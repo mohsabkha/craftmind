@@ -6,14 +6,15 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
 public class ErrorLossFunctions {
-    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double trueValues, double predictedValues) throws Exception {
+    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double trueValues, double classifierOutput) throws Exception {
         switch (lossFunction){
-            case HINGE_LOSS_FUNCTION -> { return hinge(trueValues, predictedValues); }
+            case HINGE_LOSS_FUNCTION -> { return hinge(trueValues, classifierOutput); }
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
 
     public static Object lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues) throws Exception {
+        if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
         switch (lossFunction){
             case BINARY_CROSS_ENTROPY_LOSS_FUNCTION -> { return binaryCrossEntropy(trueValues, predictedValues); }
             case CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION -> { return categoricalCrossEntropy(trueValues, predictedValues); }
@@ -37,6 +38,7 @@ public class ErrorLossFunctions {
     }
 
     public static Object lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[][] trueValues, double[][] predictedValues) throws Exception {
+        if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
         switch (lossFunction){
             case BINARY_CROSS_ENTROPY_LOSS_FUNCTION -> { return binaryCrossEntropy(trueValues, predictedValues); }
             case CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION -> { return categoricalCrossEntropy(trueValues, predictedValues); }
@@ -47,7 +49,6 @@ public class ErrorLossFunctions {
             case MAPE_LOSS_FUNCTION -> { return meanAbsolutePercentageError(trueValues, predictedValues); }
             //case MSE_LOSS_FUNCTION -> { return meanStandardError(trueValues, predictedValues); }
             case MSLE_LOSS_FUNCTION -> {  return meanStandardLogarithmicError(trueValues, predictedValues); }
-
             case QUADRATIC_LOSS -> { return quadratic(trueValues, predictedValues); }
             //case RANKNET_LOSS_FUNCTION -> { return rankNet(trueValues, predictedValues); }
             //case SPARSE_CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION -> { return sparseCategoricalCrossEntropy(trueValues, predictedValues); }
@@ -58,38 +59,43 @@ public class ErrorLossFunctions {
         }
     }
 
-    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueClass, double[] predictedValues, boolean usingHotEncodedVec) throws Exception {
+    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueClass, double[] predictedValues) throws Exception {
         switch (lossFunction) {
             case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues); }
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
-    public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueClass, double[][] predictedValues, boolean usingHotEncodedVec) throws Exception {
+    public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueClass, double[][] predictedValues) throws Exception {
+        if(trueClass.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
         switch (lossFunction) {
-            case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues, usingHotEncodedVec); }
+            case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues); }
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
-    public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueClass, double[] predictedValues, boolean usingHotEncodedVec) throws Exception {
+    public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueClass, double[] predictedValues) throws Exception {
+        if(trueClass.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
         switch (lossFunction) {
-            case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues, usingHotEncodedVec); }
+            case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues); }
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
-    public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] trueClass, double[][] predictedValues, boolean usingHotEncodedVec) throws Exception {
+    public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] trueClass, double[][] predictedValues) throws Exception {
+        if(trueClass.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
         switch (lossFunction) {
-            case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues, usingHotEncodedVec); }
+            case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues); }
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
 
     public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues, int y, double margin) throws Exception {
+        if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
         switch (lossFunction){
             case CONTRASTIVE_LOSS_FUNCTION -> { return contrastive(trueValues, predictedValues, y, margin); }
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
     public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[][] trueValues, double[][] predictedValues, int y, double margin) throws Exception {
+        if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
         switch (lossFunction){
             case CONTRASTIVE_LOSS_FUNCTION -> { return contrastive(trueValues, predictedValues, y, margin); }
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
@@ -102,6 +108,7 @@ public class ErrorLossFunctions {
         }
     }
     public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues, double[] alpha, double[] gamma) throws Exception {
+        if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
         switch (lossFunction){
             case FOCAL_LOSS_FUNCTION -> { return focal(trueValues, predictedValues, alpha, gamma); }
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
@@ -114,12 +121,14 @@ public class ErrorLossFunctions {
         }
     }
     public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues, double delta) throws Exception {
+        if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
         switch (lossFunction){
             case HUBER_LOSS_FUNCTION -> { return huber(trueValues, predictedValues, delta); }
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
     public static double[][] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[][] trueValues, double[][] predictedValues, double delta) throws Exception {
+        if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
         switch (lossFunction){
             case HUBER_LOSS_FUNCTION -> { return huber(trueValues, predictedValues, delta); }
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
@@ -142,6 +151,7 @@ public class ErrorLossFunctions {
 
 
     private static double categoricalCrossEntropy(double[] trueValues, double[] predictedValues) {
+        if(trueValues.length < 1) { throw new IllegalArgumentException("True Values must at least have 1 value when passed to categorical cross entropy"); }
         AtomicReference<Double> loss = new AtomicReference<>((double) 0);
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss.updateAndGet(v ->  v + trueValues[i] * Math.log(predictedValues[i])));
         return loss.get() / trueValues.length;
@@ -270,7 +280,6 @@ public class ErrorLossFunctions {
         return loss;
     }
 
-
     /**
     * Compute the L1 loss.
     *
@@ -288,7 +297,6 @@ public class ErrorLossFunctions {
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = absoluteError(trueValues[i], predictedValues[i]));
         return loss;
     }
-
 
     /**
      * Compute the Mean Absolute Percentage Error (MAPE).
@@ -312,7 +320,6 @@ public class ErrorLossFunctions {
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = meanAbsolutePercentageError(trueValues[i], predictedValues[i]));
         return loss;
     }
-
 
     /**
      * Compute the Mean Squared Logarithmic Error (MSLE).
@@ -351,19 +358,14 @@ public class ErrorLossFunctions {
     private static double negativeLogLikelihood(int trueClass, double[] predictedValues) {
         double predictedProbability = predictedValues[trueClass];
         if (predictedProbability <= 0 || predictedProbability > 1) {
-            throw new IllegalArgumentException("Invalid predicted probability. Values should be between 0 and 1.");
+            throw new IllegalArgumentException("Incompatible loss function and activation function! Values for predictions should be between 0 and 1!");
         }
         return -Math.log(predictedProbability);
     }
-    private static double[] negativeLogLikelihood(int[] trueValues, double[] predictedValues, boolean usingHotEncodedVec){
+    private static double[] negativeLogLikelihood(int[] trueValues, double[] predictedValues){
         double[] loss = new double[trueValues.length];
-        int trueClass = 0;
-        for(int i = 0; i < trueValues.length; i++){
-            if(trueValues[i] == 1) trueClass = i;
-        }
-        int finalTrueClass = trueClass;
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i ->
-                loss[i] = negativeLogLikelihood(usingHotEncodedVec ? finalTrueClass : trueValues[i], predictedValues));
+                loss[i] = negativeLogLikelihood(trueValues[i], predictedValues));
         return loss;
     }
     /**
@@ -373,30 +375,26 @@ public class ErrorLossFunctions {
      * @param trueValues The actual class indices.
      * @return The NLL value for the given observation.
      */
-    private static double[] negativeLogLikelihood(int[] trueValues, double[][] predictedValues, boolean usingHotEncodedVec) {
+    private static double[] negativeLogLikelihood(int[] trueValues, double[][] predictedValues) {
         double[] loss = new double[trueValues.length];
-        int[] trueClasses = new int[trueValues.length];
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> {
-             if(trueValues[i] == 1 && usingHotEncodedVec) trueClasses[i] = i;
-        });
-        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> {
-            loss[i] = negativeLogLikelihood(usingHotEncodedVec ? trueClasses[i] : trueValues[i], predictedValues[i]);
+            loss[i] = negativeLogLikelihood(trueValues[i], predictedValues[i]);
         });
         return loss;
     }
     /**
-     * Compute the Negative Log Likelihood (NLL) Loss for a batch series of observations.
+     * Compute the Negative Log Likelihood (NLL) Loss for a batch series of observations using one hot encoded vectors
      *
      * @param predictedValues Array of predicted probabilities for each class.
-     * @param trueValues The actual class of batch indices.
+     * @param oneHotEncodedVec One hot encoded vectors - array of arrays, where inner array has 1 for any position that is correct and 0 for incorrect
      * @return The NLL value for the given observation.
      */
-    private static double[] negativeLogLikelihood(int[][] trueValues, double[][] predictedValues, boolean usingHotEncodedVec) {
-        double[] loss = new double[trueValues.length];
-        int[] trueClasses = new int[trueValues.length];
-        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> {
-            IntStream.range(0, trueValues[i].length).parallel().forEachOrdered(j -> {
-                if(trueValues[i][j] == 1 && usingHotEncodedVec) trueClasses[i] = j;
+    private static double[] negativeLogLikelihood(int[][] oneHotEncodedVec, double[][] predictedValues) {
+        double[] loss = new double[oneHotEncodedVec.length];
+        int[] trueClasses = new int[oneHotEncodedVec.length];
+        IntStream.range(0, oneHotEncodedVec.length).parallel().forEachOrdered(i -> {
+            IntStream.range(0, oneHotEncodedVec[i].length).parallel().forEachOrdered(j -> {
+                if(oneHotEncodedVec[i][j] == 1) trueClasses[i] = j;
             });
         });
         IntStream.range(0, trueClasses.length).parallel().forEachOrdered(i -> loss[i] = negativeLogLikelihood(trueClasses[i], predictedValues[i]));
