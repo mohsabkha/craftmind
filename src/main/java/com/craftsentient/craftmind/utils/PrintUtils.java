@@ -14,7 +14,6 @@ public class PrintUtils {
     private static String PURPLE = "\033[35m";
     private static String CYAN = "\033[36m";
     private static String WHITE = "\033[37m";
-
     private static String BLACK_BACKGROUND = "\033[40m";
     private static String RED_BACKGROUND  = "\033[41m";
     private static String GREEN_BACKGROUND  = "\033[42m";
@@ -23,10 +22,8 @@ public class PrintUtils {
     private static String PURPLE_BACKGROUND  = "\033[45m";
     private static String CYAN_BACKGROUND  = "\033[46m";
     private static String WHITE_BACKGROUND  = "\033[47m";
-
     private static String BOLD = "\033[1m";
     private static String RESET = "\033[0m";
-
     public static String black(String str){
         return BLACK + str + RESET;
     }
@@ -51,7 +48,6 @@ public class PrintUtils {
     public static String white(String str){
         return WHITE + str + RESET;
     }
-
     public static String backgroundBlack(String str){
         return BLACK_BACKGROUND + str + RESET;
     }
@@ -76,10 +72,10 @@ public class PrintUtils {
     public static String backgroundWhite(String str){
         return WHITE_BACKGROUND + str + RESET;
     }
-
     public static String bold(String str){
         return BOLD + str + RESET;
     }
+
 
     // generic
     public static void printGeneric(String data){
@@ -136,6 +132,7 @@ public class PrintUtils {
         });
         System.out.print("\n");
     }
+
 
     // positive
     public static void printPositive(String data){
@@ -198,6 +195,7 @@ public class PrintUtils {
     }
 
 
+    // warning
     public static void printWarning(double data){
         System.out.println(yellow(bold("[WARNING] ") + data));
     }
@@ -216,7 +214,6 @@ public class PrintUtils {
     public static void printWarning(String data){
         System.out.println(yellow(bold("[WARNING] ") + data));
     }
-
     public static void printWarning(double[] vec){
         System.out.print(bold(yellow("[WARNING] ")));
         IntStream.range(0, vec.length).forEach(i-> {
@@ -286,6 +283,7 @@ public class PrintUtils {
     }
 
 
+    // negative
     public static void printNegative(float data){
         System.out.println(yellow(bold("[ERROR] ")) + data);
     }
@@ -304,7 +302,6 @@ public class PrintUtils {
     public static void printNegative(String data){
         System.out.println(yellow(bold("[ERROR] ")) + data);
     }
-
     public static void printNegative(String info, double data){
         System.out.println(yellow(bold("[ERROR] ")) + info + data);
     }
@@ -383,6 +380,7 @@ public class PrintUtils {
     }
 
 
+    // info
     public static void printInfo(String data){
         System.out.println(blue(bold("[INFO] ")) + data);
     }
@@ -399,7 +397,6 @@ public class PrintUtils {
     public static void printInfo(short data){
         System.out.println(blue(bold("[INFO] ")) + data);
     }
-
     public static void printInfo(String info, double data){
         System.out.println(blue(bold("[INFO] ")) + info + " " + data);
     }
@@ -474,6 +471,7 @@ public class PrintUtils {
     }
 
 
+    // generic matrix
     public static void printGeneric(double[][] matrix, String label){
         System.out.println(bold(green(":::: " + label + " ::::")));
         IntStream.range(0, matrix.length).forEach(i-> {
@@ -511,6 +509,7 @@ public class PrintUtils {
         System.out.print("\n");
     }
 
+    // info matrix
     public static void printInfo(double[][] matrix){
         System.out.print(bold(blue("[INFO] ")));
         IntStream.range(0, matrix.length).forEach(i-> {
@@ -547,7 +546,6 @@ public class PrintUtils {
         });
         System.out.print("\n");
     }
-
     public static void printInfo(String info, double[][] matrix){
         System.out.print(bold(blue("[INFO] ") + info + " "));
         IntStream.range(0, matrix.length).forEach(i-> {
@@ -572,19 +570,18 @@ public class PrintUtils {
         });
         System.out.print("\n");
     }
-    public static void printInfo(String info, String[][] matrix){
+    public static void printInfo(String info, String[][] matrix) {
         System.out.print(bold(blue("[INFO] ") + info + " "));
-        IntStream.range(0, matrix.length).forEach(i-> {
+        IntStream.range(0, matrix.length).forEach(i -> {
             IntStream.range(0, matrix[0].length).forEach(j -> {
-                if(j == 0) System.out.print(blue(bold("[")) + matrix[i][j] + ", ");
-                else if(j == matrix[0].length-1) System.out.print(matrix[i][j] + blue(bold("]")));
+                if (j == 0) System.out.print(blue(bold("[")) + matrix[i][j] + ", ");
+                else if (j == matrix[0].length - 1) System.out.print(matrix[i][j] + blue(bold("]")));
                 else System.out.print(matrix[i][j] + ", ");
             });
-            if(i != matrix.length - 1) System.out.print(",");
+            if (i != matrix.length - 1) System.out.print(",");
         });
         System.out.print("\n");
     }
-
     public static <K, V> void printInfo(Map<K, V> map){
         System.out.print(bold(blue("[INFO] ")));
         IntStream.range(0, map.size()).forEach(i-> {
@@ -592,7 +589,6 @@ public class PrintUtils {
         });
         System.out.print("\n");
     }
-
     public static <Integer, V> void printInfo(String info, Map<Integer, V> map){
         System.out.print(bold(blue("[INFO] ")) + info + " ");
         map.forEach((i, v) -> {
