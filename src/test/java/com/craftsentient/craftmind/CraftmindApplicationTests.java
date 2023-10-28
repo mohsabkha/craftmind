@@ -52,8 +52,4 @@ class CraftmindApplicationTests {
         CraftmindApplication.main(args);
     }
 
-    @Test
-    public void matrixTest(){
-
-    }
 }

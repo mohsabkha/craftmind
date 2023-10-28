@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -35,6 +36,13 @@ public class MathUtils {
         if(a.length != b.length) throw new IllegalArgumentException("Dimensions mismatch!");
         AtomicReference<Double> sum = new AtomicReference<>((double) 0);
         IntStream.range(0, a.length).parallel().forEachOrdered(i -> sum.updateAndGet(v -> (v + (a[i] * b[i]))));
+        return sum.getAcquire();
+    }
+
+    public static double arrayDotProduct(ArrayList<Double>a, ArrayList<Double>b){
+        if(a.size() != b.size()) throw new IllegalArgumentException("Dimensions mismatch!");
+        AtomicReference<Double> sum = new AtomicReference<>((double) 0);
+        IntStream.range(0, a.size()).parallel().forEachOrdered(i -> sum.updateAndGet(v -> (v + (a.get(i) * b.get(i)))));
         return sum.getAcquire();
     }
 

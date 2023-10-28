@@ -388,15 +388,6 @@ public class DenseLayers {
             printInfo("Total Correct: ", totalCorrect.get());
             this.accuracy = totalCorrect.get()/this.getLastLayer().getBatchTrueValues().length;
             printInfo("Accuracy: ", this.accuracy);
-        } else if(this.getLastLayer().getBatchHotOneVecs().length > 0){
-            AtomicReference<Double> totalCorrect = new AtomicReference<>((double) 0);
-            IntStream.range(0, this.getLastLayer().getBatchHotOneVecs().length).forEachOrdered(i -> {
-                printInfo("batchLayer hot one vec values: ", this.getLastLayer().getBatchHotOneVecs()[i]);
-                printInfo("decisions made: ", decisions.get(i));
-                if (this.getLastLayer().getBatchHotOneVecs()[i] == decisionsIndex[i]) totalCorrect.updateAndGet(v-> v+1); });
-            printInfo("Total Correct: ", totalCorrect.get());
-            this.accuracy = totalCorrect.get()/this.getLastLayer().getBatchTrueValues().length;
-            printInfo("Accuracy: ", this.accuracy);
         }
     }
 
