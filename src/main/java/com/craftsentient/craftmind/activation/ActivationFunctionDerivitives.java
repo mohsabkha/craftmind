@@ -119,7 +119,7 @@ public class ActivationFunctionDerivitives {
 
     // GAUSSIAN_ACTIVATION
     private static double gaussian(double value) {
-        return Math.exp(-(value*value));
+        return (-2 * value) * Math.exp(-(value*value));
     }
     private static double[] gaussian(double[] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = gaussian(values[i]));
@@ -135,7 +135,7 @@ public class ActivationFunctionDerivitives {
     private static double hardSigmoid(double value) {
         if (value < -2.5) return 0.0;
         else if (value > 2.5) return 1.0;
-        else return 0.2 * value + 0.5;
+        else return 0.2;
     }
     private static double[] hardSigmoid(double[] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = hardSigmoid(values[i]));
@@ -149,8 +149,8 @@ public class ActivationFunctionDerivitives {
 
     // LEAKY_RELU
     private static double leakyRelu(double value, double alpha) {
-        if (value > 0) return value;
-        else return alpha * value;
+        if (value > 0) return 1;
+        else return alpha;
     }
     private static double[] leakyRelu(double[] values, double alpha) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = leakyRelu(values[i], alpha));
@@ -164,19 +164,21 @@ public class ActivationFunctionDerivitives {
 
     // LINEAR_ACTIVATION
     private static double linear(double value) {
-        return value;
+        return 1;
     }
     private static double[] linear(double[] values) {
+        IntStream.range(0, values.length).forEach(i -> values[i] = 1);
         return values;
     }
     private static double[][] linear(double[][] values) {
+        IntStream.range(0, values.length).parallel().forEach(i -> values[i] = linear(values[i]));
         return values;
     }
 
 
     // MISH_ACTIVATION
     private static double mish(double value) {
-        return value * Math.tanh(Math.log1p(Math.exp(value)));
+        return tanh(softplus(value)) + (value * (1 - (tanh(softplus(value)) * tanh(softplus(value)))) * sigmoid(value));
     }
     private static double[] mish(double[] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = mish(values[i]));
@@ -190,8 +192,8 @@ public class ActivationFunctionDerivitives {
 
     // PARAMETRIC_RELU
     private static double parametricRelu(double value, double alpha) {
-        if (value > 0) return value;
-        else return alpha * value;
+        if (value > 0) return 1;
+        else return alpha;
     }
     private static double[] parametricRelu(double[] values, double[] alphas) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = parametricRelu(values[i], alphas[i]));
