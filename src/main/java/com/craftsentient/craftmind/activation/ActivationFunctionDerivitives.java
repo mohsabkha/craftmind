@@ -104,7 +104,7 @@ public class ActivationFunctionDerivitives {
 
     // EXPONENTIAL_ELU
     private static double exponentialElu(double value,double alpha, double beta) {
-        if (value < 0) return alpha * (Math.exp(value) - 1);
+        if (value <= 0) return alpha * (Math.exp(value) - 1);
         else return beta * Math.exp(value);
     }
     private static double[] exponentialElu(double values[],double alphas[], double betas[]) {
