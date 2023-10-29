@@ -61,7 +61,7 @@ public class MathUtils {
         if(isDoubleList(a) && isDoubleList(b)){
             if(bothDoubleArraysAreNotOfTheSameSize(a,b))
                 throw new ArithmeticException("ERR1: a and b must be of equal size");
-            return MutliplyVectors((ArrayList<Double>) a, (ArrayList<Double>) b);
+            return MultiplyVectors((ArrayList<Double>) a, (ArrayList<Double>) b);
         } else if( isObjectList(a) && isDoubleList(b) ){
             if(ElementOfFirstArrayIsDoubleArrayAndBothAreOfSameSize(a,b)){
                 ArrayList<ArrayList<Double>> matrix = (ArrayList<ArrayList<Double>>) a;
@@ -99,7 +99,7 @@ public class MathUtils {
         return isDoubleList(((ArrayList<?>)a).get(0)) && isDoubleList(((ArrayList<?>)b).get(0)) && ( ((ArrayList<Double>)b).size() == ((ArrayList<?>)((ArrayList<?>)a).get(0)).size());
     }
 
-    private static Double MutliplyVectors(ArrayList<Double> a, ArrayList<Double> b) {
+    private static Double MultiplyVectors(ArrayList<Double> a, ArrayList<Double> b) {
         AtomicReference<Double> sum = new AtomicReference<>(0.0);
         IntStream.range(0, a.size()).parallel().forEachOrdered( i -> sum.updateAndGet(v -> v + a.get(i) * b.get(i)));
         return sum.get();
@@ -107,7 +107,7 @@ public class MathUtils {
 
     public static ArrayList<Double> MultipleMatrixAndVector(ArrayList<ArrayList<Double>> matrix, ArrayList<Double> vector) {
         ArrayList<Double> answer = new ArrayList<>();
-        IntStream.range(0, matrix.size()).parallel().forEachOrdered( i -> answer.add(MutliplyVectors(matrix.get(i), vector)));
+        IntStream.range(0, matrix.size()).parallel().forEachOrdered( i -> answer.add(MultiplyVectors(matrix.get(i), vector)));
         return answer;
     }
 

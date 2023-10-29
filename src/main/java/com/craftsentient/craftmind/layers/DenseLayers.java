@@ -392,8 +392,6 @@ public class DenseLayers {
             printInfo("Decision Indices:", this.decisionsIndex);
             printInfo("Batch True Values:", this.getLastLayer().getBatchTrueValues());
             printInfo("Accuracy: ", this.accuracy);
-<<<<<<< HEAD
-=======
         }
         else if(this.getLastLayer().getBatchHotOneVecs().length > 0){
             this.accuracy = accuracy(this.getLastLayer().getBatchHotOneVecs(), this.decisionsIndex);
@@ -401,7 +399,6 @@ public class DenseLayers {
             printInfo("Decisions:", this.decisions);
             printInfo("Decision Indices:", this.decisionsIndex);
             printInfo("Accuracy: ", this.accuracy);
->>>>>>> 1ed61536b58039b1964c30d9d2b649d4d7eaf800
         }
     }
 
