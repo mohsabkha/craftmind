@@ -38,7 +38,6 @@ public class MathUtils {
         return sum.getAcquire();
     }
 
-<<<<<<< HEAD
     public static double arrayDotProduct(ArrayList<Double>a, ArrayList<Double>b){
         if(a.size() != b.size()) throw new IllegalArgumentException("Dimensions mismatch!");
         AtomicReference<Double> sum = new AtomicReference<>((double) 0);
@@ -46,9 +45,6 @@ public class MathUtils {
         return sum.getAcquire();
     }
 
-
-=======
->>>>>>> 1ed61536b58039b1964c30d9d2b649d4d7eaf800
     public static double[][] matrixDotProduct(double[][] input1, double[][] input2) {
         double[][] output = new double[input1.length][input2[0].length];
         for (int i = 0; i < output.length; i++)
