@@ -5,22 +5,45 @@ import java.util.stream.IntStream;
 public class ActivationFunctions {
     public static double activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double value) throws Exception {
         switch (activationFunction) {
-            case BENT_IDENTITY_ACTIVATION_FUNCTION -> { return bentIdentity(value); }
-            case GAUSSIAN_ACTIVATION_FUNCTION -> { return gaussian(value); }
-            case HARD_SIGMOID_ACTIVATION_FUNCTION -> { return hardSigmoid(value); }
-            case LINEAR_ACTIVATION_FUNCTION -> { return linear(value); }
-            case MISH_ACTIVATION_FUNCTION -> { return mish(value); }
-            case RELU_ACTIVATION_FUNCTION -> { return rectifiedLinearUnit(value); }
-            case RELU_6_ACTIVATION_FUNCTION -> { return rectifiedLinearUnit6(value); }
-            case SELU_ACTIVATION_FUNCTION -> { return scaledExponentialLinear(value); }
-            case SIGMOID_ACTIVATION_FUNCTION -> { return sigmoid(value); }
-            case SOFTPLUS_ACTIVATION_FUNCTION -> { return softplus(value); }
-            case SOFTSIGN_ACTIVATION_FUNCTION -> { return softsign(value); }
-            case TANH_ACTIVATION_FUNCTION -> { return tanh(value); }
+            case BENT_IDENTITY_ACTIVATION_FUNCTION -> {
+                return bentIdentity(value);
+            }
+            case GAUSSIAN_ACTIVATION_FUNCTION -> {
+                return gaussian(value);
+            }
+            case HARD_SIGMOID_ACTIVATION_FUNCTION -> {
+                return hardSigmoid(value);
+            }
+            case LINEAR_ACTIVATION_FUNCTION -> {
+                return linear(value);
+            }
+            case MISH_ACTIVATION_FUNCTION -> {
+                return mish(value);
+            }
+            case RELU_ACTIVATION_FUNCTION -> {
+                return rectifiedLinearUnit(value);
+            }
+            case RELU_6_ACTIVATION_FUNCTION -> {
+                return rectifiedLinearUnit6(value);
+            }
+            case SELU_ACTIVATION_FUNCTION -> {
+                return scaledExponentialLinear(value);
+            }
+            case SIGMOID_ACTIVATION_FUNCTION -> {
+                return sigmoid(value);
+            }
+            case SOFTPLUS_ACTIVATION_FUNCTION -> {
+                return softplus(value);
+            }
+            case SOFTSIGN_ACTIVATION_FUNCTION -> {
+                return softsign(value);
+            }
+            case TANH_ACTIVATION_FUNCTION -> {
+                return tanh(value);
+            }
             default -> throw new Exception("Incorrect Activation Function Name Entered: " + activationFunction.name());
         }
     }
-
     public static double activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double value, double alpha, double beta) throws Exception {
         switch (activationFunction) {
             case SWISH_ACTIVATION_FUNCTION -> { return swish(value, beta); }
@@ -30,7 +53,6 @@ public class ActivationFunctions {
             default -> throw new Exception("Incorrect Activation Function Name Entered: " + activationFunction.name());
         }
     }
-
     public static double[] activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double[] values) throws Exception {
         switch (activationFunction) {
             case BENT_IDENTITY_ACTIVATION_FUNCTION -> { return bentIdentity(values); }
@@ -49,7 +71,6 @@ public class ActivationFunctions {
             default -> throw new Exception("Incorrect Activation Function Name Entered: " + activationFunction.name());
         }
     }
-
     public static double[] activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double values[], double alphas[], double betas[]) throws Exception {
         switch (activationFunction) {
             case SWISH_ACTIVATION_FUNCTION -> { return swish(values, betas); }
@@ -58,7 +79,6 @@ public class ActivationFunctions {
             default -> throw new Exception("Incorrect Activation Function Name Entered: " + activationFunction.name());
         }
     }
-
     public static double[][] activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double[][] values) throws Exception {
         switch (activationFunction) {
             case BENT_IDENTITY_ACTIVATION_FUNCTION -> { return bentIdentity(values); }
@@ -77,7 +97,6 @@ public class ActivationFunctions {
             default -> throw new Exception("Incorrect Activation Function Name Entered: " + activationFunction.name());
         }
     }
-
     public static double[][] activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double values[][], double alphas[][], double betas[][]) throws Exception {
         switch (activationFunction) {
             case SWISH_ACTIVATION_FUNCTION -> { return swish(values, betas); }
@@ -90,7 +109,7 @@ public class ActivationFunctions {
 
     //BENT IDENTITY
     private static double bentIdentity(double value) {
-        return (Math.sqrt(value * value + 1) - 1) / 2 + value;
+        return ((Math.sqrt(value * value + 1) - 1) / 2) + value;
     }
     private static double[] bentIdentity(double[] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = bentIdentity(values[i]));
@@ -249,7 +268,7 @@ public class ActivationFunctions {
 
 
     // SIGMOID_ACTIVATION
-    private static double sigmoid(double value) {
+    public static double sigmoid(double value) {
         return 1.0 / (1.0 + Math.exp(-value));
     }
     private static double[] sigmoid(double[] values) {
@@ -292,7 +311,7 @@ public class ActivationFunctions {
 
 
     // SOFTPLUS
-    private static double softplus(double value) {
+    public static double softplus(double value) {
         return Math.log1p(Math.exp(value));
     }
     private static double[] softplus(double[] values) {
@@ -334,7 +353,7 @@ public class ActivationFunctions {
 
 
     // TANH
-    private static double tanh(double value) {
+    public static double tanh(double value) {
         return (2/(1 + Math.exp(-(2*value)))) - 1;
     }
     private static double[] tanh(double[] values) {

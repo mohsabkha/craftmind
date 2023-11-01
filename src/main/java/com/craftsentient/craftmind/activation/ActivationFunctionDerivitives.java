@@ -90,7 +90,8 @@ public class ActivationFunctionDerivitives {
 
     //BENT IDENTITY
     private static double bentIdentity(double value) {
-        return (Math.sqrt(value * value + 1) - 1) / 2 + value;
+        return (value/(2* Math.sqrt((value * value) + 1))) + 1;
+
     }
     private static double[] bentIdentity(double[] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = bentIdentity(values[i]));
@@ -102,9 +103,9 @@ public class ActivationFunctionDerivitives {
     }
 
 
-    // EXPONENTIAL_ELU
+    // EXPONENTIAL_LU
     private static double exponentialElu(double value,double alpha, double beta) {
-        if (value <= 0) return alpha * (Math.exp(value) - 1);
+        if (value <= 0) return alpha * Math.exp(value);
         else return beta * Math.exp(value);
     }
     private static double[] exponentialElu(double values[],double alphas[], double betas[]) {
@@ -134,7 +135,7 @@ public class ActivationFunctionDerivitives {
     // HARD SIGMOID
     private static double hardSigmoid(double value) {
         if (value < -2.5) return 0.0;
-        else if (value > 2.5) return 1.0;
+        else if (value > 2.5) return 0.0;
         else return 0.2;
     }
     private static double[] hardSigmoid(double[] values) {
@@ -177,11 +178,19 @@ public class ActivationFunctionDerivitives {
 
 
     // MISH_ACTIVATION
-    private static double mish(double value) {
-        return tanh(softplus(value)) + (value * (1 - (tanh(softplus(value)) * tanh(softplus(value)))) * sigmoid(value));
+    private static double mish(double value) throws Exception {
+        return
+                ActivationFunctions.tanh(ActivationFunctions.softplus(value)) +
+                        (value * (1 - (ActivationFunctions.tanh(ActivationFunctions.softplus(value)) * ActivationFunctions.tanh(ActivationFunctions.softplus(value)))) * ActivationFunctions.sigmoid(value));
     }
     private static double[] mish(double[] values) {
-        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = mish(values[i]));
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> {
+            try {
+                values[i] = mish(values[i]);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
         return values;
     }
     private static double[][] mish(double[][] values) {
@@ -192,7 +201,7 @@ public class ActivationFunctionDerivitives {
 
     // PARAMETRIC_RELU
     private static double parametricRelu(double value, double alpha) {
-        if (value > 0) return 1;
+        if (value > 0){ return 1; }
         else return alpha;
     }
     private static double[] parametricRelu(double[] values, double[] alphas) {
@@ -236,14 +245,20 @@ public class ActivationFunctionDerivitives {
 
 
     // SELU
-    private static double scaledExponentialLinear(double value) {
+    private static double scaledExponentialLinear(double value) throws Exception {
         double LAMBDA = 1.0507;
         double ALPHA = 1.67326;
-        if (value > 0) return LAMBDA * value;
-        else return LAMBDA * (ALPHA * (Math.exp(value) - 1));
+        if (value > 0) return LAMBDA;
+        else return LAMBDA * (ALPHA + ActivationFunctions.activationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SELU_ACTIVATION_FUNCTION, value));
     }
     private static double[] scaledExponentialLinear(double[] values) {
-        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = scaledExponentialLinear(values[i]));
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> {
+            try {
+                values[i] = scaledExponentialLinear(values[i]);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
         return values;
     }
     private static double[][] scaledExponentialLinear(double[][] values) {
@@ -253,11 +268,18 @@ public class ActivationFunctionDerivitives {
 
 
     // SIGMOID_ACTIVATION
-    private static double sigmoid(double value) {
-        return 1.0 / (1.0 + Math.exp(-value));
+    private static double sigmoid(double value) throws Exception {
+        return ActivationFunctions.sigmoid(value) *
+                (1 - ActivationFunctions.sigmoid(value));
     }
     private static double[] sigmoid(double[] values) {
-        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = sigmoid(values[i]));
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> {
+            try {
+                values[i] = sigmoid(values[i]);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
         return values;
     }
     private static double[][] sigmoid(double[][] values) {
@@ -266,6 +288,7 @@ public class ActivationFunctionDerivitives {
     }
 
 
+    // TODO: Implement Derivative
     // SOFTMAX
     private static double[] softmax(double[] values) {
         double sum = 0.0;
@@ -279,6 +302,7 @@ public class ActivationFunctionDerivitives {
     }
 
     // TODO: implement finding the largest value in the layer itself as neurons are added
+    // TODO: Implement Derivative
     // CAPPED SOFTMAX
     private static double[] cappedSoftmax(double[] values) {
         double sum = 0.0;
@@ -296,11 +320,17 @@ public class ActivationFunctionDerivitives {
 
 
     // SOFTPLUS
-    private static double softplus(double value) {
-        return Math.log1p(Math.exp(value));
+    private static double softplus(double value) throws Exception {
+        return ActivationFunctions.sigmoid(value);
     }
     private static double[] softplus(double[] values) {
-        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = softplus(values[i]));
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> {
+            try {
+                values[i] = softplus(values[i]);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
         return values;
     }
     private static double[][] softplus(double[][] values) {
@@ -311,7 +341,7 @@ public class ActivationFunctionDerivitives {
 
     // SOFTSIGN
     private static double softsign(double value) {
-        return value / (1 + Math.abs(value));
+        return (1 / ( (1 + Math.abs(value)*(1 + Math.abs(value))) ));
     }
     private static double[] softsign(double[] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = softsign(values[i]));
@@ -324,11 +354,17 @@ public class ActivationFunctionDerivitives {
 
 
     // SWISH
-    private static double swish(double value, double beta) {
-        return value * sigmoid(value);
+    private static double swish(double value, double beta) throws Exception {
+        return (1 + value - (value * ActivationFunctions.sigmoid(value))) * ActivationFunctions.sigmoid(value);
     }
     private static double[] swish(double[] values, double[] beta) {
-        IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = beta[i] * sigmoid(values[i]));
+        IntStream.range(0, values.length).parallel().forEachOrdered(i -> {
+            try {
+                values[i] = beta[i] * sigmoid(values[i]);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
         return values;
     }
     private static double[][] swish(double[][] values, double[][] beta) {
@@ -339,7 +375,7 @@ public class ActivationFunctionDerivitives {
 
     // TANH
     private static double tanh(double value) {
-        return (2/(1 + Math.exp(-(2*value)))) - 1;
+        return (1 - (tanh(value) * tanh(value)));
     }
     private static double[] tanh(double[] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = tanh(values[i]));
