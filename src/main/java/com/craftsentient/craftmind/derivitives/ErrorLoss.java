@@ -1,9 +1,140 @@
-package com.craftsentient.craftmind.errorLoss;
+package com.craftsentient.craftmind.derivitives;
+
+import com.craftsentient.craftmind.errorLoss.DEFAULT_LOSS_FUNCTIONS;
 
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
-public class ErrorLossFunctionDerivatives {
+public class ErrorLoss {
+    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double trueValues, double classifierOutput) throws Exception {
+        switch (lossFunction){
+            case HINGE_LOSS_FUNCTION -> { return hinge(trueValues, classifierOutput); }
+            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+        }
+    }
+    public static Object lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues) throws Exception {
+        if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
+        switch (lossFunction){
+            case BINARY_CROSS_ENTROPY_LOSS_FUNCTION -> { return binaryCrossEntropy(trueValues, predictedValues); }
+            case CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION -> { return categoricalCrossEntropy(trueValues, predictedValues); }
+            case COSINE_PROXIMITY_LOSS_FUNCTION -> { return cosineProximity(trueValues, predictedValues); }
+            case HINGE_LOSS_FUNCTION -> { return hinge(trueValues, predictedValues); }
+            case KL_DIVERGENCE_LOSS_FUNCTION -> { return kullbackLeiblerDivergence(trueValues, predictedValues); }
+            case LOG_COSH_LOSS_FUNCTION -> { return logCosh(trueValues, predictedValues); }
+            case L1_LOSS_FUNCTION -> { return absoluteError(trueValues, predictedValues); }
+            case MAPE_LOSS_FUNCTION -> { return meanAbsolutePercentageError(trueValues, predictedValues); }
+            //case MSE_LOSS_FUNCTION -> { return meanStandardError(trueValues, predictedValues); }
+            case MSLE_LOSS_FUNCTION -> {  return meanStandardLogarithmicError(trueValues, predictedValues); }
+            //case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueValues, predictedValues); }
+            case QUADRATIC_LOSS -> { return quadratic(trueValues, predictedValues); }
+            //case RANKNET_LOSS_FUNCTION -> { return rankNet(trueValues, predictedValues); }
+            //case SPARSE_CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION -> { return sparseCategoricalCrossEntropy(trueValues, predictedValues); }
+            case SQUARED_HINGE_LOSS_FUNCTION -> { return squaredHinge(trueValues, predictedValues); }
+            //case SSIM_LOSS_FUNCTION -> { return structuralSimilarityIndex(trueValues, predictedValues); }
+            //case TRIPLET_MARGIN_LOSS_FUNCTION -> { return tripletMargin(trueValues, predictedValues); }
+            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+        }
+    }
+    public static Object lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[][] trueValues, double[][] predictedValues) throws Exception {
+        if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
+        switch (lossFunction){
+            case BINARY_CROSS_ENTROPY_LOSS_FUNCTION -> { return binaryCrossEntropy(trueValues, predictedValues); }
+            case CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION -> { return categoricalCrossEntropy(trueValues, predictedValues); }
+            case COSINE_PROXIMITY_LOSS_FUNCTION -> { return cosineProximity(trueValues, predictedValues); }
+            case KL_DIVERGENCE_LOSS_FUNCTION -> { return kullbackLeiblerDivergence(trueValues, predictedValues); }
+            case LOG_COSH_LOSS_FUNCTION -> { return logCosh(trueValues, predictedValues); }
+            case L1_LOSS_FUNCTION -> { return absoluteError(trueValues, predictedValues); }
+            case MAPE_LOSS_FUNCTION -> { return meanAbsolutePercentageError(trueValues, predictedValues); }
+            //case MSE_LOSS_FUNCTION -> { return meanStandardError(trueValues, predictedValues); }
+            case MSLE_LOSS_FUNCTION -> {  return meanStandardLogarithmicError(trueValues, predictedValues); }
+            case QUADRATIC_LOSS -> { return quadratic(trueValues, predictedValues); }
+            //case RANKNET_LOSS_FUNCTION -> { return rankNet(trueValues, predictedValues); }
+            //case SPARSE_CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION -> { return sparseCategoricalCrossEntropy(trueValues, predictedValues); }
+            case SQUARED_HINGE_LOSS_FUNCTION -> { return squaredHinge(trueValues, predictedValues); }
+            //case SSIM_LOSS_FUNCTION -> { return structuralSimilarityIndex(trueValues, predictedValues); }
+            //case TRIPLET_MARGIN_LOSS_FUNCTION -> { return tripletMargin(trueValues, predictedValues); }
+            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+        }
+    }
+    public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueClass, double[] predictedValues) throws Exception {
+        switch (lossFunction) {
+            case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues); }
+            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+        }
+    }
+    public static double[][] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueClass, double[][] predictedValues) throws Exception {
+        if(trueClass.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
+        switch (lossFunction) {
+            case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues); }
+            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+        }
+    }
+    public static double[][] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueClass, double[] predictedValues) throws Exception {
+        if(trueClass.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
+        switch (lossFunction) {
+            case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues); }
+            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+        }
+    }
+    public static double[][] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] trueClass, double[][] predictedValues) throws Exception {
+        if(trueClass.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
+        switch (lossFunction) {
+            case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues); }
+            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+        }
+    }
+
+    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues, int y, double margin) throws Exception {
+        if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
+        switch (lossFunction){
+            case CONTRASTIVE_LOSS_FUNCTION -> { return contrastiveWithTwoDatasets(trueValues, predictedValues, y, margin); }
+            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+        }
+    }
+    public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[][] trueValues, double[][] predictedValues, int y, double margin) throws Exception {
+        if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
+        switch (lossFunction){
+            case CONTRASTIVE_LOSS_FUNCTION -> { return contrastiveWithTwoDatasets(trueValues, predictedValues, y, margin); }
+            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+        }
+    }
+    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double trueValues, double predictedValues, double alpha, double gamma) throws Exception {
+        switch (lossFunction){
+            case FOCAL_LOSS_FUNCTION -> { return focal(trueValues, predictedValues, alpha, gamma); }
+            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+        }
+    }
+    public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues, double[] alpha, double[] gamma) throws Exception {
+        if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
+        switch (lossFunction){
+            case FOCAL_LOSS_FUNCTION -> { return focal(trueValues, predictedValues, alpha, gamma); }
+            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+        }
+    }
+    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double trueValues, double predictedValues, double delta) throws Exception {
+        switch (lossFunction){
+            case HUBER_LOSS_FUNCTION -> { return huber(trueValues, predictedValues, delta); }
+            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+        }
+    }
+    public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues, double delta) throws Exception {
+        if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
+        switch (lossFunction){
+            case HUBER_LOSS_FUNCTION -> { return huber(trueValues, predictedValues, delta); }
+            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+        }
+    }
+    public static double[][] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[][] trueValues, double[][] predictedValues, double delta) throws Exception {
+        if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
+        switch (lossFunction){
+            case HUBER_LOSS_FUNCTION -> { return huber(trueValues, predictedValues, delta); }
+            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+        }
+    }
+
+
+
+
     // Binary Cross Entropy
     public static double binaryCrossEntropy(double trueValue, double predictedValueProbability){
         return -trueValue / predictedValueProbability + (1 - trueValue) / (1 - predictedValueProbability);
@@ -77,7 +208,7 @@ public class ErrorLossFunctionDerivatives {
 
 
     // TODO: Learn and take derivative of this function later
-    private static double cosineProximity(double[] trueValues, double[] predictedValues) {
+    public static double cosineProximity(double[] trueValues, double[] predictedValues) {
         if (trueValues.length != predictedValues.length) throw new IllegalArgumentException("Vectors must have the same dimension");
         double dotProduct = 0.0;
         double normYTrue = 0.0;
@@ -90,24 +221,24 @@ public class ErrorLossFunctionDerivatives {
         double similarity = dotProduct / (Math.sqrt(normYTrue) * Math.sqrt(normYPred));
         return -similarity;  // Negative since we want to minimize the loss
     }
-    private static double[] cosineProximity(double[][] trueValues, double[][] predictedValues) {
+    public static double[] cosineProximity(double[][] trueValues, double[][] predictedValues) {
         double[] loss = new double[trueValues.length];
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = cosineProximity(trueValues[i], predictedValues[i]));
         return loss;
     }
 
 
-    private static double focal(double trueValue, double predictedValue, double alpha, double gamma) {
+    public static double focal(double trueValue, double predictedValue, double alpha, double gamma) {
         double pt = (trueValue == 1) ? predictedValue : 1 - predictedValue;
         double alpha_t = (trueValue == 1) ? alpha : 1 - alpha;
         return -alpha_t * gamma * Math.pow(1 - pt, gamma - 1) * (Math.log(pt) + (1 - pt));
     }
-    private static double[] focal(double[] trueValues, double[] predictedValues, double[] alpha, double[] gamma) {
+    public static double[] focal(double[] trueValues, double[] predictedValues, double[] alpha, double[] gamma) {
         double[] loss = new double[trueValues.length];
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = focal(trueValues[i], predictedValues[i], alpha[i], gamma[i]));
         return loss;
     }
-    private static double[][] focal(double[][] trueValues, double[][] predictedValues, double[][] alpha, double[][] gamma) {
+    public static double[][] focal(double[][] trueValues, double[][] predictedValues, double[][] alpha, double[][] gamma) {
         double[][] loss = new double[trueValues.length][];
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = focal(trueValues[i], predictedValues[i], alpha[i], gamma[i]));
         return loss;
@@ -115,19 +246,19 @@ public class ErrorLossFunctionDerivatives {
 
 
     // Hinge Loss
-    private static double hinge(double trueValue, double classifierOutput) {
+    public static double hinge(double trueValue, double classifierOutput) {
         if((trueValue * classifierOutput) >= 1){
             return 0;
         } else {
             return -trueValue;
         }
     }
-    private static double[] hinge(double[] trueValues, double[] classifierOutput) {
+    public static double[] hinge(double[] trueValues, double[] classifierOutput) {
         double[] loss = new double[trueValues.length];
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = hinge(trueValues[i], classifierOutput[i]));
         return loss;
     }
-    private static double[][] hinge(double[][] trueValues, double[][] classifierOutput) {
+    public static double[][] hinge(double[][] trueValues, double[][] classifierOutput) {
         double[][] loss = new double[trueValues.length][];
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = hinge(trueValues[i], classifierOutput[i]));
         return loss;
@@ -135,7 +266,7 @@ public class ErrorLossFunctionDerivatives {
 
 
     // Huber
-    private static double huber(double trueValue, double predictedValue, double delta_threshold) {
+    public static double huber(double trueValue, double predictedValue, double delta_threshold) {
         double residual = trueValue - predictedValue;
         if(Math.abs(residual) <= delta_threshold){
             return -residual;
@@ -145,12 +276,12 @@ public class ErrorLossFunctionDerivatives {
             return  delta_threshold;
         }
     }
-    private static double[] huber(double[] trueValues, double[] predictedValues, double delta) {
+    public static double[] huber(double[] trueValues, double[] predictedValues, double delta) {
         double[] loss = new double[trueValues.length];
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = huber(trueValues[i], predictedValues[i], delta));
         return loss;
     }
-    private static double[][] huber(double[][] trueValues, double[][] predictedValues, double delta) {
+    public static double[][] huber(double[][] trueValues, double[][] predictedValues, double delta) {
         double[][] loss = new double[trueValues.length][];
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = huber(trueValues[i], predictedValues[i], delta));
         return loss;
@@ -158,28 +289,28 @@ public class ErrorLossFunctionDerivatives {
 
 
     //.TODO: make the derivative of this and also implement auto derivative functions
-    private static double kullbackLeiblerDivergence(double[] trueValues, double[] predictedValues) {
+    public static double kullbackLeiblerDivergence(double[] trueValues, double[] predictedValues) {
         AtomicReference<Double> loss = new AtomicReference<>((double) 0);
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss.getAndUpdate( v -> v + trueValues[i] * Math.log(trueValues[i] / predictedValues[i])));
         return loss.get();
     }
-    private static double[] kullbackLeiblerDivergence(double[][] trueValues, double[][] predictedValues) {
+    public static double[] kullbackLeiblerDivergence(double[][] trueValues, double[][] predictedValues) {
         double[] loss = new double[trueValues.length];
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = kullbackLeiblerDivergence(trueValues[i], predictedValues[i]));
         return loss;
     }
 
 
-    private static double logCosh(double trueValue, double predictedValue) {
+    public static double logCosh(double trueValue, double predictedValue) {
         double predictionError = trueValue - predictedValue;
         return -Math.tanh(predictionError);
     }
-    private static double[] logCosh(double[] trueValues, double[] predictedValues) {
+    public static double[] logCosh(double[] trueValues, double[] predictedValues) {
         double[] loss = new double[trueValues.length];
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = logCosh(trueValues[i], predictedValues[i]));
         return loss;
     }
-    private static double[][] logCosh(double[][] trueValues, double[][] predictedValues) {
+    public static double[][] logCosh(double[][] trueValues, double[][] predictedValues) {
         double[][] loss = new double[trueValues.length][];
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = logCosh(trueValues[i], predictedValues[i]));
         return loss;
@@ -204,12 +335,12 @@ public class ErrorLossFunctionDerivatives {
      * @param predictedValues Double array of predicted values.
      * @return The L1 loss.
      */
-    private static double[] absoluteError(double[] trueValues, double[] predictedValues) {
+    public static double[] absoluteError(double[] trueValues, double[] predictedValues) {
         double[] loss = new double[trueValues.length];
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = absoluteError(trueValues[i], predictedValues[i]));
         return loss;
     }
-    private static double[][] absoluteError(double[][] trueValues, double[][] predictedValues) {
+    public static double[][] absoluteError(double[][] trueValues, double[][] predictedValues) {
         double[][] loss = new double[trueValues.length][];
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = absoluteError(trueValues[i], predictedValues[i]));
         return loss;
@@ -223,7 +354,7 @@ public class ErrorLossFunctionDerivatives {
      * @param predictedValues Array of predicted values.
      * @return The MAPE value.
      */
-    private static double meanAbsolutePercentageError(double[] trueValues, double[] predictedValues) {
+    public static double meanAbsolutePercentageError(double[] trueValues, double[] predictedValues) {
         double mape = 0.0;
         for (int i = 0; i < trueValues.length; i++) {
             if (trueValues[i] == 0) {
@@ -237,7 +368,7 @@ public class ErrorLossFunctionDerivatives {
         }
         return (mape / trueValues.length) * 100.0;  // Multiply by 100 to get a percentage
     }
-    private static double[] meanAbsolutePercentageError(double[][] trueValues, double[][] predictedValues) {
+    public static double[] meanAbsolutePercentageError(double[][] trueValues, double[][] predictedValues) {
         double[] loss = new double[trueValues.length];
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = meanAbsolutePercentageError(trueValues[i], predictedValues[i]));
         return loss;
@@ -254,7 +385,7 @@ public class ErrorLossFunctionDerivatives {
      * @param predictedValues Array of predicted values.
      * @return The MSLE value.
      */
-    private static double meanStandardLogarithmicError(double[] trueValues, double[] predictedValues) {
+    public static double meanStandardLogarithmicError(double[] trueValues, double[] predictedValues) {
         double msle = 0.0;
         for (int i = 0; i < trueValues.length; i++) {
             if (trueValues[i] < 0 || predictedValues[i] < 0) {
@@ -264,7 +395,7 @@ public class ErrorLossFunctionDerivatives {
         }
         return msle/trueValues.length;
     }
-    private static double[] meanStandardLogarithmicError(double[][] trueValues, double[][] predictedValues) {
+    public static double[] meanStandardLogarithmicError(double[][] trueValues, double[][] predictedValues) {
         double[] loss = new double[trueValues.length];
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = meanStandardLogarithmicError(trueValues[i], predictedValues[i]));
         return loss;
@@ -278,12 +409,12 @@ public class ErrorLossFunctionDerivatives {
      * @param trueClass The actual class index.
      * @return The NLL value for the given observation.
      */
-    private static double[] negativeLogLikelihood(int trueClass, double[] predictedValues) {
+    public static double[] negativeLogLikelihood(int trueClass, double[] predictedValues) {
         double[] gradient = new double[predictedValues.length];
         gradient[trueClass] = -1.0 / predictedValues[trueClass];
         return gradient;
     }
-    private static double[][] negativeLogLikelihood(int[] trueValues, double[] predictedValues){
+    public static double[][] negativeLogLikelihood(int[] trueValues, double[] predictedValues){
         double[][] loss = new double[trueValues.length][];
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i ->
                 loss[i] = negativeLogLikelihood(trueValues[i], predictedValues));
@@ -296,7 +427,7 @@ public class ErrorLossFunctionDerivatives {
      * @param trueValues The actual class indices.
      * @return The NLL value for the given observation.
      */
-    private static double[][] negativeLogLikelihood(int[] trueValues, double[][] predictedValues) {
+    public static double[][] negativeLogLikelihood(int[] trueValues, double[][] predictedValues) {
         double[][] loss = new double[trueValues.length][];
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> {
             loss[i] = negativeLogLikelihood(trueValues[i], predictedValues[i]);
@@ -310,7 +441,7 @@ public class ErrorLossFunctionDerivatives {
      * @param oneHotEncodedVec One hot encoded vectors - array of arrays, where inner array has 1 for any position that is correct and 0 for incorrect
      * @return The NLL value for the given observation.
      */
-    private static double[][] negativeLogLikelihood(int[][] oneHotEncodedVec, double[][] predictedValues) {
+    public static double[][] negativeLogLikelihood(int[][] oneHotEncodedVec, double[][] predictedValues) {
         double[][] loss = new double[oneHotEncodedVec.length][];
         int[] trueClasses = new int[oneHotEncodedVec.length];
         IntStream.range(0, oneHotEncodedVec.length).parallel().forEachOrdered(i -> {
@@ -333,14 +464,14 @@ public class ErrorLossFunctionDerivatives {
      * @param predictedValues Array of predicted values.
      * @return The Quadratic Loss for the given values.
      */
-    private static double quadratic(double[] trueValues, double[] predictedValues) {
+    public static double quadratic(double[] trueValues, double[] predictedValues) {
         double totalSquaredError = 0.0;
         for (int i = 0; i < trueValues.length; i++) {
             totalSquaredError += quadratic(trueValues[i], predictedValues[i]);
         }
         return totalSquaredError / trueValues.length;
     }
-    private static double[] quadratic(double[][] trueValues, double[][] predictedValues) {
+    public static double[] quadratic(double[][] trueValues, double[][] predictedValues) {
         double[] loss = new double[trueValues.length];
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = quadratic(trueValues[i], predictedValues[i]));
         return loss;
@@ -372,12 +503,12 @@ public class ErrorLossFunctionDerivatives {
 
         return sigma * (P_ij - S_ij);
     }
-    private static double[] rankNetClassifier1(double[] classifier1, double[] classifier2, int[] label1, int[] label2, double[] sigma) {
+    public static double[] rankNetClassifier1(double[] classifier1, double[] classifier2, int[] label1, int[] label2, double[] sigma) {
         double[] loss = new double[classifier1.length];
         IntStream.range(0, classifier1.length).parallel().forEachOrdered(i -> loss[i] = rankNetClassifier1(classifier1[i], classifier2[i], label1[i], label2[i], sigma[i]));
         return loss;
     }
-    private static double[][] rankNetClassifier1(double[][] classifier1, double[][] classifier2, int[][] label1, int[][] label2, double[][] sigma) {
+    public static double[][] rankNetClassifier1(double[][] classifier1, double[][] classifier2, int[][] label1, int[][] label2, double[][] sigma) {
         double[][] loss = new double[classifier1.length][];
         IntStream.range(0, classifier1.length).parallel().forEachOrdered(i -> loss[i] = rankNetClassifier1(classifier1[i], classifier2[i], label1[i], label2[i], sigma[i]));
         return loss;
@@ -385,12 +516,12 @@ public class ErrorLossFunctionDerivatives {
     public static double rankNetClassifier2(double classifier1, double classifier2, int label1, int label2, double sigma){
         return -rankNetClassifier1(classifier1, classifier2, label1, label2, sigma);
     }
-    private static double[] rankNetClassifier2(double[] classifier1, double[] classifier2, int[] label1, int[] label2, double[] sigma) {
+    public static double[] rankNetClassifier2(double[] classifier1, double[] classifier2, int[] label1, int[] label2, double[] sigma) {
         double[] loss = new double[classifier1.length];
         IntStream.range(0, classifier1.length).parallel().forEachOrdered(i -> loss[i] = rankNetClassifier2(classifier1[i], classifier2[i], label1[i], label2[i], sigma[i]));
         return loss;
     }
-    private static double[][] rankNetClassifier2(double[][] classifier1, double[][] classifier2, int[][] label1, int[][] label2, double[][] sigma) {
+    public static double[][] rankNetClassifier2(double[][] classifier1, double[][] classifier2, int[][] label1, int[][] label2, double[][] sigma) {
         double[][] loss = new double[classifier1.length][];
         IntStream.range(0, classifier1.length).parallel().forEachOrdered(i -> loss[i] = rankNetClassifier2(classifier1[i], classifier2[i], label1[i], label2[i], sigma[i]));
         return loss;
@@ -404,7 +535,7 @@ public class ErrorLossFunctionDerivatives {
      * @param trueValueIndex The index of the true class for the sample.
      * @return The Sparse Categorical Cross-Entropy loss for the given predictions and true class.
      */
-    private static double[] sparseCategoricalCrossEntropy(int trueValueIndex, double[] predictedValues) {
+    public static double[] sparseCategoricalCrossEntropy(int trueValueIndex, double[] predictedValues) {
         if (trueValueIndex < 0 || trueValueIndex >= predictedValues.length) {
             throw new IllegalArgumentException("Invalid trueClassIndex");
         }
@@ -420,7 +551,7 @@ public class ErrorLossFunctionDerivatives {
 
         return gradient;
     }
-    private static double[][] sparseCategoricalCrossEntropy(int[] trueValues, double[][] predictedValues) {
+    public static double[][] sparseCategoricalCrossEntropy(int[] trueValues, double[][] predictedValues) {
         double[][] gradients = new double[trueValues.length][];
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> gradients[i] = sparseCategoricalCrossEntropy(trueValues[i], predictedValues[i]));
         return gradients;
@@ -434,28 +565,33 @@ public class ErrorLossFunctionDerivatives {
      * @param predictedValue Raw prediction value.
      * @return The squared hinge loss for the given true label and prediction.
      */
-    private static double squaredHinge(double trueValue, double predictedValue) {
-        double loss = Math.max(0, 1 - trueValue * predictedValue);
-        return loss * loss;
+    public static double squaredHinge(double trueValue, double predictedValue) {
+        double determiner = 1 - trueValue * predictedValue;
+        if(determiner > 0){
+            return -2 * trueValue * determiner;
+        } else {
+            return 0.0;
+        }
     }
-    private static double[] squaredHinge(double[] trueValues, double[] predictedValues) {
+    public static double[] squaredHinge(double[] trueValues, double[] predictedValues) {
         double[] loss = new double[trueValues.length];
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = squaredHinge(trueValues[i], predictedValues[i]));
         return loss;
     }
-    private static double[][] squaredHinge(double[][] trueValues, double[][] predictedValues) {
+    public static double[][] squaredHinge(double[][] trueValues, double[][] predictedValues) {
         double[][] loss = new double[trueValues.length][];
         IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = squaredHinge(trueValues[i], predictedValues[i]));
         return loss;
     }
 
 
-    private static double computeMean(double[] data){
+    // TODO: compute derivative of this manually
+    public static double computeMean(double[] data){
         double sum = 0;
         for (double value : data) { sum += value; }
         return sum / data.length;
     }
-    private static double computeVariance(double[] data) {
+    public static double computeVariance(double[] data) {
         double mean = computeMean(data);
         double temp = 0;
         for (double value : data) {
@@ -463,7 +599,7 @@ public class ErrorLossFunctionDerivatives {
         }
         return temp / data.length;
     }
-    private static double computeLossForChannel(double[] firstImageChannel, double[] secondImageChannel) {
+    public static double computeLossForChannel(double[] firstImageChannel, double[] secondImageChannel) {
         // Compute means
         double muX = computeMean(firstImageChannel);
         double muY = computeMean(secondImageChannel);
@@ -488,7 +624,7 @@ public class ErrorLossFunctionDerivatives {
         // Return loss for this channel
         return 1 - ssim;
     }
-    private static double structuralSimilarityIndex(double[][][] image1, double[][][] image2) {
+    public static double structuralSimilarityIndex(double[][][] image1, double[][][] image2) {
         if (image1.length != image2.length || image1[0].length != image2[0].length || image1[0][0].length != image2[0][0].length) {
             throw new IllegalArgumentException("Images must have the same dimensions");
         }
@@ -512,18 +648,18 @@ public class ErrorLossFunctionDerivatives {
         return totalLoss / channels; // Average loss across channels
     }
 
-
-    private static double distance(double[] vec1, double[] vec2) {
+    // TODO: compute derivative of this manually
+    public static double distance(double[] vec1, double[] vec2) {
         double sum = 0.0;
         for (int i = 0; i < vec1.length; i++) { sum += (vec1[i] - vec2[i]) * (vec1[i] - vec2[i]); }
         return Math.sqrt(sum);
     }
-    private static double tripletMargin(double[] anchor, double[] positive, double[] negative, double margin) {
+    public static double tripletMargin(double[] anchor, double[] positive, double[] negative, double margin) {
         double posDist = distance(anchor, positive);
         double negDist = distance(anchor, negative);
         return Math.max(posDist - negDist + margin, 0);
     }
-    private static double[] tripletMargin(double[][] anchors, double[][] positives, double[][] negatives, double[] margins) {
+    public static double[] tripletMargin(double[][] anchors, double[][] positives, double[][] negatives, double[] margins) {
         double[] loss = new double[anchors.length];
         IntStream.range(0, anchors.length).parallel().forEachOrdered(i -> loss[i] = tripletMargin(anchors[i], positives[i], negatives[i], margins[i]));
         return loss;
