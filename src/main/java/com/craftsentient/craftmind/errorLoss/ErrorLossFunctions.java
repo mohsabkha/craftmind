@@ -1,7 +1,5 @@
 package com.craftsentient.craftmind.errorLoss;
 
-import com.craftsentient.craftmind.utils.PrintUtils;
-
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
@@ -12,7 +10,6 @@ public class ErrorLossFunctions {
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
-
     public static Object lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues) throws Exception {
         if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
         switch (lossFunction){
@@ -36,7 +33,6 @@ public class ErrorLossFunctions {
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
-
     public static Object lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[][] trueValues, double[][] predictedValues) throws Exception {
         if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
         switch (lossFunction){
@@ -58,7 +54,6 @@ public class ErrorLossFunctions {
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
-
     public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueClass, double[] predictedValues) throws Exception {
         switch (lossFunction) {
             case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues); }
@@ -90,14 +85,14 @@ public class ErrorLossFunctions {
     public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues, int y, double margin) throws Exception {
         if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
         switch (lossFunction){
-            case CONTRASTIVE_LOSS_FUNCTION -> { return contrastive(trueValues, predictedValues, y, margin); }
+            case CONTRASTIVE_LOSS_FUNCTION -> { return contrastiveWithTwoDataSets(trueValues, predictedValues, y, margin); }
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
     public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[][] trueValues, double[][] predictedValues, int y, double margin) throws Exception {
         if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
         switch (lossFunction){
-            case CONTRASTIVE_LOSS_FUNCTION -> { return contrastive(trueValues, predictedValues, y, margin); }
+            case CONTRASTIVE_LOSS_FUNCTION -> { return contrastiveWithTwoDataSets(trueValues, predictedValues, y, margin); }
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
@@ -136,35 +131,59 @@ public class ErrorLossFunctions {
     }
 
 
-    private static double binaryCrossEntropy(double[] trueValues, double[] predictedValues) {
+
+
+
+
+    private static double binaryCrossEntropy(double trueValue, double predictedValueProbability){
+        return -trueValue * Math.log(predictedValueProbability) - (1 - trueValue) * Math.log(1 - predictedValueProbability);
+    }
+    private static double binaryCrossEntropy(double[] trueValues, double[] predictedValueProbabilities) {
         AtomicReference<Double> loss = new AtomicReference<>((double) 0);
-        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss.updateAndGet( v ->
-                (v + -trueValues[i] * Math.log(predictedValues[i]) - (1 - trueValues[i]) * Math.log(1 - predictedValues[i])))
-        );
+        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss.updateAndGet( v -> ( v + binaryCrossEntropy(trueValues[i], predictedValueProbabilities[i])) ));
         return loss.get() / trueValues.length;
     }
-    private static double[] binaryCrossEntropy(double[][] trueValues, double[][] predictedValues) {
+    private static double[] binaryCrossEntropy(double[][] trueValues, double[][] predictedValueProbabilities) {
         double [] loss = new double[trueValues.length];
-        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = binaryCrossEntropy(trueValues[i], predictedValues[i]));
+        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = binaryCrossEntropy(trueValues[i], predictedValueProbabilities[i]));
         return loss;
     }
 
 
-    private static double categoricalCrossEntropy(double[] trueValues, double[] predictedValues) {
+    private static double categoricalCrossEntropy(double trueValues, double predictedProbability){
+        return trueValues * Math.log(predictedProbability);
+    }
+    private static double categoricalCrossEntropy(double[] trueValues, double[] predictedValueProbabilities) {
         if(trueValues.length < 1) { throw new IllegalArgumentException("True Values must at least have 1 value when passed to categorical cross entropy"); }
         AtomicReference<Double> loss = new AtomicReference<>((double) 0);
-        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss.updateAndGet(v ->  v + trueValues[i] * Math.log(predictedValues[i])));
+        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss.updateAndGet(v ->  v - categoricalCrossEntropy(trueValues[i], predictedValueProbabilities[i])));
         return loss.get() / trueValues.length;
     }
-    private static double[] categoricalCrossEntropy(double[][] trueValues, double[][] predictedValues) {
+    private static double[] categoricalCrossEntropy(double[][] trueValues, double[][] predictedValueProbabilities) {
         double [] loss = new double[trueValues.length];
-        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = categoricalCrossEntropy(trueValues[i], predictedValues[i]));
+        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = categoricalCrossEntropy(trueValues[i], predictedValueProbabilities[i]));
         return loss;
     }
 
 
-
-    private static double contrastive(double[] dataPoints1, double[] dataPoints2, int y, double margin) {
+    // Contrastive, y = binary label (0 for similar, 1 for dissimilar)
+    public static double contrastive(double y, double distance){
+        double margin = 1;
+        return (1 - y) * 0.5 * distance * distance + y * 0.5 * Math.pow(Math.max(0, margin - distance), 2);
+    }
+    public static double[] contrastive(double[] y, double[] distances){
+        double[] loss = new double[distances.length];
+        double margin = 1;
+        IntStream.range(0, loss.length).parallel().forEachOrdered(i -> loss[i] = contrastive(y[i], distances[i]));
+        return loss;
+    }
+    public static double[][] contrastive(double[][] y, double[][] distances){
+        double[][] loss = new double[distances.length][];
+        double margin = 1;
+        IntStream.range(0, loss.length).parallel().forEachOrdered(i -> loss[i] = contrastive(y[i], distances[i]));
+        return loss;
+    }
+    private static double contrastiveWithTwoDataSets(double[] dataPoints1, double[] dataPoints2, int y, double margin) {
         double distance = 0;
         for (int i = 0; i < dataPoints1.length; i++) {
             distance += (dataPoints1[i] - dataPoints2[i]) * (dataPoints1[i] - dataPoints2[i]);
@@ -172,9 +191,9 @@ public class ErrorLossFunctions {
         distance = Math.sqrt(distance);
         return (1 - y) * 0.5 * distance * distance + y * 0.5 * Math.pow(Math.max(0, margin - distance), 2);
     }
-    private static double[] contrastive(double[][] trueValues, double[][] predictedValues, int y, double margin) {
+    private static double[] contrastiveWithTwoDataSets(double[][] trueValues, double[][] predictedValues, int y, double margin) {
         double[] loss = new double[trueValues.length];
-        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = contrastive(trueValues[i], predictedValues[i], y, margin));
+        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = contrastiveWithTwoDataSets(trueValues[i], predictedValues[i], y, margin));
         return loss;
     }
 
@@ -199,6 +218,11 @@ public class ErrorLossFunctions {
     }
 
 
+    /*
+     * Used for object detection
+     * alpha is a balancing factor
+     * gamma is the focusing parameter to reduce contributions to easy examples
+     */
     private static double focal(double trueValue, double predictedValue, double alpha, double gamma) {
         double pt = (trueValue == 1) ? predictedValue : 1 - predictedValue;
         double alpha_t = (trueValue == 1) ? alpha : 1 - alpha;
@@ -321,6 +345,10 @@ public class ErrorLossFunctions {
         return loss;
     }
 
+
+    public static double meanStandardLogarithmicError(double trueValue, double predictedValue){
+        return Math.pow(Math.log1p(trueValue) - Math.log1p(predictedValue), 2);
+    }
     /**
      * Compute the Mean Squared Logarithmic Error (MSLE).
      *
@@ -334,11 +362,9 @@ public class ErrorLossFunctions {
             if (trueValues[i] < 0 || predictedValues[i] < 0) {
                 throw new IllegalArgumentException("Values should not be negative, as this would cause issues with logarithms in MSLE.");
             }
-            double logActual = Math.log1p(trueValues[i]);
-            double logPredicted = Math.log1p(predictedValues[i]);
-            double difference = logActual - logPredicted;
 
-            msle += difference * difference;  // Squared difference of logarithms
+
+            msle += meanStandardLogarithmicError(trueValues[i], predictedValues[i]);
         }
         return msle;
     }
