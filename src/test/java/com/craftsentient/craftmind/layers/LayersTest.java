@@ -10,7 +10,7 @@ import static com.craftsentient.craftmind.utils.PrintUtils.printPositive;
 
 public class LayersTest {
     @Test
-    public void testAllConstructors() {
+    public void testAllConstructors() throws Exception {
 
         double[][] inputs = {
                 {1, 2, 3, 2.5},
@@ -111,7 +111,7 @@ public class LayersTest {
                 .withInitialWeights(weights)
                 .withInitialInput(inputs)
                 .withTrueValue(new int[]{0,2,0})
-                .build().printLayers("NETWORK 4C NEW");
+                .build();
 
         // create neural network with number of layers, initial weights per input, biases for each neuron, and initial inputs
         new DenseLayers.DenseLayersBuilder()
