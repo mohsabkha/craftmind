@@ -26,7 +26,7 @@ public class DenseLayers {
     private Map<Integer, Double> decisions;
     private int[] decisionsIndex;
     private double accuracy;
-    private double loss;
+    private final double loss;
     public static final Random random = new Random(0);
 
     private DenseLayers(int layers, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap,
@@ -67,9 +67,8 @@ public class DenseLayers {
 
     private DenseLayers(int layers, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap,
                         DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] hotOneVec, int[] trueValues) throws Exception {
-        if(hotOneVec.length != 0 && trueValues.length != 0) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
-        // check if both the one hot vector mappings true values mappings are empty
-        if(hotOneVec.length == 0 && trueValues.length == 0) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
+        if (hotOneVec != null && trueValues != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
+        if (hotOneVec == null && trueValues == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
 
@@ -96,9 +95,9 @@ public class DenseLayers {
 
     private DenseLayers(int layers, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer,
             DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] hotOneVec, int[] trueValues) throws Exception {
-        if(hotOneVec.length != 0 && trueValues.length != 0) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
-        // check if both the one hot vector mappings true values mappings are empty
-        if(hotOneVec.length == 0 && trueValues.length == 0) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
+        // gather initial input
+        if (hotOneVec != null && trueValues != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
+        if (hotOneVec == null && trueValues == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
 
@@ -125,9 +124,9 @@ public class DenseLayers {
 
     private DenseLayers(int layers, double[][] initialWeights, double[]biases, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer,
             DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] hotOneVec, int[] trueValues) throws Exception {
-        if(hotOneVec.length != 0 && trueValues.length != 0) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
-        // check if both the one hot vector mappings true values mappings are empty
-        if(hotOneVec.length == 0 && trueValues.length == 0) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
+        // gather initial input
+        if (hotOneVec != null && trueValues != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
+        if (hotOneVec == null && trueValues == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
         this.layerList = new ArrayList<>();
         this.initialInput = initialInput;
         IntStream.range(0, layers).forEach(i -> {
@@ -153,9 +152,9 @@ public class DenseLayers {
 
     private DenseLayers(int layers, int numberOfNeurons, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap,
                         DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] hotOneVec, int[] trueValues) throws Exception {
-        if(hotOneVec.length != 0 && trueValues.length != 0) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
-        // check if both the one hot vector mappings true values mappings are empty
-        if(hotOneVec.length == 0 && trueValues.length == 0) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
+        // gather initial input
+        if (hotOneVec != null && trueValues != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
+        if (hotOneVec == null && trueValues == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
         this.layerList = new ArrayList<>();
         this.initialInput = randn(1,numberOfNeurons);
 
@@ -181,9 +180,9 @@ public class DenseLayers {
 
     private DenseLayers(int layers, int numberOfNeurons, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer,
             DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] hotOneVec, int[] trueValues) throws Exception {
-        if(hotOneVec.length != 0 && trueValues.length != 0) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
-        // check if both the one hot vector mappings true values mappings are empty
-        if(hotOneVec.length == 0 && trueValues.length == 0) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
+        // gather initial input
+        if (hotOneVec != null && trueValues != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
+        if (hotOneVec == null && trueValues == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
         if(numberOfNeurons != initialInput.length) { throw new IllegalArgumentException("neuronsPerLayer of " + numberOfNeurons + " and initialInput size of " + initialInput.length + " do not match!");}
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
@@ -210,9 +209,9 @@ public class DenseLayers {
 
     private DenseLayers(int layers, int numberOfNeurons, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction,
                         Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] hotOneVec, int[] trueValues) throws Exception {
-        if(hotOneVec.length != 0 && trueValues.length != 0) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
-        // check if both the one hot vector mappings true values mappings are empty
-        if(hotOneVec.length == 0 && trueValues.length == 0) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
+        // gather initial input
+        if (hotOneVec != null && trueValues != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
+        if (hotOneVec == null && trueValues == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
 
@@ -239,9 +238,9 @@ public class DenseLayers {
 
     private DenseLayers(int layers, int numberOfNeurons, double[][] initialWeights, double[]biases, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction,
                         Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] hotOneVec, int[] trueValues) throws Exception {
-        if(hotOneVec.length != 0 && trueValues.length != 0) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
-        // check if both the one hot vector mappings true values mappings are empty
-        if(hotOneVec.length == 0 && trueValues.length == 0) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
+        // gather initial input
+        if (hotOneVec != null && trueValues != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
+        if (hotOneVec == null && trueValues == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
         this.layerList = new ArrayList<>();
         this.initialInput = initialInput;
 
@@ -268,9 +267,9 @@ public class DenseLayers {
 
     private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap,
                         DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] hotOneVec, int[] trueValues) throws Exception {
-        if(hotOneVec.length != 0 && trueValues.length != 0) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
-        // check if both the one hot vector mappings true values mappings are empty
-        if(hotOneVec.length == 0 && trueValues.length == 0) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
+        // gather initial input
+        if (hotOneVec != null && trueValues != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
+        if (hotOneVec == null && trueValues == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
         if(layers != numberOfNeuronsPerLayer.length) {
             throw new IllegalArgumentException(layers + " Layers given but only " + numberOfNeuronsPerLayer.length
                     + " layers described!\nAdjust neuronsPerLayer to be of same length as number of layers!");
@@ -303,9 +302,9 @@ public class DenseLayers {
 
     private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer,
             DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] hotOneVec, int[] trueValues) throws Exception {
-        if(hotOneVec.length != 0 && trueValues.length != 0) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
-        // check if both the one hot vector mappings true values mappings are empty
-        if(hotOneVec.length == 0 && trueValues.length == 0) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
+        // gather initial input
+        if (hotOneVec != null && trueValues != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
+        if (hotOneVec == null && trueValues == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
 
@@ -334,9 +333,9 @@ public class DenseLayers {
 
     private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction,
                         Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] hotOneVec, int[] trueValues) throws Exception {
-        if(hotOneVec.length != 0 && trueValues.length != 0) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
-        // check if both the one hot vector mappings true values mappings are empty
-        if(hotOneVec.length == 0 && trueValues.length == 0) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
+        // gather initial input
+        if (hotOneVec != null && trueValues != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
+        if (hotOneVec == null && trueValues == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
         this.layerList = new ArrayList<>();
         this.initialInput = initialInput;
         IntStream.range(0, layers).forEach(i -> {
@@ -375,6 +374,9 @@ public class DenseLayers {
                 if (i != 0) {
                     double[][] weights = randn(numberOfNeuronsPerLayer[i], numberOfNeuronsPerLayer[i - 1]);
                     double[] biases = randn(numberOfNeuronsPerLayer[i]);
+                    printInfo("Weights In Hidden Layer", weights);
+                    printInfo("Biases In Hidden Layers", biases);
+                    printInfo("Inputs In Hidden Layers", layerList.get(i - 1).getLayerOutputs());
                     DenseLayer layer = new DenseLayer(weights, biases, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse);
                     layerList.add(layer);
                 } else {
@@ -385,7 +387,7 @@ public class DenseLayers {
                 throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation! " + e.getMessage());
             }
         });
-        if(lossFunction == DEFAULT_LOSS_FUNCTIONS.NLL_LOSS_FUNCTION) {
+        if(lossFunction == DEFAULT_LOSS_FUNCTIONS.NLL_LOSS_FUNCTION && hotOneVec != null) {
             this.loss =  MathUtils.mean(ErrorLossFunctions.lossFunction(lossFunction, hotOneVec[0], this.getLastLayer().getLayerOutputs()));
         } else {
             this.loss = ErrorLossFunctions.lossFunction(lossFunction, trueValues[0], this.getLastLayer().getLayerOutputs());
@@ -500,22 +502,26 @@ public class DenseLayers {
             this.decisionsIndex[i] = (int)indexAndMax[0];
             this.decisions.put(i, indexAndMax[1]);
         });
-        if(this.getTrueValues()[this.batchCounter].length > 0){
-            this.accuracy = accuracy(this.getTrueValues()[this.batchCounter], this.decisionsIndex);
-            printInfo("Using Batch True Values");
-            printInfo("Decisions:", this.decisions);
-            printInfo("Decision Indices:", this.decisionsIndex);
-            printInfo("True Values:", this.getTrueValues()[this.batchCounter]);
-            printInfo("Accuracy: ", this.accuracy);
-            this.batchCounter++;
+        if(this.getTrueValues() != null){
+            if(this.getTrueValues()[this.batchCounter].length > 0) {
+                this.accuracy = accuracy(this.getTrueValues()[this.batchCounter], this.decisionsIndex);
+                printInfo("Using Batch True Values");
+                printInfo("Decisions:", this.decisions);
+                printInfo("Decision Indices:", this.decisionsIndex);
+                printInfo("True Values:", this.getTrueValues()[this.batchCounter]);
+                printInfo("Accuracy: ", this.accuracy);
+                this.batchCounter++;
+            }
         }
-        else if(this.getHotOneVecs()[this.batchCounter].length > 0){
-            this.accuracy = accuracy(this.getHotOneVecs()[this.batchCounter], this.decisionsIndex);
-            printInfo("Using Batch Hot One Vectors");
-            printInfo("Decisions:", this.decisions);
-            printInfo("Decision Indices:", this.decisionsIndex);
-            printInfo("Accuracy: ", this.accuracy);
-            this.batchCounter++;
+        else if(this.getHotOneVecs() != null){
+            if(this.getHotOneVecs()[this.batchCounter].length > 0) {
+                this.accuracy = accuracy(this.getHotOneVecs()[this.batchCounter], this.decisionsIndex);
+                printInfo("Using Batch Hot One Vectors");
+                printInfo("Decisions:", this.decisions);
+                printInfo("Decision Indices:", this.decisionsIndex);
+                printInfo("Accuracy: ", this.accuracy);
+                this.batchCounter++;
+            }
         }
     }
 

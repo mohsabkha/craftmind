@@ -70,14 +70,14 @@ public class DenseLayer {
 
     public DenseLayer(double[][] weights, double[] biases, double[] inputs, DEFAULT_ACTIVATION_FUNCTIONS activationFunction) throws Exception {
         this.neuronList = new ArrayList<>();
-        this.neuronWeights = new double[0][0];
-        this.neuronBiases = new double[0];
-        this.inputs = inputs;
         this.layerOutputs = new double[0];
+        this.neuronWeights = weights;
+        this.neuronBiases = biases;
+        this.inputs = inputs;
         this.activationFunction = activationFunction;
         printInfo("Values set in DenseLayer(double[][] weights, double[] biases, double[] inputs, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] batchHotOneVec, int[] batchTrueValue)");
         printInfo("Beginning generation of individual layer and layer outputs...");
-        this.generateLayer(weights, biases, inputs);
+        this.generateLayer(this.neuronWeights, this.neuronBiases, this.inputs);
         this.generateLayerOutput();
         printInfo("Generation of individual layer and layer outputs complete!");
     }
@@ -108,12 +108,11 @@ public class DenseLayer {
      * calls the generateNonBatchedLayerOutput for each entry in the batch of data, then calls the addOutput method to save the results
      * - Is called by the generateBatchedLayerOutput function
      */
-    public double[] generateLayerOutput(double[] inputs) throws Exception {
+    private double[] generateLayerOutput(double[] inputs) throws Exception {
         printInfo("Entered generateNonBatchedLayerOutput(double[] inputs)");
         this.layerOutputs = new double[0];
         IntStream.range(0, this.neuronBiases.length).forEach(i -> {
             try {
-                this.addInput(inputs[i]);
                 this.addOutput(Neuron.generateOutput(inputs, this.neuronWeights[i], this.neuronBiases[i]));
             } catch (Exception e) {
                 throw new RuntimeException(e);

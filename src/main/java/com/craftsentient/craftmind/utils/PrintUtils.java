@@ -1,5 +1,8 @@
 package com.craftsentient.craftmind.utils;
 
+import com.craftsentient.craftmind.layer.DenseLayer;
+import com.craftsentient.craftmind.layers.DenseLayers;
+
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -406,6 +409,9 @@ public class PrintUtils {
     public static void printInfo(String info, long data){
         System.out.println(blue(bold("[INFO] ")) + info + " " + data);
     }
+    public static void printInfo(String info, String data){
+        System.out.println(info + " " + data);
+    }
     public static void printInfo(double[] vec){
         System.out.print(bold(blue("[INFO] ")));
         IntStream.range(0, vec.length).forEach(i-> {
@@ -462,6 +468,87 @@ public class PrintUtils {
     }
     public static void printInfo(String info, ArrayList<Object> vec){
         System.out.print(bold(blue("[INFO] ") + info + " "));
+        IntStream.range(0, vec.size()).forEach(i-> {
+            if(i == vec.size()-1) System.out.print(vec.get(i) + bold(blue("]")));
+            else if(i == 0) System.out.print(blue(bold("[")) + vec.get(i) + ", ");
+            else System.out.print(String.valueOf(vec.get(i)) + ", ");
+        });
+        System.out.print("\n");
+    }
+
+
+    // no label
+    public static void print(String data) { System.out.println(data); }
+    public static void print(double data) { System.out.println(data); }
+    public static void print(int data){
+        System.out.println(data);
+    }
+    public static void print(long data){
+        System.out.println(data);
+    }
+    public static void print(float data){
+        System.out.println(data);
+    }
+    public static void print(short data){
+        System.out.println(data);
+    }
+    public static void print(String info, double data){System.out.println(bold(info) + " " + data);}
+    public static void print(String info, int data){System.out.println(bold(info) + " " + data);}
+    public static void print(String info, long data){System.out.println(bold(info) + " " + data);}
+    public static void print(String info, String data){System.out.println(bold(info) + " " + data);}
+    public static void print(double[] vec){
+        IntStream.range(0, vec.length).forEach(i-> {
+            if(i == vec.length-1) System.out.print(vec[i] + bold(blue("]")));
+            else if(i == 0) System.out.print(blue(bold("[")) + vec[i] + ", ");
+            else System.out.print(String.valueOf(vec[i]) + ", ");
+        });
+        System.out.print("\n");
+    }
+    public static void print(int[] vec){
+        IntStream.range(0, vec.length).forEach(i-> {
+            if(i == vec.length-1) System.out.print(vec[i] + bold(blue("]")));
+            else if(i == 0) System.out.print(blue(bold("[")) + vec[i] + ", ");
+            else System.out.print(String.valueOf(vec[i]) + ", ");
+        });
+        System.out.print("\n");
+    }
+    public static void print(String[] vec){
+        IntStream.range(0, vec.length).forEach(i-> {
+            if(i == vec.length-1) System.out.print(vec[i] + bold(blue("]")));
+            else if(i == 0) System.out.print(blue(bold("[")) + vec[i] + ", ");
+            else System.out.print(String.valueOf(vec[i]) + ", ");
+        });
+        System.out.print("\n");
+    }
+    public static void print(String info, double[] vec){
+        System.out.print(bold(info + " "));
+        IntStream.range(0, vec.length).forEach(i-> {
+            if(i == vec.length-1) System.out.print(vec[i] + bold(blue("]")));
+            else if(i == 0) System.out.print(blue(bold("[")) + vec[i] + ", ");
+            else System.out.print(String.valueOf(vec[i]) + ", ");
+        });
+        System.out.print("\n");
+    }
+    public static void print(String info, int[] vec){
+        System.out.print(bold(info + " "));
+        IntStream.range(0, vec.length).forEach(i-> {
+            if(i == vec.length-1) System.out.print(vec[i] + bold(blue("]")));
+            else if(i == 0) System.out.print(blue(bold("[")) + vec[i] + ", ");
+            else System.out.print(String.valueOf(vec[i]) + ", ");
+        });
+        System.out.print("\n");
+    }
+    public static void print(String info, String[] vec){
+        System.out.print(bold(info + " "));
+        IntStream.range(0, vec.length).forEach(i-> {
+            if(i == vec.length-1) System.out.print(vec[i] + bold(blue("]")));
+            else if(i == 0) System.out.print(blue(bold("[")) + vec[i] + ", ");
+            else System.out.print(String.valueOf(vec[i]) + ", ");
+        });
+        System.out.print("\n");
+    }
+    public static void print(String info, ArrayList<Object> vec){
+        System.out.print(bold(info + " "));
         IntStream.range(0, vec.size()).forEach(i-> {
             if(i == vec.size()-1) System.out.print(vec.get(i) + bold(blue("]")));
             else if(i == 0) System.out.print(blue(bold("[")) + vec.get(i) + ", ");
@@ -603,4 +690,20 @@ public class PrintUtils {
         });
         System.out.print("\n");
     }
+
+    public static void printLayer(String label, DenseLayer layer) {
+        System.out.println(bold(green("Layer " + label + " ")));
+        print("Inputs: ", layer.getInputs());
+        print("Outputs: ", layer.getLayerOutputs());
+        print("Activation: ", layer.getActivationFunction().name());
+    }
+
+    public static void printLayers(String label, DenseLayers layers) {
+        System.out.println(bold(green(":::: " + label + " NETWORK ::::")));
+        for(int i = 0; i < layers.getLayerList().size(); i++){
+            printLayer("" + i, layers.getLayerAt(i));
+            System.out.println();
+        }
+    }
+
 }
