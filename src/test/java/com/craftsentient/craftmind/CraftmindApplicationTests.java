@@ -14,15 +14,13 @@ import java.util.HashMap;
 class CraftmindApplicationTests {
     @Test
     public void neuralNetworkTest() throws Exception {
-        double[][] inputs = {
-                {1, 2, 3, 2.5},
-                {2, 5, -1, 2},
-                {-1.5, 2.7, 3.3, -0.8}};
-        double[][] weights = {
+        double[][] inputs = {{1, 2, 3, 2.5}};
+        double[][] weights = { // 1 per neuron
                 {0.2, 0.8, -0.5, 1.0},
                 {0.5, -0.91, 0.26, -0.5},
-                {-0.26, -0.27, 0.17, 0.87}};
-        double[] biases = {2, 3, 0.5};
+                {-0.26, -0.27, 0.17, 0.87}
+        };
+        double[] biases = {2, 3, 0.5}; // 1 per neuron
 
         DenseLayers builtLayerWithFile = new DenseLayers.DenseLayersBuilder()
                 .withNumberOfLayers(6)
@@ -30,18 +28,15 @@ class CraftmindApplicationTests {
                 .withInitialInput(inputs)
                 .withInitialBiases(biases)
                 .withInitialWeights(weights)
-                .withSingleActivationFunctionForSingleLayer(0, DEFAULT_ACTIVATION_FUNCTIONS.RELU_ACTIVATION_FUNCTION)
-                .withSingleActivationFunctionForSingleLayer(2, DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION)
-                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
+                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.RELU_ACTIVATION_FUNCTION)
                 .withLossFunction(DEFAULT_LOSS_FUNCTIONS.NLL_LOSS_FUNCTION)
                 .withTrueValue(new int[] {0, 1, 2})
                 .build();
 
-
-        builtLayerWithFile.printLayers("BUILT WITH FILE NETWORK");
-        builtLayerWithFile.generateBatchDecisionsMap();
+        builtLayerWithFile.generateDecisionsMap();
         PrintUtils.printInfo("decisions per batch", builtLayerWithFile.getDecisions());
-        double[]loss = ErrorLossFunctions.lossFunction(DEFAULT_LOSS_FUNCTIONS.NLL_LOSS_FUNCTION, new int[]{0,1,1}, builtLayerWithFile.getLayerAt(builtLayerWithFile.getLayerList().size()-1).getBatchLayerOutputs());
+        double[]loss = ErrorLossFunctions.lossFunction(DEFAULT_LOSS_FUNCTIONS.NLL_LOSS_FUNCTION,
+                new int[]{0,1,1}, builtLayerWithFile.getLayerAt(builtLayerWithFile.getLayerList().size()-1).getLayerOutputs());
     }
 
     @Test

@@ -1,8 +1,6 @@
 package com.craftsentient.craftmind.layer;
 
 import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATION_FUNCTIONS;
-import com.craftsentient.craftmind.errorLoss.DEFAULT_LOSS_FUNCTIONS;
-import com.craftsentient.craftmind.errorLoss.ErrorLossFunctions;
 import com.craftsentient.craftmind.utils.MathUtils;
 import com.craftsentient.craftmind.neuron.Neuron;
 import lombok.*;

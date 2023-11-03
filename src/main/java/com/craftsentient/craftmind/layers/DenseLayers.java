@@ -11,7 +11,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 import static com.craftsentient.craftmind.utils.MathUtils.accuracy;
@@ -51,7 +50,7 @@ public class DenseLayers {
                 if (i != 0) {
                     layerList.add(new DenseLayer(weights, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse));
                 } else {
-                    layerList.add(new DenseLayer(weights, initialInput[i], activationFunctionToUse));
+                    layerList.add(new DenseLayer(weights, initialInput[this.batchCounter], activationFunctionToUse));
                 }
             } catch (Exception e){
                 throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation!");
@@ -81,7 +80,7 @@ public class DenseLayers {
                 if (i != 0) {
                     layerList.add(new DenseLayer(weights, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse));
                 } else {
-                    layerList.add(new DenseLayer(weights, initialInput[i], activationFunctionToUse));
+                    layerList.add(new DenseLayer(weights, initialInput[0], activationFunctionToUse));
                 }
             } catch (Exception e){
                 throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation!");
@@ -110,7 +109,7 @@ public class DenseLayers {
                     double[][] weights = randn(initialWeights.length, initialInput[0].length);
                     layerList.add(new DenseLayer(weights, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse));
                 } else {
-                    layerList.add(new DenseLayer(initialWeights, initialInput[i], activationFunctionToUse));
+                    layerList.add(new DenseLayer(initialWeights, initialInput[0], activationFunctionToUse));
                 }
             } catch(Exception e){
                 throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation!");
@@ -138,7 +137,7 @@ public class DenseLayers {
                     double[][] weights = randn(initialWeights.length, initialInput[0].length);
                     layerList.add(new DenseLayer(weights, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse));
                 } else {
-                    layerList.add(new DenseLayer(initialWeights, biases, initialInput[i], activationFunctionToUse));
+                    layerList.add(new DenseLayer(initialWeights, biases, initialInput[0], activationFunctionToUse));
                 }
             } catch (Exception e){
                 throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation!");
@@ -167,7 +166,7 @@ public class DenseLayers {
                 if (i != 0)
                     layerList.add(new DenseLayer(weights, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse));
                 else
-                    layerList.add(new DenseLayer(weights, initialInput[i], activationFunctionToUse));
+                    layerList.add(new DenseLayer(weights, initialInput[0], activationFunctionToUse));
             } catch (Exception e){
                 throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation!");
             }
@@ -196,7 +195,7 @@ public class DenseLayers {
                 if (i != 0)
                     layerList.add(new DenseLayer(weights, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse));
                 else
-                    layerList.add(new DenseLayer(weights, initialInput[i], activationFunctionToUse));
+                    layerList.add(new DenseLayer(weights, initialInput[0], activationFunctionToUse));
             } catch (Exception e) {
                 throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation!");
             }
@@ -224,7 +223,7 @@ public class DenseLayers {
                     double[][] weights = randn(numberOfNeurons, numberOfNeurons);
                     layerList.add(new DenseLayer(weights, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse));
                 } else {
-                    layerList.add(new DenseLayer(initialWeights, initialInput[i], activationFunctionToUse));
+                    layerList.add(new DenseLayer(initialWeights, initialInput[0], activationFunctionToUse));
                 }
             } catch (Exception e) {
                 throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation!");
@@ -253,7 +252,7 @@ public class DenseLayers {
                     double[][] weights = randn(numberOfNeurons, numberOfNeurons);
                     layerList.add(new DenseLayer(weights, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse));
                 } else {
-                    layerList.add(new DenseLayer(initialWeights, biases, initialInput[i], activationFunctionToUse));
+                    layerList.add(new DenseLayer(initialWeights, biases, initialInput[0], activationFunctionToUse));
                 }
             } catch (Exception e) {
                 throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation!");
@@ -288,7 +287,7 @@ public class DenseLayers {
                     layerList.add(new DenseLayer(weights, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse));
                 } else {
                     weights = randn(numberOfNeuronsPerLayer[i], numberOfNeuronsPerLayer[i]);
-                    layerList.add(new DenseLayer(weights, initialInput[i], activationFunctionToUse));
+                    layerList.add(new DenseLayer(weights, initialInput[0], activationFunctionToUse));
                 }
             } catch (Exception e) {
                 throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation!");
@@ -319,7 +318,7 @@ public class DenseLayers {
                     layerList.add(new DenseLayer(weights, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse));
                 } else {
                     weights = randn(numberOfNeuronsPerLayer[i], initialInput[0].length);
-                    layerList.add(new DenseLayer(weights, initialInput[i], activationFunctionToUse));
+                    layerList.add(new DenseLayer(weights, initialInput[0], activationFunctionToUse));
                 }
             } catch (Exception e) {
                 throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation!");
@@ -347,7 +346,7 @@ public class DenseLayers {
                     double[][] weights = randn(numberOfNeuronsPerLayer[i], numberOfNeuronsPerLayer[i - 1]);
                     layerList.add(new DenseLayer(weights, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse));
                 } else {
-                    layerList.add(new DenseLayer(initialWeights, initialInput[i], activationFunctionToUse));
+                    layerList.add(new DenseLayer(initialWeights, initialInput[0], activationFunctionToUse));
                 }
             } catch (Exception e){
                 throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation!");
@@ -361,28 +360,31 @@ public class DenseLayers {
         }
     }
 
-    private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialWeights, double[]biases, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction,
+    private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialWeights, double[]initialBiases, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction,
                         Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] hotOneVec, int[] trueValues) throws Exception {
-        if(hotOneVec.length != 0 && trueValues.length != 0) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
-        // check if both the one hot vector mappings true values mappings are empty
-        if(hotOneVec.length == 0 && trueValues.length == 0) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
+        // gather initial input
+        if (hotOneVec != null && trueValues != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
+        if (hotOneVec == null && trueValues == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
         this.layerList = new ArrayList<>();
         this.initialInput = initialInput;
 
+        // create first layer by multiplying the initial input by the  initial weights and adding the initial biases
         IntStream.range(0, layers).forEach(i -> {
             DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             try {
                 if (i != 0) {
                     double[][] weights = randn(numberOfNeuronsPerLayer[i], numberOfNeuronsPerLayer[i - 1]);
-                    layerList.add(new DenseLayer(weights, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse));
+                    double[] biases = randn(numberOfNeuronsPerLayer[i]);
+                    DenseLayer layer = new DenseLayer(weights, biases, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse);
+                    layerList.add(layer);
                 } else {
-                    layerList.add(new DenseLayer(initialWeights, biases, initialInput[i], activationFunctionToUse));
+                    DenseLayer layer = new DenseLayer(initialWeights, initialBiases, initialInput[batchCounter], activationFunctionToUse);
+                    layerList.add(layer);
                 }
-            } catch (Exception e){
-                throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation!");
+            } catch (Exception e) {
+                throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation! " + e.getMessage());
             }
         });
-
         if(lossFunction == DEFAULT_LOSS_FUNCTIONS.NLL_LOSS_FUNCTION) {
             this.loss =  MathUtils.mean(ErrorLossFunctions.lossFunction(lossFunction, hotOneVec[0], this.getLastLayer().getLayerOutputs()));
         } else {
@@ -440,12 +442,24 @@ public class DenseLayers {
         return getRandomMatrix(rows, cols);
     }
 
+    public static double[] randn(int elementCount){
+        return getRandomArray(elementCount);
+    }
+
     // creates a metrix of randomly generated numbers
-    static double[][] getRandomMatrix(int rows, int cols) {
+    private static double[][] getRandomMatrix(int rows, int cols) {
         double[][] output = new double[rows][cols];
         for (int i = 0; i < output.length; i++)
             for (int j = 0; j < output[0].length; j++)
                 output[i][j] = (0.1 * random.nextGaussian());
+        return output;
+    }
+
+    private static double[] getRandomArray(int elementCount) {
+        double[] output = new double[elementCount];
+        for(int i = 0; i < output.length; i++){
+            output[i] = (0.1 * random.nextGaussian());
+        }
         return output;
     }
 
@@ -717,13 +731,9 @@ public class DenseLayers {
                     printInfo("Initial biases set to", this.initialBiases);
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    printInfo("Initial hot one map set to", this.hotOneMap);
-                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(this.isUsingFileAsInput && this.isUsingSpecificWeights) {
                     printInfo("Using construct 1.2");
@@ -735,14 +745,11 @@ public class DenseLayers {
                     printInfo("Initial weights set to", this.initialWeights);
                     printInfo("Initial biases not set!");
                     printInfo("Initial weights set to", this.initialInput);
-                    printInfo("Initial weights set to " + this.activationFunction.name());
+                    printInfo("Initial weights set to " + this.initialWeights);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    printInfo("Initial hot one map set to", this.hotOneMap);
-                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(this.isUsingFileAsInput) {
                     printInfo("Using construct 1.3");
@@ -755,13 +762,9 @@ public class DenseLayers {
                     printInfo("Initial biases not set!");
                     printInfo("Initial weights set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    printInfo("Initial hot one map set to", this.hotOneMap);
-                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(!this.isUsingFileAsInput && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printInfo("Using construct 1.4");
@@ -775,11 +778,8 @@ public class DenseLayers {
                     printInfo("Initial inputs not set!");
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    printInfo("Initial hot one map set to", this.hotOneMap);
-                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
             }
             else if(this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingBatchInputs) {
@@ -795,11 +795,8 @@ public class DenseLayers {
                     printInfo("Initial input set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    printInfo("Initial hot one map set to", this.hotOneMap);
-                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(this.isUsingFileAsInput  && this.isUsingSpecificWeights) {
                     printInfo("Using construct 2.2");
@@ -813,11 +810,8 @@ public class DenseLayers {
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    printInfo("Initial hot one map set to", this.hotOneMap);
-                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(this.isUsingFileAsInput) {
                     printInfo("Using construct 2.3");
@@ -831,11 +825,8 @@ public class DenseLayers {
                     printInfo("Initial weights set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    printInfo("Initial hot one map set to", this.hotOneMap);
-                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(!this.isUsingFileAsInput && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printInfo("Using construct 2.4");
@@ -849,11 +840,8 @@ public class DenseLayers {
                     printInfo("Initial inputs not set!");
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    printInfo("Initial hot one map set to", this.hotOneMap);
-                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
             }
             else if(this.isUsingSpecificNeurons && this.isUsingNumberOfLayers && !this.isUsingBatchInputs) {
@@ -869,11 +857,8 @@ public class DenseLayers {
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    printInfo("Initial hot one map set to", this.hotOneMap);
-                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(this.isUsingFileAsInput && this.isUsingSpecificWeights) {
                     printInfo("Using construct 3.2");
@@ -887,11 +872,8 @@ public class DenseLayers {
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    printInfo("Initial hot one map set to", this.hotOneMap);
-                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(this.isUsingFileAsInput) {
                     printInfo("Using construct 3.3");
@@ -905,11 +887,8 @@ public class DenseLayers {
                     printInfo("Initial inputs set to", this.initialInput);
                     printInfo("Initial activation function set to " + this.activationFunction.name());
                     printInfo("Initial activation function map set to", this.activationFunctionsMap);
-                    printInfo("Initial loss function map set to", this.lossFunctionsMap);
                     if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndex);}
                     else {printInfo("Initial hot one vector set to", this.hotOneVec);}
-                    printInfo("Initial hot one map set to", this.hotOneMap);
-                    printInfo("Initial true value index map set to", this.trueValueIndexMap);
                 }
                 else if(!this.isUsingFileAsInput && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printInfo("Using construct 3.4");
