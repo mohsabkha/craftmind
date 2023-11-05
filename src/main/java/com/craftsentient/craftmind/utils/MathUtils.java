@@ -32,6 +32,12 @@ public class MathUtils {
     }
 
     public static double arrayDotProduct(double[]a, double[]b) {
+        if(a == null){
+            throw new IllegalArgumentException("[arrayDotProduct(double[], double[])]: a is null");
+        }
+        if(b == null){
+            throw new IllegalArgumentException("[arrayDotProduct(double[], double[])]: b is null");
+        }
         if(a.length != b.length) throw new IllegalArgumentException("Dimensions mismatch!");
         AtomicReference<Double> sum = new AtomicReference<>((double) 0);
         IntStream.range(0, a.length).parallel().forEachOrdered(i -> sum.updateAndGet(v -> (v + (a[i] * b[i]))));
@@ -309,6 +315,7 @@ public class MathUtils {
         });
         return totalCorrect.get();
     }
+
 
     public static double accuracy(double[] trueValues, double[] predictedValues){
         double sum = accuracySum(trueValues, predictedValues);

@@ -693,15 +693,15 @@ public class PrintUtils {
 
     public static void printLayer(String label, DenseLayer layer) {
         System.out.println(bold(green("Layer " + label + " ")));
+        print("Number of Neurons:", layer.getNeuronList().size());
         print("Inputs: ", layer.getInputs());
         print("Outputs: ", layer.getLayerOutputs());
-        print("Activation: ", layer.getActivationFunction().name());
     }
 
     public static void printLayers(String label, DenseLayers layers) {
         System.out.println(bold(green(":::: " + label + " NETWORK ::::")));
-        for(int i = 0; i < layers.getLayerList().size(); i++){
-            printLayer("" + i, layers.getLayerAt(i));
+        for(int i = 1; i <= layers.getLayerList().size(); i++){
+            printLayer("" + i, layers.getLayerAt(i-1));
             System.out.println();
         }
     }

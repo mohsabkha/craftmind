@@ -8,13 +8,19 @@ import com.craftsentient.craftmind.utils.PrintUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.HashMap;
 
 @SpringBootTest
 class CraftmindApplicationTests {
     @Test
     public void neuralNetworkTest() throws Exception {
-        double[][] inputs = {{1, 2, 3, 2.5}};
+        double[][] inputs = {
+                {1, 2, 3, 2.5},
+                {2.0,5.0,-1.0,2.0},
+                {-1.5,2.7,3.3,-0.8},
+                {1, 2, 3, 2.5},
+                {2.0,5.0,-1.0,2.0},
+                {-1.5,2.7,3.3,-0.8}
+        };
         double[][] weights = { // 1 per neuron
                 {0.2, 0.8, -0.5, 1.0},
                 {0.5, -0.91, 0.26, -0.5},
@@ -24,16 +30,15 @@ class CraftmindApplicationTests {
 
         DenseLayers builtLayerWithFile = new DenseLayers.DenseLayersBuilder()
                 .withNumberOfLayers(6)
-                .withNumberOfNeuronsPerLayer(new int[]{3,5,6,7,4,3})
+                .withNumberOfNeuronsPerLayer(new int[]{3,5,6,7,4,10})
                 .withInitialInput(inputs)
                 .withInitialBiases(biases)
                 .withInitialWeights(weights)
                 .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .withLossFunction(DEFAULT_LOSS_FUNCTIONS.NLL_LOSS_FUNCTION)
-                .withTrueValue(new int[] {0, 1, 2})
+                .withTrueValueIndices(new int[] {1, 1, 2, 1, 1, 0})
                 .build();
-        PrintUtils.printLayers("Built With File", builtLayerWithFile);
-
+        builtLayerWithFile.train();
     }
 
     @Test

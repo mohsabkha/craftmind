@@ -20,6 +20,7 @@ public class Neuron {
     private double output;
     private double bias;
     private double[] weights;
+    private double[] inputs;
 
     public Neuron() {
         this.weights = new double[0];
@@ -54,20 +55,25 @@ public class Neuron {
     }
 
     public double generateOutput(double[] inputs){
-        printInfo("Entered generateOutput(double[] inputs) - Generating neuron output...");
         this.output = MathUtils.arrayDotProduct(inputs, this.weights) + this.bias;
         return this.output;
     }
 
     public static double generateOutput(double[] inputs, double[] weights, double bias){
-        printInfo("Entered generateOutput(double[] inputs, double[] weights, double bias) - Generating neuron output...");
         return MathUtils.arrayDotProduct(inputs, weights) + bias;
     }
 
+    public double regenerateOutput(double[] inputs){
+        return MathUtils.arrayDotProduct(inputs, this.weights) + this.bias;
+    }
+
     public void addWeight(double value){
-        printInfo("Entered addWeight(double value) - Adding weight value to neuron...");
         this.weights = MathUtils.addToDoubleArray(this.weights, value);
         this.size = weights.length;
+    }
+
+    public void setWeight(int index, double value){
+        this.weights[index] = value;
     }
 
     public static double randn(){

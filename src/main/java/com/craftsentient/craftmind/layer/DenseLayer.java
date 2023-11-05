@@ -18,6 +18,7 @@ public class DenseLayer {
     private ArrayList<Neuron> neuronList;
     private double[][] neuronWeights;
     private double[] neuronBiases;
+    @Setter
     private double[] inputs;
     private boolean isHiddenLayer = true;
     private double alpha;
@@ -99,9 +100,29 @@ public class DenseLayer {
     /**
      * calls either batched or non-batched layer output generation function
     */
-    public Object generateLayerOutput() throws Exception {
+    public double[] generateLayerOutput() throws Exception {
         printInfo("Entered generateLayerOutput()");
         return generateLayerOutput(this.inputs);
+    }
+
+    public double[] regenerateLayerOutput(double[] inputs) {
+        double[] newOutputs = new double[this.getLayerOutputs().length];
+        IntStream.range(0, this.getLayerOutputs().length).forEachOrdered(i -> {
+            this.setInputs(inputs);
+            Neuron neuron = this.getNeuronList().get(i);
+            newOutputs[i] = neuron.regenerateOutput(this.inputs);
+        });
+        return this.layerOutputs;
+    }
+
+    public double[] regenerateLayerOutput() {
+        double[] newOutputs = new double[this.getLayerOutputs().length];
+        IntStream.range(0, this.getLayerOutputs().length).forEachOrdered(i -> {
+            Neuron neuron = this.getNeuronList().get(i);
+            printInfo("Current Layer Inputs:", this.inputs);
+            newOutputs[i] = neuron.regenerateOutput(this.inputs);
+        });
+        return this.layerOutputs;
     }
 
     /**
@@ -111,7 +132,7 @@ public class DenseLayer {
     private double[] generateLayerOutput(double[] inputs) throws Exception {
         printInfo("Entered generateNonBatchedLayerOutput(double[] inputs)");
         this.layerOutputs = new double[0];
-        IntStream.range(0, this.neuronBiases.length).forEach(i -> {
+        IntStream.range(0, this.neuronBiases.length).forEachOrdered(i -> {
             try {
                 this.addOutput(Neuron.generateOutput(inputs, this.neuronWeights[i], this.neuronBiases[i]));
             } catch (Exception e) {

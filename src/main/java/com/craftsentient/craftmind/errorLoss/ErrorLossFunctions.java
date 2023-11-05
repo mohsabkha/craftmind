@@ -4,12 +4,18 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
 public class ErrorLossFunctions {
-    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double trueValues, double classifierOutput) throws Exception {
+    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double trueValues, double output) throws Exception {
         switch (lossFunction){
-            case HINGE_LOSS_FUNCTION -> { return hinge(trueValues, classifierOutput); }
+            case BINARY_CROSS_ENTROPY_LOSS_FUNCTION -> { return binaryCrossEntropy(trueValues, output); }
+            case CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION -> { return categoricalCrossEntropy(trueValues, output); }
+            case HINGE_LOSS_FUNCTION -> { return hinge(trueValues, output); }
+            case LOG_COSH_LOSS_FUNCTION -> { return logCosh(trueValues, output); }
+            case MSLE_LOSS_FUNCTION -> {  return meanStandardLogarithmicError(trueValues, output); }
+            case SQUARED_HINGE_LOSS_FUNCTION -> { return squaredHinge(trueValues, output); }
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
+
     public static Object lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues) throws Exception {
         if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
         switch (lossFunction){
@@ -23,7 +29,6 @@ public class ErrorLossFunctions {
             case MAPE_LOSS_FUNCTION -> { return meanAbsolutePercentageError(trueValues, predictedValues); }
             //case MSE_LOSS_FUNCTION -> { return meanStandardError(trueValues, predictedValues); }
             case MSLE_LOSS_FUNCTION -> {  return meanStandardLogarithmicError(trueValues, predictedValues); }
-            //case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueValues, predictedValues); }
             case QUADRATIC_LOSS -> { return quadratic(trueValues, predictedValues); }
             //case RANKNET_LOSS_FUNCTION -> { return rankNet(trueValues, predictedValues); }
             //case SPARSE_CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION -> { return sparseCategoricalCrossEntropy(trueValues, predictedValues); }
@@ -54,10 +59,13 @@ public class ErrorLossFunctions {
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
+
     public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueClass, double[] predictedValues) throws Exception {
         switch (lossFunction) {
             case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+            default -> {
+                throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name() + ". Only Available Loss Function For Data Entered Is NLL_LOSS_FUNCTION");
+            }
         }
     }
     public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueClass, double[][] predictedValues) throws Exception {
@@ -96,6 +104,7 @@ public class ErrorLossFunctions {
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
+
     public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double trueValues, double predictedValues, double alpha, double gamma) throws Exception {
         switch (lossFunction){
             case FOCAL_LOSS_FUNCTION -> { return focal(trueValues, predictedValues, alpha, gamma); }
@@ -109,6 +118,7 @@ public class ErrorLossFunctions {
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
+
     public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double trueValues, double predictedValues, double delta) throws Exception {
         switch (lossFunction){
             case HUBER_LOSS_FUNCTION -> { return huber(trueValues, predictedValues, delta); }
@@ -362,8 +372,6 @@ public class ErrorLossFunctions {
             if (trueValues[i] < 0 || predictedValues[i] < 0) {
                 throw new IllegalArgumentException("Values should not be negative, as this would cause issues with logarithms in MSLE.");
             }
-
-
             msle += meanStandardLogarithmicError(trueValues[i], predictedValues[i]);
         }
         return msle;

@@ -26,7 +26,7 @@ public class LayersTest {
         printPositive("First DenseLayer");
         new DenseLayers.DenseLayersBuilder()
                 .withNumberOfLayers(5)
-                .withTrueValue(new int[]{4})
+                .withTrueValueIndices(new int[]{4})
                 .build();//.printLayers("NETWORK 1 NEW");
 
         // when no batch input is provided, one layer of input will be created
@@ -34,7 +34,7 @@ public class LayersTest {
         new DenseLayers.DenseLayersBuilder()
                 .withNumberOfLayers(7)
                 .withNumberOfNeurons(7)
-                .withTrueValue(new int[]{1})
+                .withTrueValueIndices(new int[]{1})
                 .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTPLUS_ACTIVATION_FUNCTION)
                 .build();//.printLayers("NETWORK 2 NEW");
 
@@ -44,7 +44,7 @@ public class LayersTest {
                 .withNumberOfLayers(64)
                 .withNumberOfInputs(27)
                 .withNumberOfNeurons(64)
-                .withTrueValue(new int[]{0})
+                .withTrueValueIndices(new int[]{0})
                 .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .build();//.printLayers("NETWORK 2A NEW");
 
@@ -54,7 +54,7 @@ public class LayersTest {
         new DenseLayers.DenseLayersBuilder()
                 .withNumberOfLayers(7)
                 .withNumberOfNeuronsPerLayer(new int[]{2, 5, 9, 2, 5, 4, 10})
-                .withTrueValue(new int[]{8})
+                .withTrueValueIndices(new int[]{8})
                 .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .build();//.printLayers("NETWORK 2B NEW");
 
@@ -63,7 +63,7 @@ public class LayersTest {
         new DenseLayers.DenseLayersBuilder()
                 .withNumberOfLayers(3)
                 .withInitialInput(inputs)
-                .withTrueValue(new int[]{0,2,1})
+                .withTrueValueIndices(new int[]{0,2,1})
                 .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .build();//.printLayers("NETWORK 3A NEW");
 
@@ -72,7 +72,7 @@ public class LayersTest {
                 .withNumberOfLayers(7)
                 .withNumberOfNeurons(3)
                 .withInitialInput(inputs)
-                .withTrueValue(new int[]{0,0,1})
+                .withTrueValueIndices(new int[]{0,0,1})
                 .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .build();//.printLayers("NETWORK 3B NEW");
 
@@ -81,7 +81,7 @@ public class LayersTest {
                 .withNumberOfLayers(3)
                 .withNumberOfNeuronsPerLayer(new int[]{3, 5, 9, 4, 6, 10})
                 .withInitialInput(inputs)
-                .withTrueValue(new int[] {2,1,1})
+                .withTrueValueIndices(new int[] {2,1,1})
                 .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .build();//.printLayers("NETWORK 3C NEW");
 
@@ -90,7 +90,7 @@ public class LayersTest {
                 .withNumberOfLayers(5)
                 .withInitialWeights(weights)
                 .withInitialInput(inputs)
-                .withTrueValue(new int[]{1,2,0})
+                .withTrueValueIndices(new int[]{1,2,0})
                 .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .build();//.printLayers("NETWORK 4A NEW");
 
@@ -98,7 +98,7 @@ public class LayersTest {
         new DenseLayers.DenseLayersBuilder()
                 .withNumberOfLayers(5)
                 .withNumberOfNeurons(3)
-                .withTrueValue(new int[]{1,2,0})
+                .withTrueValueIndices(new int[]{1,2,0})
                 .withInitialWeights(weights)
                 .withInitialInput(inputs)
                 .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
@@ -110,7 +110,7 @@ public class LayersTest {
                 .withNumberOfNeuronsPerLayer( new int[]{3, 5, 9, 2, 7})
                 .withInitialWeights(weights)
                 .withInitialInput(inputs)
-                .withTrueValue(new int[]{0,2,0})
+                .withTrueValueIndices(new int[]{0,2,0})
                 .build();
 
         // create neural network with number of layers, initial weights per input, biases for each neuron, and initial inputs
@@ -119,7 +119,7 @@ public class LayersTest {
                 .withInitialWeights(weights)
                 .withInitialBiases(biases)
                 .withInitialInput(inputs)
-                .withTrueValue(new int[]{1,0,0})
+                .withTrueValueIndices(new int[]{1,0,0})
                 //.withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .build();//.printLayers("NETWORK 5A NEW");
 
@@ -130,7 +130,7 @@ public class LayersTest {
                 .withInitialWeights(weights)
                 .withInitialBiases(biases)
                 .withInitialInput(inputs)
-                .withTrueValue(new int[]{1,2,2})
+                .withTrueValueIndices(new int[]{1,2,2})
                 .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .build();//.printLayers("NETWORK 5B NEW");
 
@@ -141,7 +141,7 @@ public class LayersTest {
                 .withInitialWeights(weights)
                 .withInitialBiases(biases)
                 .withInitialInput(inputs)
-                .withTrueValue(new int[]{1,2,0})
+                .withTrueValueIndices(new int[]{1,2,0})
                 .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .build();//.printLayers("NETWORK 5C NEW");
     }
