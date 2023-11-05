@@ -31,7 +31,8 @@ public class DenseLayers {
     private double accuracy;
     private double loss;
     private double sum;
-    private double learningRate;
+    private double learningRate = .001;
+    private int[][] hotOneVec;
     private DEFAULT_LOSS_FUNCTIONS lossFunction;
     public static final Random random = new Random(0);
 
@@ -41,7 +42,7 @@ public class DenseLayers {
         // create an initial input array of random numbers of size layers
         this.initialInput = randn(1,layers);
         // instantiate the decisions index
-        this.decisionsIndex = new int[layers];
+        this.decisionsIndex = new int[initialInput.length];
         // instantiate the hash map for the values of the decision
         this.decisions = new HashMap<>();
 
@@ -68,7 +69,7 @@ public class DenseLayers {
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
         // instantiate the decisions index
-        this.decisionsIndex = new int[layers];
+        this.decisionsIndex = new int[initialInput.length];
         // instantiate the hash map for the values of the decision
         this.decisions = new HashMap<>();
 
@@ -91,7 +92,7 @@ public class DenseLayers {
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
         // instantiate the decisions index
-        this.decisionsIndex = new int[layers];
+        this.decisionsIndex = new int[initialInput.length];
         // instantiate the hash map for the values of the decision
         this.decisions = new HashMap<>();
 
@@ -114,7 +115,7 @@ public class DenseLayers {
         this.layerList = new ArrayList<>();
         this.initialInput = initialInput;
         // instantiate the decisions index
-        this.decisionsIndex = new int[layers];
+        this.decisionsIndex = new int[initialInput.length];
         // instantiate the hash map for the values of the decision
         this.decisions = new HashMap<>();
 
@@ -137,7 +138,7 @@ public class DenseLayers {
         this.layerList = new ArrayList<>();
         this.initialInput = randn(1,numberOfNeurons);
         // instantiate the decisions index
-        this.decisionsIndex = new int[layers];
+        this.decisionsIndex = new int[initialInput.length];
         // instantiate the hash map for the values of the decision
         this.decisions = new HashMap<>();
 
@@ -160,7 +161,7 @@ public class DenseLayers {
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
         // instantiate the decisions index
-        this.decisionsIndex = new int[layers];
+        this.decisionsIndex = new int[initialInput.length];
         // instantiate the hash map for the values of the decision
         this.decisions = new HashMap<>();
 
@@ -182,7 +183,7 @@ public class DenseLayers {
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
         // instantiate the decisions index
-        this.decisionsIndex = new int[layers];
+        this.decisionsIndex = new int[initialInput.length];
         // instantiate the hash map for the values of the decision
         this.decisions = new HashMap<>();
 
@@ -205,7 +206,7 @@ public class DenseLayers {
         this.layerList = new ArrayList<>();
         this.initialInput = initialInput;
         // instantiate the decisions index
-        this.decisionsIndex = new int[layers];
+        this.decisionsIndex = new int[initialInput.length];
         // instantiate the hash map for the values of the decision
         this.decisions = new HashMap<>();
 
@@ -232,7 +233,7 @@ public class DenseLayers {
         this.layerList = new ArrayList<>();
         this.initialInput = randn(1, numberOfNeuronsPerLayer[0]);
         // instantiate the decisions index
-        this.decisionsIndex = new int[layers];
+        this.decisionsIndex = new int[initialInput.length];
         // instantiate the hash map for the values of the decision
         this.decisions = new HashMap<>();
 
@@ -261,7 +262,7 @@ public class DenseLayers {
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
         // instantiate the decisions index
-        this.decisionsIndex = new int[layers];
+        this.decisionsIndex = new int[initialInput.length];
         // instantiate the hash map for the values of the decision
         this.decisions = new HashMap<>();
 
@@ -290,7 +291,7 @@ public class DenseLayers {
         this.layerList = new ArrayList<>();
         this.initialInput = initialInput;
         // instantiate the decisions index
-        this.decisionsIndex = new int[layers];
+        this.decisionsIndex = new int[initialInput.length];
         // instantiate the hash map for the values of the decision
         this.decisions = new HashMap<>();
 
@@ -317,7 +318,7 @@ public class DenseLayers {
         this.layerList = new ArrayList<>();
         this.initialInput = initialInput;
         // instantiate the decisions index
-        this.decisionsIndex = new int[layers];
+        this.decisionsIndex = new int[initialInput.length];
         // instantiate the hash map for the values of the decision
         this.decisions = new HashMap<>();
 
@@ -328,9 +329,6 @@ public class DenseLayers {
                 if (i != 0) {
                     double[][] weights = randn(numberOfNeuronsPerLayer[i], numberOfNeuronsPerLayer[i - 1]);
                     double[] biases = randn(numberOfNeuronsPerLayer[i]);
-                    printInfo("Weights In Hidden Layer", weights);
-                    printInfo("Biases In Hidden Layers", biases);
-                    printInfo("Inputs In Hidden Layers", layerList.get(i - 1).getLayerOutputs());
                     DenseLayer layer = new DenseLayer(weights, biases, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse);
                     layerList.add(layer);
                 } else {
@@ -362,12 +360,21 @@ public class DenseLayers {
                 if (i != 0) {
                     this.getLayerAt(i).setInputs(inputs[i-1]); // use previous layers input
                     inputs[i] = this.getLayerAt(i).regenerateLayerOutput();
-                    printInfo("After regeneration, inputs=", inputs[i]);
                 } else {
                     this.getLayerAt(i).setInputs(this.initialInput[batchCounter]); // use user provided input
                     inputs[i] = this.getLayerAt(i).regenerateLayerOutput();
                 }
             }
+
+            if(this.hotOneVec != null && this.trueValueIndices != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
+            // check if both the one hot vector mappings true values mappings are empty
+            if(this.hotOneVec == null && this.trueValueIndices == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
+            if(lossFunction == DEFAULT_LOSS_FUNCTIONS.NLL_LOSS_FUNCTION && hotOneVec != null) {
+                this.loss =  MathUtils.mean(ErrorLossFunctions.lossFunction(lossFunction, hotOneVec[this.batchCounter], this.getLastLayer().getLayerOutputs()));
+            } else if (trueValueIndices != null){
+                this.loss = ErrorLossFunctions.lossFunction(lossFunction, trueValueIndices[this.batchCounter], this.getLastLayer().getLayerOutputs());
+            }
+
             printPositive("Training for iteration " + (this.batchCounter) + " completed!");
             printGeneric(":::: Loss and Accuracy Data ::::");
             this.generateDecisionsMap(trueValueIndices[this.batchCounter]);
@@ -376,7 +383,6 @@ public class DenseLayers {
             printInfo("Accuracy:", this.getAccuracy());
             printInfo("Loss:", this.getLoss());
         }
-        PrintUtils.printLayers("Network", this);
     }
 
     // method to enable backpropagation and training

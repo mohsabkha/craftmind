@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import java.util.stream.IntStream;
 
 import static com.craftsentient.craftmind.layers.DenseLayers.random;
-import static com.craftsentient.craftmind.utils.PrintUtils.printInfo;
 
 @Component
 @Data
@@ -27,31 +26,24 @@ public class Neuron {
         this.bias = 0.0;
         this.output = 0.0;
         this.size = 0;
-        printInfo("Values set in neuron with no input...");
     }
 
     public Neuron(int weights) {
         this.size = weights;
         this.bias = 0;
         this.weights = randn(weights);
-        printInfo("Weights of neuron randomly generated...");
-        printInfo("Values set in neuron with number of weights...");
     }
 
     public Neuron(int weights, double bias){
         this.size = weights;
         this.bias = bias;
         this.weights = randn(weights);
-        printInfo("Weights of neuron randomly generated...");
-        printInfo("Values set in neuron with number of weights and biases...");
-
     }
 
     public Neuron(double[] weights, double bias){
         this.size = weights.length;
         this.bias = bias;
         this.weights = weights;
-        printInfo("Values set in neuron with inputted weights and number of biases...");
     }
 
     public double generateOutput(double[] inputs){
