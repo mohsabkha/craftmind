@@ -260,7 +260,7 @@ public class MathUtils {
     }
 
     public static double[] indexAndMax(double[] values){
-        double[] indexAndMax = new double[2];
+        double[] indexAndMax = {0.0, 0.0};
         for(int i = 0; i < values.length; i++)
             if(indexAndMax[1] < values[i]) {
                 indexAndMax[0] = i;

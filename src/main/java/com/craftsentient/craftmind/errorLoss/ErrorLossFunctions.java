@@ -3,184 +3,130 @@ package com.craftsentient.craftmind.errorLoss;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
+import static com.craftsentient.craftmind.layers.DenseLayers.*;
+import static com.craftsentient.craftmind.utils.PrintUtils.printGeneric;
+import static com.craftsentient.craftmind.utils.PrintUtils.printInfo;
+
 public class ErrorLossFunctions {
-    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double trueValues, double output) throws Exception {
+
+    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex, int selectedOutputIndex, double[] outputs){
         switch (lossFunction){
-            case BINARY_CROSS_ENTROPY_LOSS_FUNCTION -> { return binaryCrossEntropy(trueValues, output); }
-            case CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION -> { return categoricalCrossEntropy(trueValues, output); }
-            case HINGE_LOSS_FUNCTION -> { return hinge(trueValues, output); }
-            case LOG_COSH_LOSS_FUNCTION -> { return logCosh(trueValues, output); }
-            case MSLE_LOSS_FUNCTION -> {  return meanStandardLogarithmicError(trueValues, output); }
-            case SQUARED_HINGE_LOSS_FUNCTION -> { return squaredHinge(trueValues, output); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+            case BINARY_CROSS_ENTROPY_LOSS_FUNCTION -> { return binaryCrossEntropy(trueValueIndex, selectedOutputIndex, outputs); }
+            case CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION -> { return categoricalCrossEntropy(trueValueIndex, outputs); }
+            case FOCAL_LOSS_FUNCTION -> { return focal(trueValueIndex, outputs); }
+            case HINGE_LOSS_FUNCTION -> { return hinge(trueValueIndex, outputs); }
+            case HUBER_LOSS_FUNCTION -> { return huber(trueValueIndex, outputs); }
+            case LOG_COSH_LOSS_FUNCTION -> { return logCosh(trueValueIndex, outputs); }
+            case MSLE_LOSS_FUNCTION -> {  return meanStandardLogarithmicError(trueValueIndex, selectedOutputIndex, outputs); }
+            case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueValueIndex, outputs); }
+            case SQUARED_HINGE_LOSS_FUNCTION -> { return squaredHinge(trueValueIndex, outputs); }
+            default -> throw new RuntimeException("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
 
-    public static Object lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues) throws Exception {
-        if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
-        switch (lossFunction){
-            case BINARY_CROSS_ENTROPY_LOSS_FUNCTION -> { return binaryCrossEntropy(trueValues, predictedValues); }
-            case CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION -> { return categoricalCrossEntropy(trueValues, predictedValues); }
-            case COSINE_PROXIMITY_LOSS_FUNCTION -> { return cosineProximity(trueValues, predictedValues); }
-            case HINGE_LOSS_FUNCTION -> { return hinge(trueValues, predictedValues); }
-            case KL_DIVERGENCE_LOSS_FUNCTION -> { return kullbackLeiblerDivergence(trueValues, predictedValues); }
-            case LOG_COSH_LOSS_FUNCTION -> { return logCosh(trueValues, predictedValues); }
-            case L1_LOSS_FUNCTION -> { return absoluteError(trueValues, predictedValues); }
-            case MAPE_LOSS_FUNCTION -> { return meanAbsolutePercentageError(trueValues, predictedValues); }
-            //case MSE_LOSS_FUNCTION -> { return meanStandardError(trueValues, predictedValues); }
-            case MSLE_LOSS_FUNCTION -> {  return meanStandardLogarithmicError(trueValues, predictedValues); }
-            case QUADRATIC_LOSS -> { return quadratic(trueValues, predictedValues); }
-            //case RANKNET_LOSS_FUNCTION -> { return rankNet(trueValues, predictedValues); }
-            //case SPARSE_CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION -> { return sparseCategoricalCrossEntropy(trueValues, predictedValues); }
-            case SQUARED_HINGE_LOSS_FUNCTION -> { return squaredHinge(trueValues, predictedValues); }
-            //case SSIM_LOSS_FUNCTION -> { return structuralSimilarityIndex(trueValues, predictedValues); }
-            //case TRIPLET_MARGIN_LOSS_FUNCTION -> { return tripletMargin(trueValues, predictedValues); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
-        }
-    }
-    public static Object lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[][] trueValues, double[][] predictedValues) throws Exception {
-        if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
-        switch (lossFunction){
-            case BINARY_CROSS_ENTROPY_LOSS_FUNCTION -> { return binaryCrossEntropy(trueValues, predictedValues); }
-            case CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION -> { return categoricalCrossEntropy(trueValues, predictedValues); }
-            case COSINE_PROXIMITY_LOSS_FUNCTION -> { return cosineProximity(trueValues, predictedValues); }
-            case KL_DIVERGENCE_LOSS_FUNCTION -> { return kullbackLeiblerDivergence(trueValues, predictedValues); }
-            case LOG_COSH_LOSS_FUNCTION -> { return logCosh(trueValues, predictedValues); }
-            case L1_LOSS_FUNCTION -> { return absoluteError(trueValues, predictedValues); }
-            case MAPE_LOSS_FUNCTION -> { return meanAbsolutePercentageError(trueValues, predictedValues); }
-            //case MSE_LOSS_FUNCTION -> { return meanStandardError(trueValues, predictedValues); }
-            case MSLE_LOSS_FUNCTION -> {  return meanStandardLogarithmicError(trueValues, predictedValues); }
-            case QUADRATIC_LOSS -> { return quadratic(trueValues, predictedValues); }
-            //case RANKNET_LOSS_FUNCTION -> { return rankNet(trueValues, predictedValues); }
-            //case SPARSE_CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION -> { return sparseCategoricalCrossEntropy(trueValues, predictedValues); }
-            case SQUARED_HINGE_LOSS_FUNCTION -> { return squaredHinge(trueValues, predictedValues); }
-            //case SSIM_LOSS_FUNCTION -> { return structuralSimilarityIndex(trueValues, predictedValues); }
-            //case TRIPLET_MARGIN_LOSS_FUNCTION -> { return tripletMargin(trueValues, predictedValues); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
-        }
+
+    /*
+     * For binary classification
+     * Compatible with most activation functions. Please use unbounded activation functions in output layer though
+     */
+    private static double binaryCrossEntropy(int trueValueIndex, int selectedOutputIndex, double[] outputs){
+        return -outputs[trueValueIndex] * Math.log(outputs[selectedOutputIndex]) - (1 - outputs[trueValueIndex]) * Math.log(1 - outputs[selectedOutputIndex]);
     }
 
-    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueClass, double[] predictedValues) throws Exception {
-        switch (lossFunction) {
-            case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues); }
-            default -> {
-                throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name() + ". Only Available Loss Function For Data Entered Is NLL_LOSS_FUNCTION");
+    /*
+     * For binary classification
+     * For this, the output should ideally be a -1 or 1, but passing in the index will auto convert to these values
+     */
+    private static double binaryHinge(int trueValueIndex, int selectedOutputIndex, double[] outputs){
+        double margin = 0.5;
+        int trueLabel = trueValueIndex * 2 - 1;
+        int selectedLabel = selectedOutputIndex * 2 - 1;
+
+        return Math.max(0, margin - trueLabel * selectedLabel);
+    }
+
+    /*
+     * For multi-class classification
+     * Compatible with most activation functions. Please use unbounded activation functions in output layer though
+     */
+    private static double categoricalCrossEntropy(int trueValueIndex, double[] outputs){
+        return -Math.log(outputs[trueValueIndex]);
+    }
+
+    /*
+     * For two concurrent Siamese networks
+     * Compatible with most activation functions. Please use unbounded activation functions in output layer though
+     */
+    public static double contrastive(double firstSiameseValue, double secondSiameseValue){
+        double distance = firstSiameseValue - secondSiameseValue;
+        double y;
+        if(distance < MARGIN) {
+            y = 0;
+        } else {
+            y = 1;
+        }
+        return (1 - y) * 0.5 * distance * distance + y * 0.5 * Math.pow(Math.max(0, MARGIN - distance), 2);
+    }
+
+    private static double hinge(int trueValueIndex, double[] outputs){
+        double trueScore = outputs[trueValueIndex];
+        double maxIncorrectScore = Double.NEGATIVE_INFINITY;
+
+        for (int i = 0; i < outputs.length; i++) {
+            if (i != trueValueIndex) {
+                maxIncorrectScore = Math.max(maxIncorrectScore, outputs[i]);
             }
         }
-    }
-    public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueClass, double[][] predictedValues) throws Exception {
-        if(trueClass.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
-        switch (lossFunction) {
-            case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
-        }
-    }
-    public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueClass, double[] predictedValues) throws Exception {
-        if(trueClass.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
-        switch (lossFunction) {
-            case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
-        }
-    }
-    public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] trueClass, double[][] predictedValues) throws Exception {
-        if(trueClass.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
-        switch (lossFunction) {
-            case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
-        }
+
+        return Math.max(0, 1 + maxIncorrectScore - trueScore);
     }
 
-    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues, int y, double margin) throws Exception {
-        if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
-        switch (lossFunction){
-            case CONTRASTIVE_LOSS_FUNCTION -> { return contrastiveWithTwoDataSets(trueValues, predictedValues, y, margin); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+    private static double logCosh(int trueValueIndex, double[] outputs) {
+        // The true probability for the correct class is 1, and 0 for all other classes
+        double trueValue = 1.0;
+        // Get the predicted probability for the true class
+        double predictedValue = outputs[trueValueIndex];
+        // Calculate the prediction error for the true class
+        double predictionError = predictedValue - trueValue;
+        // Calculate and return the log-cosh of the prediction error
+        return Math.log(Math.cosh(predictionError));
+    }
+
+    public static double meanStandardLogarithmicError(int trueValueIndex, int selectedOutputIndex, double[] outputs){
+        return Math.pow(Math.log1p(outputs[trueValueIndex]) - Math.log1p(outputs[selectedOutputIndex]), 2);
+    }
+
+    private static double squaredHinge(int trueValueIndex, double[] outputs) {
+        double loss = 0.0;
+        for (int i = 0; i < outputs.length; i++) {
+            if (i == trueValueIndex) {
+                // For the true class, we subtract the output from 1.
+                loss += Math.pow(Math.max(0, 1 - outputs[i]), 2);
+            } else {
+                // For the incorrect classes, we add 1 to the output.
+                loss += Math.pow(Math.max(0, 1 + outputs[i]), 2);
+            }
         }
-    }
-    public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[][] trueValues, double[][] predictedValues, int y, double margin) throws Exception {
-        if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
-        switch (lossFunction){
-            case CONTRASTIVE_LOSS_FUNCTION -> { return contrastiveWithTwoDataSets(trueValues, predictedValues, y, margin); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
-        }
-    }
-
-    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double trueValues, double predictedValues, double alpha, double gamma) throws Exception {
-        switch (lossFunction){
-            case FOCAL_LOSS_FUNCTION -> { return focal(trueValues, predictedValues, alpha, gamma); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
-        }
-    }
-    public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues, double[] alpha, double[] gamma) throws Exception {
-        if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
-        switch (lossFunction){
-            case FOCAL_LOSS_FUNCTION -> { return focal(trueValues, predictedValues, alpha, gamma); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
-        }
-    }
-
-    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double trueValues, double predictedValues, double delta) throws Exception {
-        switch (lossFunction){
-            case HUBER_LOSS_FUNCTION -> { return huber(trueValues, predictedValues, delta); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
-        }
-    }
-    public static double[] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues, double delta) throws Exception {
-        if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
-        switch (lossFunction){
-            case HUBER_LOSS_FUNCTION -> { return huber(trueValues, predictedValues, delta); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
-        }
-    }
-    public static double[][] lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, double[][] trueValues, double[][] predictedValues, double delta) throws Exception {
-        if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
-        switch (lossFunction){
-            case HUBER_LOSS_FUNCTION -> { return huber(trueValues, predictedValues, delta); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
-        }
-    }
-
-
-
-
-
-
-    private static double binaryCrossEntropy(double trueValue, double predictedValueProbability){
-        return -trueValue * Math.log(predictedValueProbability) - (1 - trueValue) * Math.log(1 - predictedValueProbability);
-    }
-    private static double binaryCrossEntropy(double[] trueValues, double[] predictedValueProbabilities) {
-        AtomicReference<Double> loss = new AtomicReference<>((double) 0);
-        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss.updateAndGet( v -> ( v + binaryCrossEntropy(trueValues[i], predictedValueProbabilities[i])) ));
-        return loss.get() / trueValues.length;
-    }
-    private static double[] binaryCrossEntropy(double[][] trueValues, double[][] predictedValueProbabilities) {
-        double [] loss = new double[trueValues.length];
-        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = binaryCrossEntropy(trueValues[i], predictedValueProbabilities[i]));
         return loss;
     }
 
+    /*
+     * Used for object detection
+     * alpha is a balancing factor
+     * gamma is the focusing parameter to reduce contributions to easy examples
+     */
+    private static double focal(int trueValueIndex, double[] outputs) {
+        // Extract the predicted probability associated with the true class
+        double p = outputs[trueValueIndex];
+        // Calculate the modulating factor (1 - p_t)^gamma
+        double modulatingFactor = Math.pow(1 - p, GAMMA);
+        // Calculate the focal loss
+        return -ALPHA * modulatingFactor * Math.log(p);
+    }
 
-    private static double categoricalCrossEntropy(double trueValues, double predictedProbability){
-        return trueValues * Math.log(predictedProbability);
-    }
-    private static double categoricalCrossEntropy(double[] trueValues, double[] predictedValueProbabilities) {
-        if(trueValues.length < 1) { throw new IllegalArgumentException("True Values must at least have 1 value when passed to categorical cross entropy"); }
-        AtomicReference<Double> loss = new AtomicReference<>((double) 0);
-        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss.updateAndGet(v ->  v - categoricalCrossEntropy(trueValues[i], predictedValueProbabilities[i])));
-        return loss.get() / trueValues.length;
-    }
-    private static double[] categoricalCrossEntropy(double[][] trueValues, double[][] predictedValueProbabilities) {
-        double [] loss = new double[trueValues.length];
-        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = categoricalCrossEntropy(trueValues[i], predictedValueProbabilities[i]));
-        return loss;
-    }
 
 
     // Contrastive, y = binary label (0 for similar, 1 for dissimilar)
-    public static double contrastive(double y, double distance){
-        double margin = 1;
-        return (1 - y) * 0.5 * distance * distance + y * 0.5 * Math.pow(Math.max(0, margin - distance), 2);
-    }
     public static double[] contrastive(double[] y, double[] distances){
         double[] loss = new double[distances.length];
         double margin = 1;
@@ -233,22 +179,6 @@ public class ErrorLossFunctions {
      * alpha is a balancing factor
      * gamma is the focusing parameter to reduce contributions to easy examples
      */
-    private static double focal(double trueValue, double predictedValue, double alpha, double gamma) {
-        double pt = (trueValue == 1) ? predictedValue : 1 - predictedValue;
-        double alpha_t = (trueValue == 1) ? alpha : 1 - alpha;
-        return -alpha_t * Math.pow(1 - pt, gamma) * Math.log(pt);
-    }
-    private static double[] focal(double[] trueValues, double[] predictedValues, double[] alpha, double[] gamma) {
-        double[] loss = new double[trueValues.length];
-        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = focal(trueValues[i], predictedValues[i], alpha[i], gamma[i]));
-        return loss;
-    }
-    private static double[][] focal(double[][] trueValues, double[][] predictedValues, double[][] alpha, double[][] gamma) {
-        double[][] loss = new double[trueValues.length][];
-        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = focal(trueValues[i], predictedValues[i], alpha[i], gamma[i]));
-        return loss;
-    }
-
 
     private static double hinge(double trueValue, double classifierOutput) {
         return Math.max(0, 1 - trueValue * classifierOutput);
@@ -265,26 +195,26 @@ public class ErrorLossFunctions {
     }
 
 
-    private static double huber(double trueValue, double predictedValue, double delta) {
-        double residual = trueValue - predictedValue;
-        if (Math.abs(residual) <= delta) {
-            // Quadratic loss for small residuals
-            return 0.5 * Math.pow(residual, 2);
-        } else {
-            // Linear loss for large residuals
-            return delta * (Math.abs(residual) - 0.5 * delta);
+    private static double huber(int trueValueIndex, double[] outputs) {
+        double loss = 0.0;
+        for (int i = 0; i < outputs.length; i++) {
+            // Convert true value index to one-hot encoding, 1 for true class, 0 for all others
+            double trueValue = (i == trueValueIndex) ? 1.0 : 0.0;
+            double predictedValue = outputs[i];
+            double residual = trueValue - predictedValue;
+
+            // Apply the Huber loss formula for each class
+            if (Math.abs(residual) <= DELTA) {
+                // Quadratic loss for small residuals
+                loss += 0.5 * residual * residual;
+            } else {
+                // Linear loss for large residuals, adjusted by the delta value
+                loss += DELTA * (Math.abs(residual) - 0.5 * DELTA);
+            }
         }
-    }
-    private static double[] huber(double[] trueValues, double[] predictedValues, double delta) {
-        double[] loss = new double[trueValues.length];
-        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = huber(trueValues[i], predictedValues[i], delta));
         return loss;
     }
-    private static double[][] huber(double[][] trueValues, double[][] predictedValues, double delta) {
-        double[][] loss = new double[trueValues.length][];
-        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = huber(trueValues[i], predictedValues[i], delta));
-        return loss;
-    }
+
 
 
     private static double kullbackLeiblerDivergence(double[] trueValues, double[] predictedValues) {
@@ -332,32 +262,16 @@ public class ErrorLossFunctions {
         return loss;
     }
 
-    /**
-     * Compute the Mean Absolute Percentage Error (MAPE).
-     *
-     * @param trueValues  Array of true values.
-     * @param predictedValues Array of predicted values.
-     * @return The MAPE value.
-     */
-    private static double meanAbsolutePercentageError(double[] trueValues, double[] predictedValues) {
-        double mape = 0.0;
-        for (int i = 0; i < trueValues.length; i++) {
-            if (trueValues[i] == 0) {
-                throw new IllegalArgumentException("True values should not be zero, as this would cause division by zero in MAPE.");
-            }
-            mape += Math.abs((trueValues[i] - predictedValues[i]) / trueValues[i]);
-        }
-        return (mape / trueValues.length) * 100.0;  // Multiply by 100 to get a percentage
-    }
-    private static double[] meanAbsolutePercentageError(double[][] trueValues, double[][] predictedValues) {
-        double[] loss = new double[trueValues.length];
-        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = meanAbsolutePercentageError(trueValues[i], predictedValues[i]));
-        return loss;
-    }
 
-
+    // this will require summation and then division across multiple iterations over the back propagation
     public static double meanStandardLogarithmicError(double trueValue, double predictedValue){
-        return Math.pow(Math.log1p(trueValue) - Math.log1p(predictedValue), 2);
+        predictedValue = Math.max(predictedValue, 1e-15);
+        trueValue = Math.max(trueValue, 1e-15);
+
+        double logTrueValue = Math.log(trueValue + 1);
+        double logPredictedValue = Math.log(predictedValue + 1);
+
+        return Math.pow(logPredictedValue - logTrueValue, 2);
     }
     /**
      * Compute the Mean Squared Logarithmic Error (MSLE).
@@ -385,15 +299,15 @@ public class ErrorLossFunctions {
     /**
      * Compute the Negative Log Likelihood (NLL) Loss for a single observation.
      *
-     * @param predictedValues Array of predicted probabilities for each class.
+     * @param outputs Array of predicted probabilities for each class.
      * @param trueClass The actual class index.
      * @return The NLL value for the given observation.
      */
-    private static double negativeLogLikelihood(int trueClass, double[] predictedValues) {
-        double predictedProbability = predictedValues[trueClass];
-        if (predictedProbability <= 0 || predictedProbability > 1) {
-            throw new IllegalArgumentException("Incompatible loss function and activation function! Values for predictions should be between 0 and 1!");
-        }
+    private static double negativeLogLikelihood(int trueClass, double[] outputs) {
+        double predictedProbability = outputs[trueClass];
+        double epsilon = 1e-15; // a small number to prevent log(0)
+        printGeneric("Predicted Probability = " + predictedProbability);
+        predictedProbability = Math.max(outputs[trueClass], epsilon);
         return -Math.log(predictedProbability);
     }
     private static double[] negativeLogLikelihood(int[] trueValues, double[] predictedValues){
@@ -511,27 +425,6 @@ public class ErrorLossFunctions {
     }
 
 
-    /**
-     * Compute the squared hinge loss.
-     *
-     * @param trueValue True label (+1 or -1).
-     * @param predictedValue Raw prediction value.
-     * @return The squared hinge loss for the given true label and prediction.
-     */
-    private static double squaredHinge(double trueValue, double predictedValue) {
-        double loss = Math.max(0, 1 - trueValue * predictedValue);
-        return loss * loss;
-    }
-    private static double[] squaredHinge(double[] trueValues, double[] predictedValues) {
-        double[] loss = new double[trueValues.length];
-        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = squaredHinge(trueValues[i], predictedValues[i]));
-        return loss;
-    }
-    private static double[][] squaredHinge(double[][] trueValues, double[][] predictedValues) {
-        double[][] loss = new double[trueValues.length][];
-        IntStream.range(0, trueValues.length).parallel().forEachOrdered(i -> loss[i] = squaredHinge(trueValues[i], predictedValues[i]));
-        return loss;
-    }
 
 
     private static double computeMean(double[] data){

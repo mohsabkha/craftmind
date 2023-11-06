@@ -139,22 +139,22 @@ public class PrintUtils {
 
     // positive
     public static void printPositive(String data){
-        System.out.println(yellow(bold("[SUCCESS] ") + data));
+        System.out.println(green(bold("[SUCCESS] ") + data));
     }
     public static void printPositive(double data){
-        System.out.println(yellow(bold("[SUCCESS] ") + data));
+        System.out.println(green(bold("[SUCCESS] ") + data));
     }
     public static void printPositive(int data){
-        System.out.println(yellow(bold("[SUCCESS] ") + data));
+        System.out.println(green(bold("[SUCCESS] ") + data));
     }
     public static void printPositive(float data){
-        System.out.println(yellow(bold("[SUCCESS] ") + data));
+        System.out.println(green(bold("[SUCCESS] ") + data));
     }
     public static void printPositive(short data){
-        System.out.println(yellow(bold("[SUCCESS] ") + data));
+        System.out.println(green(bold("[SUCCESS] ") + data));
     }
     public static void printPositive(long data){
-        System.out.println(yellow(bold("[SUCCESS] ") + data));
+        System.out.println(green(bold("[SUCCESS] ") + data));
     }
     public static void printPositive(double[] vec, String label){
         System.out.println(bold(cyan(":::: " + label + " ::::")));

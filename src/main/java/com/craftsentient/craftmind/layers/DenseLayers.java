@@ -9,15 +9,12 @@ import com.craftsentient.craftmind.layer.DenseLayer;
 import com.craftsentient.craftmind.utils.FileUtils;
 import com.craftsentient.craftmind.utils.MathUtils;
 import com.craftsentient.craftmind.neuron.Neuron;
-import com.craftsentient.craftmind.utils.PrintUtils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
-import static com.craftsentient.craftmind.utils.MathUtils.accuracy;
 import static com.craftsentient.craftmind.utils.PrintUtils.*;
 
 @Getter
@@ -31,12 +28,16 @@ public class DenseLayers {
     private double accuracy;
     private double loss;
     private double sum;
-    private double learningRate = .001;
+    private double learningRate = .01;
     private int[][] hotOneVec;
+    public static final double ALPHA = 0.0;
+    public static final double GAMMA = 0.0;
+    public static final double DELTA = 0.0;
+    public static final double MARGIN = 0.0;
     private DEFAULT_LOSS_FUNCTIONS lossFunction;
     public static final Random random = new Random(0);
 
-    private DenseLayers(int layers, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) throws Exception {
+    private DenseLayers(int layers, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         // create layer list
         this.layerList = new ArrayList<>();
         // create an initial input array of random numbers of size layers
@@ -366,13 +367,20 @@ public class DenseLayers {
                 }
             }
 
-            if(this.hotOneVec != null && this.trueValueIndices != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
+            if(hotOneVec != null && trueValueIndices != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
             // check if both the one hot vector mappings true values mappings are empty
-            if(this.hotOneVec == null && this.trueValueIndices == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
+            if(hotOneVec == null && trueValueIndices == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
             if(lossFunction == DEFAULT_LOSS_FUNCTIONS.NLL_LOSS_FUNCTION && hotOneVec != null) {
-                this.loss =  MathUtils.mean(ErrorLossFunctions.lossFunction(lossFunction, hotOneVec[this.batchCounter], this.getLastLayer().getLayerOutputs()));
+                int hotValueIndex = 0;
+                for(int i = 0; i < hotOneVec.length; i++){
+                    if(hotOneVec[this.batchCounter][i] != 0){
+                        hotValueIndex = i;
+                        break;
+                    }
+                }
+                this.loss =  ErrorLossFunctions.lossFunction(lossFunction, hotValueIndex, this.getDecisionsIndex()[this.batchCounter], this.getLastLayer().getLayerOutputs());
             } else if (trueValueIndices != null){
-                this.loss = ErrorLossFunctions.lossFunction(lossFunction, trueValueIndices[this.batchCounter], this.getLastLayer().getLayerOutputs());
+                this.loss = ErrorLossFunctions.lossFunction(lossFunction, trueValueIndices[this.batchCounter],  this.getDecisionsIndex()[this.batchCounter], this.getLastLayer().getLayerOutputs());
             }
 
             printPositive("Training for iteration " + (this.batchCounter) + " completed!");
@@ -382,53 +390,69 @@ public class DenseLayers {
             if(this.trueValueIndices != null) {printInfo("True index passed in:", this.trueValueIndices[this.batchCounter]);}
             printInfo("Accuracy:", this.getAccuracy());
             printInfo("Loss:", this.getLoss());
+            printInfo("Layer Outputs:", this.getLastLayer().getLayerOutputs());
         }
     }
 
     // method to enable backpropagation and training
     public void backPropagate(){
         printInfo("Back-Propagating...");
-        //AtomicInteger index = new AtomicInteger(this.getLayerList().size() - 1);
-        double[][] gradient = new double[this.layerList.size()][];
-        for(int i = 0; i < this.getLayerList().size(); i++){
-            int index = this.getLayerList().size() - 1 - i;
-            if (index == this.getLayerList().size() - 1) { // if output layer
-                gradient[index] = ErrorLoss.derivative(this.getLossFunction(), this.getTrueValueIndices()[batchCounter], this.getLayerAt(index).getLayerOutputs()); // create gradient of the layer
-                for(int j = 0; j < this.getLayerAt(index).getNeuronList().size(); j++){
-                    Neuron neuron = this.getNeuronFromLayerAt(index, j);
-                    neuron.setBias(neuron.getBias() - (this.learningRate * gradient[index][j]));
-                    double[] inputs = this.getLayerAt(index - 1).getLayerOutputs(); // Get the outputs from the previous layer to use as inputs
-                    for(int k = 0; k < neuron.getWeights().length; k++) {
-                        double deltaWeight = this.learningRate * gradient[index][j] * inputs[k]; // Gradient for weight is product of error gradient, input, and learning rate
-                        neuron.setWeight(k, neuron.getWeights()[k] - deltaWeight);
-                    }
+
+        double[][] gradients = new double[this.layerList.size()][];
+
+        // Output layer error gradient
+        int outputIndex = this.getLayerList().size() - 1;
+        gradients[outputIndex] = ErrorLoss.derivative(
+                lossFunction,
+                this.getTrueValueIndices()[batchCounter],
+                this.getDecisionsIndex()[batchCounter],
+                this.getLayerAt(outputIndex).getLayerOutputs()
+        );
+
+        // Update output layer weights and biases
+        for (int j = 0; j < this.getLayerAt(outputIndex).getNeuronList().size(); j++) {
+            Neuron neuron = this.getNeuronFromLayerAt(outputIndex, j);
+            neuron.setBias(neuron.getBias() - (this.learningRate * gradients[outputIndex][j]));
+
+            double[] inputs = this.getLayerAt(outputIndex - 1).getLayerOutputs();
+            for (int k = 0; k < neuron.getWeights().length; k++) {
+                double deltaWeight = this.learningRate * gradients[outputIndex][j] * inputs[k];
+                neuron.setWeight(k, neuron.getWeights()[k] - deltaWeight);
+            }
+        }
+
+        // Backpropagate through the hidden layers
+        for (int index = outputIndex - 1; index >= 0; index--) {
+            gradients[index] = new double[this.getLayerAt(index).getNeuronList().size()];
+
+            double[] derivatives = Activation.derivative(
+                    this.getLayerAt(index).getActivationFunction(),
+                    this.getLayerAt(index).getLayerOutputs()
+            );
+
+            for (int j = 0; j < gradients[index].length; j++) {
+                double gradientSum = 0;
+                for (int k = 0; k < this.getLayerAt(index + 1).getNeuronList().size(); k++) {
+                    gradientSum += gradients[index + 1][k] * this.getLayerAt(index + 1).getNeuronList().get(k).getWeights()[j];
                 }
-            } else {
-                double[] nextLayerGradients = gradient[index + 1]; // pass in gradient from the next layer
-                    double[] derivativeOfActivation = Activation.derivative(this.getLayerAt(index).getActivationFunction(), this.getLayerAt(index).getLayerOutputs());
-                    gradient[index] = new double[this.getLayerAt(index).getNeuronList().size()];
-                    for(int j = 0; j < this.getLayerAt(index).getNeuronList().size(); j++){
-                        Neuron neuron = this.getNeuronFromLayerAt(index, j);
-                        double[] inputs;
-                        if(index == 0){
-                            inputs = this.getInitialInput()[batchCounter];
-                        } else {
-                            inputs = this.getLayerAt(index - 1).getLayerOutputs();
-                        }
-                             // Get the outputs from the previous layer to use as inputs
-                        double gradientSum = 0; // get the sum of the gradients and weights
-                        for(int k = 0; k < nextLayerGradients.length; k++){
-                            gradientSum += nextLayerGradients[k] * this.getLayerAt(index + 1).getNeuronList().get(k).getWeights()[j];
-                        }
-                        gradient[index][j] = gradientSum * derivativeOfActivation[j];
-                        neuron.setBias(neuron.getBias() - (this.learningRate * gradient[index][j]));
-                        for(int k = 0; k < neuron.getWeights().length; k++) {
-                            double deltaWeight = this.learningRate * gradient[index][j] * inputs[k]; // Gradient for weight is product of error gradient, input, and learning rate
-                            neuron.setWeight(k, neuron.getWeights()[k] - deltaWeight);
-                        }
-                    }
+                gradients[index][j] = gradientSum * derivatives[j];
+            }
+
+            // Update weights and biases for the current layer
+            for (int j = 0; j < this.getLayerAt(index).getNeuronList().size(); j++) {
+                Neuron neuron = this.getNeuronFromLayerAt(index, j);
+                neuron.setBias(neuron.getBias() - (this.learningRate * gradients[index][j]));
+
+                double[] inputs = (index == 0) ? this.getInitialInput()[batchCounter] :
+                        this.getLayerAt(index - 1).getLayerOutputs();
+
+                for (int k = 0; k < neuron.getWeights().length; k++) {
+                    double deltaWeight = this.learningRate * gradients[index][j] * inputs[k];
+                    neuron.setWeight(k, neuron.getWeights()[k] - deltaWeight);
                 }
             }
+        }
+
         printPositive("Finished back-propagation!");
     }
      // calls the getDoubles random matrix generator
@@ -500,7 +524,6 @@ public class DenseLayers {
         this.decisionsIndex[batchCounter] = (int)indexAndMax[0];
         // store the actual value of the decision as well
         this.decisions.put(batchCounter, indexAndMax[1]);
-
         // determine the accuracy of the decision
         this.accuracy = accuracy(trueValueIndex, this.decisionsIndex[batchCounter]);
     }
@@ -1080,16 +1103,23 @@ public class DenseLayers {
             // check if both the one hot vector mappings true values mappings are empty
             if(hotOneVec == null && trueValueIndices == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
             if(lossFunction == DEFAULT_LOSS_FUNCTIONS.NLL_LOSS_FUNCTION && hotOneVec != null) {
-                built.loss =  MathUtils.mean(ErrorLossFunctions.lossFunction(lossFunction, hotOneVec[built.batchCounter], built.getLastLayer().getLayerOutputs()));
+                int hotValueIndex = 0;
+                for(int i = 0; i < hotOneVec.length; i++){
+                    if(hotOneVec[built.batchCounter][i] != 0){
+                        hotValueIndex = i;
+                        break;
+                    }
+                }
+                built.loss =  ErrorLossFunctions.lossFunction(lossFunction, hotValueIndex, built.getDecisionsIndex()[built.batchCounter], built.getLastLayer().getLayerOutputs());
             } else if (trueValueIndices != null){
-                built.loss = ErrorLossFunctions.lossFunction(lossFunction, trueValueIndices[built.batchCounter], built.getLastLayer().getLayerOutputs());
+                built.loss = ErrorLossFunctions.lossFunction(lossFunction, trueValueIndices[built.batchCounter],  built.getDecisionsIndex()[built.batchCounter], built.getLastLayer().getLayerOutputs());
             }
 
             assert built != null;
             built.lossFunction = lossFunction;
             built.trueValueIndices = trueValueIndices;
 
-            printGeneric(":::: Loss and Accuracy Data ::::");
+            printGeneric(":::: Loss and Accuracy Data On Initialization::::");
             built.generateDecisionsMap(trueValueIndices[built.batchCounter]);
             printInfo("Current iteration:", built.batchCounter);
             printInfo("Index of neuron chosen for layer's prediction:", built.getDecisionsIndex()[built.batchCounter]);
