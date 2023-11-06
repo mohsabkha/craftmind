@@ -34,12 +34,12 @@ class CraftmindApplicationTests {
         DenseLayers builtLayerWithFile = new DenseLayers.DenseLayersBuilder()
                 .withNumberOfLayers(6)
                 .withNumberOfNeuronsPerLayer(new int[]{3,5,6,7,4,10})
-                .withInitialInput(inputs)
+                .withTextFileAsInput("src/main/resources/inputs.txt",",")
                 .withInitialBiases(biases)
                 .withInitialWeights(weights)
                 .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .withLossFunction(DEFAULT_LOSS_FUNCTIONS.NLL_LOSS_FUNCTION)
-                .withTrueValueIndices(new int[] {1, 1, 2, 1, 1, 0, 2, 1, 1})
+                .withTrueValueIndices(new int[] {1, 1, 2})
                 .build();
         builtLayerWithFile.train();
     }

@@ -393,23 +393,18 @@ public class DenseLayers {
         for(int i = 0; i < this.getLayerList().size(); i++){
             int index = this.getLayerList().size() - 1 - i;
             if (index == this.getLayerList().size() - 1) { // if output layer
-                try {
-                    gradient[index] = ErrorLoss.derivative(this.getLossFunction(), this.getTrueValueIndices()[batchCounter], this.getLayerAt(index).getLayerOutputs()); // create gradient of the layer
-                    for(int j = 0; j < this.getLayerAt(index).getNeuronList().size(); j++){
-                        Neuron neuron = this.getNeuronFromLayerAt(index, j);
-                        neuron.setBias(neuron.getBias() - (this.learningRate * gradient[index][j]));
-                        double[] inputs = this.getLayerAt(index - 1).getLayerOutputs(); // Get the outputs from the previous layer to use as inputs
-                        for(int k = 0; k < neuron.getWeights().length; k++) {
-                            double deltaWeight = this.learningRate * gradient[index][j] * inputs[k]; // Gradient for weight is product of error gradient, input, and learning rate
-                            neuron.setWeight(k, neuron.getWeights()[k] - deltaWeight);
-                        }
+                gradient[index] = ErrorLoss.derivative(this.getLossFunction(), this.getTrueValueIndices()[batchCounter], this.getLayerAt(index).getLayerOutputs()); // create gradient of the layer
+                for(int j = 0; j < this.getLayerAt(index).getNeuronList().size(); j++){
+                    Neuron neuron = this.getNeuronFromLayerAt(index, j);
+                    neuron.setBias(neuron.getBias() - (this.learningRate * gradient[index][j]));
+                    double[] inputs = this.getLayerAt(index - 1).getLayerOutputs(); // Get the outputs from the previous layer to use as inputs
+                    for(int k = 0; k < neuron.getWeights().length; k++) {
+                        double deltaWeight = this.learningRate * gradient[index][j] * inputs[k]; // Gradient for weight is product of error gradient, input, and learning rate
+                        neuron.setWeight(k, neuron.getWeights()[k] - deltaWeight);
                     }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
                 }
             } else {
                 double[] nextLayerGradients = gradient[index + 1]; // pass in gradient from the next layer
-                try {
                     double[] derivativeOfActivation = Activation.derivative(this.getLayerAt(index).getActivationFunction(), this.getLayerAt(index).getLayerOutputs());
                     gradient[index] = new double[this.getLayerAt(index).getNeuronList().size()];
                     for(int j = 0; j < this.getLayerAt(index).getNeuronList().size(); j++){
@@ -432,11 +427,8 @@ public class DenseLayers {
                             neuron.setWeight(k, neuron.getWeights()[k] - deltaWeight);
                         }
                     }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
                 }
             }
-        }
         printPositive("Finished back-propagation!");
     }
      // calls the getDoubles random matrix generator

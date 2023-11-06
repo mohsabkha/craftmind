@@ -6,13 +6,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
 public class ErrorLoss {
-    public static double derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, double trueValues, double classifierOutput) throws Exception {
+    public static double derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, double trueValues, double classifierOutput) {
         switch (lossFunction){
             case HINGE_LOSS_FUNCTION -> { return hinge(trueValues, classifierOutput); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+            default -> throw new RuntimeException("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
-    public static Object derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues) throws Exception {
+    public static Object derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues) {
         if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
         switch (lossFunction){
             case BINARY_CROSS_ENTROPY_LOSS_FUNCTION -> { return binaryCrossEntropy(trueValues, predictedValues); }
@@ -32,7 +32,7 @@ public class ErrorLoss {
             case SQUARED_HINGE_LOSS_FUNCTION -> { return squaredHinge(trueValues, predictedValues); }
             //case SSIM_LOSS_FUNCTION -> { return structuralSimilarityIndex(trueValues, predictedValues); }
             //case TRIPLET_MARGIN_LOSS_FUNCTION -> { return tripletMargin(trueValues, predictedValues); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+            default -> throw new RuntimeException("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
     public static Object derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, double[][] trueValues, double[][] predictedValues) throws Exception {
@@ -56,79 +56,79 @@ public class ErrorLoss {
             default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
-    public static double[] derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueClass, double[] predictedValues) throws Exception {
+    public static double[] derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueClass, double[] predictedValues){
         switch (lossFunction) {
             case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+            default -> throw new RuntimeException("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
-    public static double[][] derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueClass, double[][] predictedValues) throws Exception {
+    public static double[][] derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueClass, double[][] predictedValues) {
         if(trueClass.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
         switch (lossFunction) {
             case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+            default -> throw new RuntimeException("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
-    public static double[][] derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueClass, double[] predictedValues) throws Exception {
+    public static double[][] derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueClass, double[] predictedValues) {
         if(trueClass.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
         switch (lossFunction) {
             case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+            default -> throw new RuntimeException("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
-    public static double[][] derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] trueClass, double[][] predictedValues) throws Exception {
+    public static double[][] derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] trueClass, double[][] predictedValues) {
         if(trueClass.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
         switch (lossFunction) {
             case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueClass, predictedValues); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+            default -> throw new RuntimeException("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
 
-    public static double derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues, int y, double margin) throws Exception {
+    public static double derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues, int y, double margin) {
         if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
         switch (lossFunction){
             case CONTRASTIVE_LOSS_FUNCTION -> { return contrastiveWithTwoDatasets(trueValues, predictedValues, y, margin); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+            default -> throw new RuntimeException("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
-    public static double[] derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, double[][] trueValues, double[][] predictedValues, int y, double margin) throws Exception {
+    public static double[] derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, double[][] trueValues, double[][] predictedValues, int y, double margin) {
         if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
         switch (lossFunction){
             case CONTRASTIVE_LOSS_FUNCTION -> { return contrastiveWithTwoDatasets(trueValues, predictedValues, y, margin); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+            default -> throw new RuntimeException("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
-    public static double derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, double trueValues, double predictedValues, double alpha, double gamma) throws Exception {
+    public static double derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, double trueValues, double predictedValues, double alpha, double gamma) {
         switch (lossFunction){
             case FOCAL_LOSS_FUNCTION -> { return focal(trueValues, predictedValues, alpha, gamma); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+            default -> throw new RuntimeException("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
-    public static double[] derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues, double[] alpha, double[] gamma) throws Exception {
+    public static double[] derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues, double[] alpha, double[] gamma) {
         if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
         switch (lossFunction){
             case FOCAL_LOSS_FUNCTION -> { return focal(trueValues, predictedValues, alpha, gamma); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+            default -> throw new RuntimeException("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
-    public static double derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, double trueValues, double predictedValues, double delta) throws Exception {
+    public static double derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, double trueValues, double predictedValues, double delta) {
         switch (lossFunction){
             case HUBER_LOSS_FUNCTION -> { return huber(trueValues, predictedValues, delta); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+            default -> throw new RuntimeException("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
-    public static double[] derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues, double delta) throws Exception {
+    public static double[] derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, double[] trueValues, double[] predictedValues, double delta) {
         if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
         switch (lossFunction){
             case HUBER_LOSS_FUNCTION -> { return huber(trueValues, predictedValues, delta); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+            default -> throw new RuntimeException("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
-    public static double[][] derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, double[][] trueValues, double[][] predictedValues, double delta) throws Exception {
+    public static double[][] derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, double[][] trueValues, double[][] predictedValues, double delta) {
         if(trueValues.length != predictedValues.length) throw new IllegalArgumentException("Number of true values and predicted values must be the same!");
         switch (lossFunction){
             case HUBER_LOSS_FUNCTION -> { return huber(trueValues, predictedValues, delta); }
-            default -> throw new Exception("Incorrect Loss Function Name Entered: " + lossFunction.name());
+            default -> throw new RuntimeException("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
 

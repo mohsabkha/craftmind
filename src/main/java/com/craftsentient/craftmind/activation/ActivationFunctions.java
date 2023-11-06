@@ -3,7 +3,7 @@ package com.craftsentient.craftmind.activation;
 import java.util.stream.IntStream;
 
 public class ActivationFunctions {
-    public static double activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double value) throws Exception {
+    public static double activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double value) {
         switch (activationFunction) {
             case BENT_IDENTITY_ACTIVATION_FUNCTION -> {
                 return bentIdentity(value);
@@ -41,16 +41,16 @@ public class ActivationFunctions {
             case TANH_ACTIVATION_FUNCTION -> {
                 return tanh(value);
             }
-            default -> throw new Exception("Incorrect Activation Function Name Entered: " + activationFunction.name());
+            default -> throw new RuntimeException("Incorrect Activation Function Name Entered: " + activationFunction.name());
         }
     }
-    public static double activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double value, double alpha, double beta) throws Exception {
+    public static double activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double value, double alpha, double beta) {
         switch (activationFunction) {
             case SWISH_ACTIVATION_FUNCTION -> { return swish(value, beta); }
             case EXPONENTIAL_ELU_ACTIVATION_FUNCTION -> { return exponentialElu(value, alpha, beta); }
             case LEAKY_RELU_ACTIVATION_FUNCTION -> { return leakyRelu(value, alpha); }
             case PARAMETRIC_RELU_ACTIVATION_FUNCTION -> { return parametricRelu(value,alpha); }
-            default -> throw new Exception("Incorrect Activation Function Name Entered: " + activationFunction.name());
+            default -> throw new RuntimeException("Incorrect Activation Function Name Entered: " + activationFunction.name());
         }
     }
     public static double[] activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double[] values) throws Exception {
@@ -68,15 +68,15 @@ public class ActivationFunctions {
             case SOFTPLUS_ACTIVATION_FUNCTION -> { return softplus(values); }
             case SOFTSIGN_ACTIVATION_FUNCTION -> { return softsign(values); }
             case TANH_ACTIVATION_FUNCTION -> { return tanh(values); }
-            default -> throw new Exception("Incorrect Activation Function Name Entered: " + activationFunction.name());
+            default -> throw new RuntimeException("Incorrect Activation Function Name Entered: " + activationFunction.name());
         }
     }
-    public static double[] activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double values[], double alphas[], double betas[]) throws Exception {
+    public static double[] activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double values[], double alphas[], double betas[]) {
         switch (activationFunction) {
             case SWISH_ACTIVATION_FUNCTION -> { return swish(values, betas); }
             case EXPONENTIAL_ELU_ACTIVATION_FUNCTION -> { return exponentialElu(values, alphas, betas); }
             case PARAMETRIC_RELU_ACTIVATION_FUNCTION -> { return parametricRelu(values,alphas); }
-            default -> throw new Exception("Incorrect Activation Function Name Entered: " + activationFunction.name());
+            default -> throw new RuntimeException("Incorrect Activation Function Name Entered: " + activationFunction.name());
         }
     }
     public static double[][] activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double[][] values) throws Exception {
@@ -94,15 +94,15 @@ public class ActivationFunctions {
             case SOFTPLUS_ACTIVATION_FUNCTION -> { return softplus(values); }
             case SOFTSIGN_ACTIVATION_FUNCTION -> { return softsign(values); }
             case TANH_ACTIVATION_FUNCTION -> { return tanh(values); }
-            default -> throw new Exception("Incorrect Activation Function Name Entered: " + activationFunction.name());
+            default -> throw new RuntimeException("Incorrect Activation Function Name Entered: " + activationFunction.name());
         }
     }
-    public static double[][] activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double values[][], double alphas[][], double betas[][]) throws Exception {
+    public static double[][] activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double values[][], double alphas[][], double betas[][]) {
         switch (activationFunction) {
             case SWISH_ACTIVATION_FUNCTION -> { return swish(values, betas); }
             case EXPONENTIAL_ELU_ACTIVATION_FUNCTION -> { return exponentialElu(values, alphas, betas); }
             case PARAMETRIC_RELU_ACTIVATION_FUNCTION -> { return parametricRelu(values,alphas); }
-            default -> throw new Exception("Incorrect Activation Function Name Entered: " + activationFunction.name());
+            default -> throw new RuntimeException("Incorrect Activation Function Name Entered: " + activationFunction.name());
         }
     }
 
