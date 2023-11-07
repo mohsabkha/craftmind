@@ -50,14 +50,14 @@ public class DenseLayer {
         this.generateLayerOutput();
     }
 
-    public DenseLayer(double[][] weights, double[] biases, DEFAULT_ACTIVATION_FUNCTIONS activationFunction) throws Exception {
+    public DenseLayer(double[][] weights, double[] inputs, DEFAULT_ACTIVATION_FUNCTIONS activationFunction) throws Exception {
         this.neuronList = new ArrayList<>();
         this.neuronWeights = new double[0][0];
         this.neuronBiases = new double[0];
-        this.inputs = new double[0];
         this.layerOutputs = new double[0];
         this.activationFunction = activationFunction;
-        this.generateLayer(weights, biases);
+        this.inputs = inputs;
+        this.generateLayer(weights, neuronBiases);
         this.generateLayerOutput();
     }
 
@@ -87,6 +87,9 @@ public class DenseLayer {
      * calls either batched or non-batched layer output generation function
     */
     public double[] generateLayerOutput() throws Exception {
+        if(this.inputs.length == 0){
+            this.inputs = new double[this.getNeuronList().size()];
+        }
         return generateLayerOutput(this.inputs);
     }
 
@@ -97,15 +100,17 @@ public class DenseLayer {
             Neuron neuron = this.getNeuronList().get(i);
             newOutputs[i] = neuron.regenerateOutput(this.inputs);
         });
+        this.layerOutputs = newOutputs;
         return this.layerOutputs;
     }
 
-    public double[] regenerateLayerOutput() {
+    public double[] regenerateLayerOutput() throws Exception {
         double[] newOutputs = new double[this.getLayerOutputs().length];
         IntStream.range(0, this.getLayerOutputs().length).forEachOrdered(i -> {
             Neuron neuron = this.getNeuronList().get(i);
             newOutputs[i] = neuron.regenerateOutput(this.inputs);
         });
+        this.layerOutputs = activationFunction(this.activationFunction,newOutputs);
         return this.layerOutputs;
     }
 
@@ -198,6 +203,9 @@ public class DenseLayer {
     public void generateLayer(double[][] weights, double[] biases) {
         this.neuronList = new ArrayList<>();
         this.neuronWeights = weights;
+        if(biases.length == 0){
+            biases = new double[weights.length];
+        }
         this.neuronBiases = biases;
         for (int i = 0; i < weights.length; i++) {
             this.neuronList.add(new Neuron(weights[i], biases[i]));

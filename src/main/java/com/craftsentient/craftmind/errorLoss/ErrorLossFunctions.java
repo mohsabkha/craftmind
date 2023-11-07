@@ -5,7 +5,6 @@ import java.util.stream.IntStream;
 
 import static com.craftsentient.craftmind.layers.DenseLayers.*;
 import static com.craftsentient.craftmind.utils.PrintUtils.printGeneric;
-import static com.craftsentient.craftmind.utils.PrintUtils.printInfo;
 
 public class ErrorLossFunctions {
 
@@ -50,7 +49,16 @@ public class ErrorLossFunctions {
      * Compatible with most activation functions. Please use unbounded activation functions in output layer though
      */
     private static double categoricalCrossEntropy(int trueValueIndex, double[] outputs){
-        return -Math.log(outputs[trueValueIndex]);
+        // Check if the predicted probability for the true class is within a valid range
+        if (trueValueIndex < 0 || trueValueIndex >= outputs.length) {
+            throw new IllegalArgumentException("True value index is out of bounds.");
+        }
+        double probability = outputs[trueValueIndex];
+
+        // Prevent taking the log of 0 which is undefined
+        double safeProbability = Math.max(probability, 1e-15);
+
+        return -Math.log(safeProbability);
     }
 
     /*

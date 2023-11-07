@@ -22,18 +22,18 @@ public class DenseLayers {
     private final ArrayList<DenseLayer> layerList;
     private final double[][] initialInput;
     private int batchCounter = 0;
-    private Map<Integer, Double> decisions;
-    private int[] decisionsIndex;
+    private final Map<Integer, Double> decisions;
+    private final int[] decisionsIndex;
     private int[] trueValueIndices;
     private double accuracy;
     private double loss;
     private double sum;
-    private double learningRate = .01;
+    private final double learningRate = 0.01;
     private int[][] hotOneVec;
-    public static final double ALPHA = 0.0;
-    public static final double GAMMA = 0.0;
-    public static final double DELTA = 0.0;
-    public static final double MARGIN = 0.0;
+    public static final double ALPHA = 1.0;
+    public static final double GAMMA = 1.0;
+    public static final double DELTA = 1.0;
+    public static final double MARGIN = 1.0;
     private DEFAULT_LOSS_FUNCTIONS lossFunction;
     public static final Random random = new Random(0);
 
@@ -58,15 +58,15 @@ public class DenseLayers {
                 if (i != 0) {
                     layerList.add(new DenseLayer(weights, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse));
                 } else {
-                    layerList.add(new DenseLayer(weights, initialInput[this.batchCounter], activationFunctionToUse));
+                    layerList.add(new DenseLayer(weights, activationFunctionToUse));
                 }
             } catch (Exception e){
-                throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation!");
+                throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation! " + e.getMessage());
             }
         });
     }
 
-    private DenseLayers(int layers, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) throws Exception {
+    private DenseLayers(int layers, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
         // instantiate the decisions index
@@ -76,20 +76,20 @@ public class DenseLayers {
 
         IntStream.range(0, layers).forEach(i -> {
             DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
-            double[][] weights = randn(initialInput.length, initialInput[0].length);
+            double[][] weights = randn(initialInput.length, initialInput[batchCounter].length);
             try {
                 if (i != 0) {
                     layerList.add(new DenseLayer(weights, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse));
                 } else {
-                    layerList.add(new DenseLayer(weights, initialInput[0], activationFunctionToUse));
+                    layerList.add(new DenseLayer(weights, initialInput[batchCounter], activationFunctionToUse));
                 }
             } catch (Exception e){
-                throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation!");
+                throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation! " + e.getMessage());
             }
         });
     }
 
-    private DenseLayers(int layers, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) throws Exception {
+    private DenseLayers(int layers, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
         // instantiate the decisions index
@@ -107,12 +107,12 @@ public class DenseLayers {
                     layerList.add(new DenseLayer(initialWeights, initialInput[0], activationFunctionToUse));
                 }
             } catch(Exception e){
-                throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation!");
+                throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation! " + e.getMessage());
             }
         });
     }
 
-    private DenseLayers(int layers, double[][] initialWeights, double[]biases, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) throws Exception {
+    private DenseLayers(int layers, double[][] initialWeights, double[]biases, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         this.layerList = new ArrayList<>();
         this.initialInput = initialInput;
         // instantiate the decisions index
@@ -130,12 +130,12 @@ public class DenseLayers {
                     layerList.add(new DenseLayer(initialWeights, biases, initialInput[0], activationFunctionToUse));
                 }
             } catch (Exception e){
-                throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation!");
+                throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation! " + e.getMessage());
             }
         });
     }
 
-    private DenseLayers(int layers, int numberOfNeurons, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) throws Exception {
+    private DenseLayers(int layers, int numberOfNeurons, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         this.layerList = new ArrayList<>();
         this.initialInput = randn(1,numberOfNeurons);
         // instantiate the decisions index
@@ -147,17 +147,19 @@ public class DenseLayers {
             DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             double[][] weights = randn(numberOfNeurons, numberOfNeurons);
             try {
-                if (i != 0)
+                if (i != 0) {
                     layerList.add(new DenseLayer(weights, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse));
-                else
+                }
+                else {
                     layerList.add(new DenseLayer(weights, initialInput[0], activationFunctionToUse));
+                }
             } catch (Exception e){
-                throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation!");
+                throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation! " + e.getMessage());
             }
         });
     }
 
-    private DenseLayers(int layers, int numberOfNeurons, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) throws Exception {
+    private DenseLayers(int layers, int numberOfNeurons, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         if(numberOfNeurons != initialInput.length) { throw new IllegalArgumentException("neuronsPerLayer of " + numberOfNeurons + " and initialInput size of " + initialInput.length + " do not match!");}
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
@@ -170,17 +172,19 @@ public class DenseLayers {
             DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             double[][] weights = randn(numberOfNeurons, initialInput[0].length);
             try {
-                if (i != 0)
+                if (i != 0) {
                     layerList.add(new DenseLayer(weights, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse));
-                else
+                }
+                else {
                     layerList.add(new DenseLayer(weights, initialInput[0], activationFunctionToUse));
+                }
             } catch (Exception e) {
-                throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation!");
+                throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation! " + e.getMessage());
             }
         });
     }
 
-    private DenseLayers(int layers, int numberOfNeurons, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) throws Exception {
+    private DenseLayers(int layers, int numberOfNeurons, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
         // instantiate the decisions index
@@ -198,12 +202,12 @@ public class DenseLayers {
                     layerList.add(new DenseLayer(initialWeights, initialInput[0], activationFunctionToUse));
                 }
             } catch (Exception e) {
-                throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation!");
+                throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation! " + e.getMessage());
             }
         });
     }
 
-    private DenseLayers(int layers, int numberOfNeurons, double[][] initialWeights, double[]biases, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) throws Exception {
+    private DenseLayers(int layers, int numberOfNeurons, double[][] initialWeights, double[]biases, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         this.layerList = new ArrayList<>();
         this.initialInput = initialInput;
         // instantiate the decisions index
@@ -221,12 +225,12 @@ public class DenseLayers {
                     layerList.add(new DenseLayer(initialWeights, biases, initialInput[0], activationFunctionToUse));
                 }
             } catch (Exception e) {
-                throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation!");
+                throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation! " + e.getMessage());
             }
         });
     }
 
-    private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) throws Exception {
+    private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         if(layers != numberOfNeuronsPerLayer.length) {
             throw new IllegalArgumentException(layers + " Layers given but only " + numberOfNeuronsPerLayer.length
                     + " layers described!\nAdjust neuronsPerLayer to be of same length as number of layers!");
@@ -250,12 +254,12 @@ public class DenseLayers {
                     layerList.add(new DenseLayer(weights, initialInput[0], activationFunctionToUse));
                 }
             } catch (Exception e) {
-                throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation!");
+                throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation! " + e.getMessage());
             }
         });
     }
 
-    private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) throws Exception {
+    private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         if(layers != numberOfNeuronsPerLayer.length) {
             throw new IllegalArgumentException(layers + " Layers given but only " + numberOfNeuronsPerLayer.length
                     + " layers described!\nAdjust neuronsPerLayer to be of same length as number of layers!");
@@ -279,12 +283,12 @@ public class DenseLayers {
                     layerList.add(new DenseLayer(weights, initialInput[0], activationFunctionToUse));
                 }
             } catch (Exception e) {
-                throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation!");
+                throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation! " + e.getMessage());
             }
         });
     }
 
-    private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) throws Exception {
+    private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         if(layers != numberOfNeuronsPerLayer.length) {
             throw new IllegalArgumentException(layers + " Layers given but only " + numberOfNeuronsPerLayer.length
                     + " layers described!\nAdjust neuronsPerLayer to be of same length as number of layers!");
@@ -306,12 +310,12 @@ public class DenseLayers {
                     layerList.add(new DenseLayer(initialWeights, initialInput[0], activationFunctionToUse));
                 }
             } catch (Exception e){
-                throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation!");
+                throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation! " + e.getMessage());
             }
         });
     }
 
-    private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialWeights, double[]initialBiases, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) throws Exception {
+    private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialWeights, double[]initialBiases, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         if(layers != numberOfNeuronsPerLayer.length) {
             throw new IllegalArgumentException(layers + " Layers given but only " + numberOfNeuronsPerLayer.length
                     + " layers described!\nAdjust neuronsPerLayer to be of same length as number of layers!");
@@ -348,29 +352,31 @@ public class DenseLayers {
             return;
         }
         for(int k = 0; k < this.initialInput.length-1; k++) {
-            printInfo("training on input batch " + this.batchCounter);
             // call back-propagate
             this.backPropagate();
             // increase batchCounter
             this.batchCounter++;
+            printInfo("training on input batch " + this.batchCounter);
             // set buffer to hold inputs
             double[][] inputs = new double[this.getLayerList().size()][];
+
             // do forward pass with next batch of input
             printInfo("Beginning next forward pass...");
             for (int i = 0; i < this.getLayerList().size(); i++) {
                 if (i != 0) {
                     this.getLayerAt(i).setInputs(inputs[i-1]); // use previous layers input
-                    inputs[i] = this.getLayerAt(i).regenerateLayerOutput();
                 } else {
                     this.getLayerAt(i).setInputs(this.initialInput[batchCounter]); // use user provided input
-                    inputs[i] = this.getLayerAt(i).regenerateLayerOutput();
                 }
+                inputs[i] = this.getLayerAt(i).regenerateLayerOutput();
             }
 
             if(hotOneVec != null && trueValueIndices != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
             // check if both the one hot vector mappings true values mappings are empty
             if(hotOneVec == null && trueValueIndices == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
-            if(lossFunction == DEFAULT_LOSS_FUNCTIONS.NLL_LOSS_FUNCTION && hotOneVec != null) {
+            assert trueValueIndices != null;
+            this.generateDecisionsMap(trueValueIndices[this.batchCounter]);
+            if(hotOneVec != null) {
                 int hotValueIndex = 0;
                 for(int i = 0; i < hotOneVec.length; i++){
                     if(hotOneVec[this.batchCounter][i] != 0){
@@ -378,82 +384,79 @@ public class DenseLayers {
                         break;
                     }
                 }
-                this.loss =  ErrorLossFunctions.lossFunction(lossFunction, hotValueIndex, this.getDecisionsIndex()[this.batchCounter], this.getLastLayer().getLayerOutputs());
+                this.loss = ErrorLossFunctions.lossFunction(lossFunction, hotValueIndex, this.getDecisionsIndex()[this.batchCounter], this.getLastLayer().getLayerOutputs());
             } else if (trueValueIndices != null){
+
                 this.loss = ErrorLossFunctions.lossFunction(lossFunction, trueValueIndices[this.batchCounter],  this.getDecisionsIndex()[this.batchCounter], this.getLastLayer().getLayerOutputs());
             }
-
-            printPositive("Training for iteration " + (this.batchCounter) + " completed!");
-            printGeneric(":::: Loss and Accuracy Data ::::");
-            this.generateDecisionsMap(trueValueIndices[this.batchCounter]);
-            printInfo("Index of neuron chosen for layer's prediction:", this.getDecisionsIndex()[this.batchCounter]);
-            if(this.trueValueIndices != null) {printInfo("True index passed in:", this.trueValueIndices[this.batchCounter]);}
+            printInfo("Loss and Accuracy Data For Batch: " + this.batchCounter);
             printInfo("Accuracy:", this.getAccuracy());
             printInfo("Loss:", this.getLoss());
             printInfo("Layer Outputs:", this.getLastLayer().getLayerOutputs());
+            //printLayers("Layers", this);
         }
+        printTitle("Training Complete!");
     }
 
     // method to enable backpropagation and training
     public void backPropagate(){
         printInfo("Back-Propagating...");
-
-        double[][] gradients = new double[this.layerList.size()][];
-
         // Output layer error gradient
+        double[][] gradients = new double[this.layerList.size()][];
+        // index of the output layer
         int outputIndex = this.getLayerList().size() - 1;
+        // loss function derivative
         gradients[outputIndex] = ErrorLoss.derivative(
                 lossFunction,
                 this.getTrueValueIndices()[batchCounter],
                 this.getDecisionsIndex()[batchCounter],
                 this.getLayerAt(outputIndex).getLayerOutputs()
         );
-
         // Update output layer weights and biases
         for (int j = 0; j < this.getLayerAt(outputIndex).getNeuronList().size(); j++) {
+            // update biases
             Neuron neuron = this.getNeuronFromLayerAt(outputIndex, j);
             neuron.setBias(neuron.getBias() - (this.learningRate * gradients[outputIndex][j]));
 
             double[] inputs = this.getLayerAt(outputIndex - 1).getLayerOutputs();
             for (int k = 0; k < neuron.getWeights().length; k++) {
-                double deltaWeight = this.learningRate * gradients[outputIndex][j] * inputs[k];
+                // update weights with fractional change (learning rate should be between 0.01 and 0.0001
+                double deltaWeight = this.learningRate * gradients[outputIndex][j] * inputs[k]; // previously multiplied by inputs[j]
                 neuron.setWeight(k, neuron.getWeights()[k] - deltaWeight);
             }
         }
 
         // Backpropagate through the hidden layers
         for (int index = outputIndex - 1; index >= 0; index--) {
+            // create gradient for current layer
             gradients[index] = new double[this.getLayerAt(index).getNeuronList().size()];
-
+            // activation funciton derivative
             double[] derivatives = Activation.derivative(
                     this.getLayerAt(index).getActivationFunction(),
                     this.getLayerAt(index).getLayerOutputs()
             );
-
             for (int j = 0; j < gradients[index].length; j++) {
                 double gradientSum = 0;
+                // sum the weights related to the given input by the gradients related to the given neuron (derivative related to input)
                 for (int k = 0; k < this.getLayerAt(index + 1).getNeuronList().size(); k++) {
                     gradientSum += gradients[index + 1][k] * this.getLayerAt(index + 1).getNeuronList().get(k).getWeights()[j];
                 }
+                // multiply the sum of the gradients and the derivative of that activation function to get the current error signal
                 gradients[index][j] = gradientSum * derivatives[j];
             }
-
-            // Update weights and biases for the current layer
             for (int j = 0; j < this.getLayerAt(index).getNeuronList().size(); j++) {
                 Neuron neuron = this.getNeuronFromLayerAt(index, j);
+                // update biases
                 neuron.setBias(neuron.getBias() - (this.learningRate * gradients[index][j]));
-
                 double[] inputs = (index == 0) ? this.getInitialInput()[batchCounter] :
                         this.getLayerAt(index - 1).getLayerOutputs();
-
                 for (int k = 0; k < neuron.getWeights().length; k++) {
                     double deltaWeight = this.learningRate * gradients[index][j] * inputs[k];
                     neuron.setWeight(k, neuron.getWeights()[k] - deltaWeight);
                 }
             }
         }
-
-        printPositive("Finished back-propagation!");
+        printPositive("Finished back-propagation!\n");
     }
      // calls the getDoubles random matrix generator
     public static double[][] randn(int rows, int cols) {
@@ -492,9 +495,7 @@ public class DenseLayers {
     // gets the outputs (or decisions) of each layer in the network
     private double[] batchDecisions(){
         double[] decisions = new double[this.getLastLayer().getLayerOutputs().length];
-        IntStream.range(0, decisions.length).parallel().forEachOrdered( i -> {
-            decisions[i] = decision(this.getLastLayer().getLayerOutputs())[1];
-        });
+        IntStream.range(0, decisions.length).parallel().forEachOrdered( i -> decisions[i] = decision(this.getLastLayer().getLayerOutputs())[1]);
         return decisions;
     }
 
@@ -585,7 +586,7 @@ public class DenseLayers {
         private int numberOfNeurons;
         private boolean isUsingNumberOfNeurons = false;
         private String filePath = "";
-        private boolean isUsingFileAsInput= false;
+        private boolean isUsingFileAsInput = false;
 
 
         public DenseLayersBuilder withTextFileAsInput(String filePath, String delimiter){
@@ -664,13 +665,20 @@ public class DenseLayers {
             return this;
         }
 
-        public DenseLayersBuilder withSingleActivationFunctionForSingleLayer(int layer, DEFAULT_ACTIVATION_FUNCTIONS activationFunction) {
+        public DenseLayersBuilder withActivationFunctionForSingleLayer(int layer, DEFAULT_ACTIVATION_FUNCTIONS activationFunction) {
             activationFunctionsMap.put(layer, activationFunction);
             return this;
         }
 
-        public DenseLayersBuilder withSingleActivationFunctionForMultipleLayers(int startingLayer, int endingLayer, DEFAULT_ACTIVATION_FUNCTIONS activationFunction) {
+        public DenseLayersBuilder withActivationFunctionForMultipleLayers(int startingLayer, int endingLayer, DEFAULT_ACTIVATION_FUNCTIONS activationFunction) {
             IntStream.range(startingLayer, endingLayer+1).forEachOrdered( i -> activationFunctionsMap.put(i, activationFunction));
+            return this;
+        }
+
+        public DenseLayersBuilder withActivationFunctionForOutput(DEFAULT_ACTIVATION_FUNCTIONS activationFunction){
+            if(numberOfLayers > 1){
+                activationFunctionsMap.put(numberOfLayers-1, activationFunction);
+            }
             return this;
         }
 
@@ -701,394 +709,127 @@ public class DenseLayers {
             return this;
         }
 
-        public DenseLayersBuilder withLossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] hotOneOutput){
+        public DenseLayersBuilder withLossFunctionAndHotEncodedVectors(DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] hotOneOutput){
             this.lossFunction = lossFunction;
             this.hotOneVec = hotOneOutput;
             return this;
         }
 
-        public DenseLayersBuilder withLossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueValueIndices){
+        public DenseLayersBuilder withLossFunctionAndTrueValues(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueValueIndices){
             this.lossFunction = lossFunction;
             this.trueValueIndices = trueValueIndices;
             return this;
         }
 
-        public DenseLayersBuilder withSingleLossFunctionForSingleLayer(int layer, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] hotOneOutput){
-            lossFunctionsMap.put(layer, lossFunction);
-            hotOneMap.put(layer, hotOneOutput);
-            return this;
-        }
-        public DenseLayersBuilder withSingleLossFunctionForSingleLayer(int layer, DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueValueIndex){
-            lossFunctionsMap.put(layer, lossFunction);
-            trueValueIndexMap.put(layer, trueValueIndex);
-            return this;
-        }
-        public DenseLayersBuilder withSingleLossFunctionForMultipleLayers(int startingLayer, int endingLayer, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][][] hotOneOutputs){
-            IntStream.range(startingLayer, endingLayer+1).forEachOrdered(i -> {
-                lossFunctionsMap.put(i, lossFunction);
-                hotOneMap.put(i, hotOneOutputs[i]);
-            });
-            this.hasSetSpecificLayerLossFunctions = true;
-            return this;
-        }
-        public DenseLayersBuilder withSingleLossFunctionForMultipleLayers(int startingLayer, int endingLayer, DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] trueIndices){
-            IntStream.range(startingLayer, endingLayer+1).forEachOrdered(i -> {
-                lossFunctionsMap.put(i, lossFunction);
-                trueValueIndexMap.put(i, trueIndices[i]);
-            });
-            this.hasSetSpecificLayerLossFunctions = true;
-            return this;
-        }
-
-        public DenseLayers build() throws Exception {
+        public DenseLayers build() {
             DenseLayers built = null;
             if(!this.isUsingNumberOfLayers && !this.isUsingListOfLayers) throw new IllegalArgumentException("Please use the numberOfLayers() builder method to initialize, or provide an ArrayList<DenseLayer> using the withLayerList() builder method!");
             if(!this.isUsingSpecificNeurons && !this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingBatchInputs){
                 if(this.isUsingFileAsInput && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     printInfo("Using construct 1.1");
                     built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
-                    printPositive("Neural network successfully built!");
-                    printInfo("Created dense layer neural network: " + built);
-                    printInfo("Number of layers set to " + this.numberOfLayers);
-                    printInfo("Initial weights set to", this.initialWeights);
-                    printInfo("Initial biases set to", this.initialBiases);
-                    printInfo("Initial inputs set to", this.initialInput);
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
-                    if (this.activationFunctionsMap.size() > 0) {printInfo("Initial activation function map set to", this.activationFunctionsMap);}
-                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndices[0]);}
-                    else {printInfo("Initial hot one vector set to", this.hotOneVec);}
                 }
                 else if(this.isUsingFileAsInput && this.isUsingSpecificWeights) {
                     printInfo("Using construct 1.2");
                     built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
-                    printPositive("Neural network successfully built!");
-                    printInfo("Created dense layer neural network: " + built);
-                    printInfo("Number of layers set to " + this.numberOfLayers);
-                    printInfo("Initial weights set to", this.initialWeights);
-                    printInfo("Initial biases not set!");
-                    printInfo("Initial weights set to", this.initialInput);
-                    printInfo("Initial weights set to " + this.initialWeights);
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
-                    if (this.activationFunctionsMap.size() > 0) {printInfo("Initial activation function map set to", this.activationFunctionsMap);}
-                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndices[0]);}
-                    else {printInfo("Initial hot one vector set to", this.hotOneVec);}
                 }
                 else if(this.isUsingFileAsInput) {
                     printInfo("Using construct 1.3");
                     built = new DenseLayers(this.numberOfLayers, this.initialInput, this.activationFunction, this.activationFunctionsMap);
-                    printPositive("Neural network successfully built!");
-                    printInfo("Created dense layer neural network: " + built);
-                    printInfo("Number of layers set to " + this.numberOfLayers);
-                    printInfo("Initial weights not set!");
-                    printInfo("Initial biases not set!");
-                    printInfo("Initial weights set to", this.initialInput);
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
-                    if (this.activationFunctionsMap.size() > 0) {printInfo("Initial activation function map set to", this.activationFunctionsMap);}
-                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndices[0]);}
-                    else {printInfo("Initial hot one vector set to", this.hotOneVec);}
                 }
                 else if(!this.isUsingFileAsInput && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printInfo("Using construct 1.4");
                     built = new DenseLayers(this.numberOfLayers, this.activationFunction, this.activationFunctionsMap);
-                    printPositive("Neural network successfully built!");
-                    printInfo("Created dense layer neural network: " + built);
-                    printInfo("Number of layers set to " + this.numberOfLayers);
-                    printInfo("Initial weights not set!");
-                    printInfo("Initial biases not set!");
-                    printInfo("Initial inputs not set!");
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
-                    if (this.activationFunctionsMap.size() > 0) {printInfo("Initial activation function map set to", this.activationFunctionsMap);}
-                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndices[0]);}
-                    else {printInfo("Initial hot one vector set to", this.hotOneVec);}
                 }
             }
             else if(this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingBatchInputs) {
                 if(this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     printInfo("Using construct 2.1");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
-                    printPositive("Neural network successfully built!");
-                    printInfo("Created dense layer neural network: " + built);
-                    printInfo("Number of layers set to " + this.numberOfLayers);
-                    printInfo("Initial weights set to", this.initialWeights);
-                    printInfo("Initial biases set to", this.initialBiases);
-                    printInfo("Initial input set to", this.initialInput);
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
-                    if (this.activationFunctionsMap.size() > 0) {printInfo("Initial activation function map set to", this.activationFunctionsMap);}
-                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndices[0]);}
-                    else {printInfo("Initial hot one vector set to", this.hotOneVec);}
                 }
                 else if(this.isUsingFileAsInput  && this.isUsingSpecificWeights) {
                     printInfo("Using construct 2.2");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
-                    printPositive("Neural network successfully built!");
-                    printInfo("Created dense layer neural network: " + built);
-                    printInfo("Number of layers set to " + this.numberOfLayers);
-                    printInfo("Initial weights set to", this.initialWeights);
-                    printInfo("Initial biases not set!");
-                    printInfo("Initial inputs set to", this.initialInput);
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
-                    if (this.activationFunctionsMap.size() > 0) {printInfo("Initial activation function map set to", this.activationFunctionsMap);}
-                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndices[0]);}
-                    else {printInfo("Initial hot one vector set to", this.hotOneVec);}
                 }
                 else if(this.isUsingFileAsInput) {
                     printInfo("Using construct 2.3");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialInput, this.activationFunction, this.activationFunctionsMap);
-                    printPositive("Neural network successfully built!");
-                    printInfo("Created dense layer neural network: " + built);
-                    printInfo("Number of layers set to " + this.numberOfLayers);
-                    printInfo("Initial weights not set!");
-                    printInfo("Initial biases not set!");
-                    printInfo("Initial weights set to", this.initialInput);
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
-                    if (this.activationFunctionsMap.size() > 0) {printInfo("Initial activation function map set to", this.activationFunctionsMap);}
-                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndices[0]);}
-                    else {printInfo("Initial hot one vector set to", this.hotOneVec);}
                 }
                 else if(!this.isUsingFileAsInput && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printInfo("Using construct 2.4");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.activationFunction, this.activationFunctionsMap);
-                    printPositive("Neural network successfully built!");
-                    printInfo("Created dense layer neural network: " + built);
-                    printInfo("Number of layers set to " + this.numberOfLayers);
-                    printInfo("Initial weights not set!");
-                    printInfo("Initial biases not set!");
-                    printInfo("Initial inputs not set!");
-                    if (this.activationFunctionsMap.size() > 0) {printInfo("Initial activation function map set to", this.activationFunctionsMap);}
-                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndices[0]);}
-                    else {printInfo("Initial hot one vector set to", this.hotOneVec);}
                 }
             }
             else if(this.isUsingSpecificNeurons && this.isUsingNumberOfLayers && !this.isUsingBatchInputs) {
                 if(this.isUsingFileAsInput && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     printInfo("Using construct 3.1");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
-                    printPositive("Neural network successfully built!");
-                    printInfo("Created dense layer neural network: " + built);
-                    printInfo("Number of layers set to " + this.numberOfLayers);
-                    printInfo("Initial weights set to", this.initialWeights);
-                    printInfo("Initial biases set to", this.initialBiases);
-                    printInfo("Initial inputs set to", this.initialInput);
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
-                    if (this.activationFunctionsMap.size() > 0) {printInfo("Initial activation function map set to", this.activationFunctionsMap);}
-                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndices[0]);}
-                    else {printInfo("Initial hot one vector set to", this.hotOneVec);}
                 }
                 else if(this.isUsingFileAsInput && this.isUsingSpecificWeights) {
                     printInfo("Using construct 3.2");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
-                    printPositive("Neural network successfully built!");
-                    printInfo("Created dense layer neural network: " + built);
-                    printInfo("Number of layers set to " + this.numberOfLayers);
-                    printInfo("Initial weights set to", this.initialWeights);
-                    printInfo("Initial biases not set!");
-                    printInfo("Initial inputs set to", this.initialInput);
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
-                    if (this.activationFunctionsMap.size() > 0) {printInfo("Initial activation function map set to", this.activationFunctionsMap);}
-                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndices[0]);}
-                    else {printInfo("Initial hot one vector set to", this.hotOneVec);}
                 }
                 else if(this.isUsingFileAsInput) {
                     printInfo("Using construct 3.3");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialInput, this.activationFunction, this.activationFunctionsMap);
-                    printPositive("Neural network successfully built!");
-                    printInfo("Created dense layer neural network: " + built);
-                    printInfo("Number of layers set to " + this.numberOfLayers);
-                    printInfo("Initial weights not set!");
-                    printInfo("Initial biases not set!");
-                    printInfo("Initial inputs set to", this.initialInput);
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
-                    if (this.activationFunctionsMap.size() > 0) {printInfo("Initial activation function map set to", this.activationFunctionsMap);}
-                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndices[0]);}
-                    else {printInfo("Initial hot one vector set to", this.hotOneVec);}
                 }
                 else if(!this.isUsingFileAsInput && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printInfo("Using construct 3.4");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.activationFunction, this.activationFunctionsMap);
-                    printPositive("Neural network successfully built!");
-                    printInfo("Created dense layer neural network: " + built);
-                    printInfo("Number of layers set to " + this.numberOfLayers);
-                    printInfo("Initial weights not set!");
-                    printInfo("Initial biases not set!");
-                    printInfo("Initial inputs not set!");
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
-                    if (this.activationFunctionsMap.size() > 0) {printInfo("Initial activation function map set to", this.activationFunctionsMap);}
-                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndices[0]);}
-                    else {printInfo("Initial hot one vector set to", this.hotOneVec);}
                 }
             }
             else if(!this.isUsingSpecificNeurons && !this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingFileAsInput){
                 if(this.isUsingBatchInputs && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     printInfo("Using construct 4.1");
                     built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
-                    printPositive("Neural network successfully built!");
-                    printInfo("Created dense layer neural network: " + built);
-                    printInfo("Number of layers set to " + this.numberOfLayers);
-                    printInfo("Initial weights set to", this.initialWeights);
-                    printInfo("Initial biases set to", this.initialBiases);
-                    printInfo("Initial inputs set to", this.initialInput);
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
-                    if (this.activationFunctionsMap.size() > 0) {printInfo("Initial activation function map set to", this.activationFunctionsMap);}
-                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndices[0]);}
-                    else {printInfo("Initial hot one vector set to", this.hotOneVec);}
                 }
                 else if(this.isUsingBatchInputs  && this.isUsingSpecificWeights) {
                     printInfo("Using construct 4.2");
                     built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
-                    printPositive("Neural network successfully built!");
-                    printInfo("Created dense layer neural network: " + built);
-                    printInfo("Number of layers set to " + this.numberOfLayers);
-                    printInfo("Initial weights set to", this.initialWeights);
-                    printInfo("Initial biases not set!");
-                    printInfo("Initial inputs set to", this.initialInput);
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
-                    if (this.activationFunctionsMap.size() > 0) {printInfo("Initial activation function map set to", this.activationFunctionsMap);}
-                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndices[0]);}
-                    else {printInfo("Initial hot one vector set to", this.hotOneVec);}
                 }
                 else if(this.isUsingBatchInputs) {
                     printInfo("Using construct 4.3");
                     built = new DenseLayers(this.numberOfLayers, this.initialInput, this.activationFunction, this.activationFunctionsMap);
-                    printPositive("Neural network successfully built!");
-                    printInfo("Created dense layer neural network: " + built);
-                    printInfo("Number of layers set to " + this.numberOfLayers);
-                    printInfo("Initial weights not set!");
-                    printInfo("Initial biases not set!");
-                    printInfo("Initial inputs set to", this.initialInput);
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
-                    if (this.activationFunctionsMap.size() > 0) {printInfo("Initial activation function map set to", this.activationFunctionsMap);}
-                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndices[0]);}
-                    else {printInfo("Initial hot one vector set to", this.hotOneVec);}
                 }
                 else if(!this.isUsingBatchInputs && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printInfo("Using construct 4.4");
                     built = new DenseLayers(this.numberOfLayers, this.activationFunction, this.activationFunctionsMap);
-                    printPositive("Neural network successfully built!");
-                    printInfo("Created dense layer neural network: " + built);
-                    printInfo("Number of layers set to " + this.numberOfLayers);
-                    printInfo("Initial weights not set!");
-                    printInfo("Initial biases not set!");
-                    printInfo("Initial inputs not set!");
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
-                    if (this.activationFunctionsMap.size() > 0) {printInfo("Initial activation function map set to", this.activationFunctionsMap);}
-                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndices[0]);}
-                    else {printInfo("Initial hot one vector set to", this.hotOneVec);}
                 }
             }
             else if(this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingFileAsInput) {
                 if(this.isUsingBatchInputs && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     printInfo("Using construct 5.1");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
-                    printPositive("Neural network successfully built!");
-                    printInfo("Created dense layer neural network: " + built);
-                    printInfo("Number of layers set to " + this.numberOfLayers);
-                    printInfo("Initial weights set to", this.initialWeights);
-                    printInfo("Initial biases set to", this.initialBiases);
-                    printInfo("Initial inputs set to", this.initialInput);
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
-                    if (this.activationFunctionsMap.size() > 0) {printInfo("Initial activation function map set to", this.activationFunctionsMap);}
-                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndices[0]);}
-                    else {printInfo("Initial hot one vector set to", this.hotOneVec);}
                 }
                 else if(this.isUsingBatchInputs  && this.isUsingSpecificWeights) {
                     printInfo("Using construct 5.2");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
-                    printPositive("Neural network successfully built!");
-                    printInfo("Created dense layer neural network: " + built);
-                    printInfo("Number of layers set to " + this.numberOfLayers);
-                    printInfo("Initial weights set to", this.initialWeights);
-                    printInfo("Initial biases not set!");
-                    printInfo("Initial inputs set to", this.initialInput);
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
-                    if (this.activationFunctionsMap.size() > 0) {printInfo("Initial activation function map set to", this.activationFunctionsMap);}
-                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndices[0]);}
-                    else {printInfo("Initial hot one vector set to", this.hotOneVec);}
                 }
                 else if(this.isUsingBatchInputs) {
                     printInfo("Using construct 5.3");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialInput, this.activationFunction, this.activationFunctionsMap);
-                    printPositive("Neural network successfully built!");
-                    printInfo("Created dense layer neural network: " + built);
-                    printInfo("Number of layers set to " + this.numberOfLayers);
-                    printInfo("Initial weights not set!");
-                    printInfo("Initial biases not set!");
-                    printInfo("Initial inputs set to", this.initialInput);
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
-                    if (this.activationFunctionsMap.size() > 0) {printInfo("Initial activation function map set to", this.activationFunctionsMap);}
-                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndices[0]);}
-                    else { printInfo("Initial hot one vector set to", this.hotOneVec); }
                 }
                 else if(!this.isUsingBatchInputs && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printInfo("Using construct 5.4");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.activationFunction, this.activationFunctionsMap);
-                    printPositive("Neural network successfully built!");
-                    printInfo("Created dense layer neural network: " + built);
-                    printInfo("Number of layers set to " + this.numberOfLayers);
-                    printInfo("Initial weights not set!");
-                    printInfo("Initial biases not set!");
-                    printInfo("Initial inputs not set!");
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
-                    if (this.activationFunctionsMap.size() > 0) {printInfo("Initial activation function map set to", this.activationFunctionsMap);}
-                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndices[0]);}
-                    else {printInfo("Initial hot one vector set to", this.hotOneVec);}
                 }
             }
             else if(this.isUsingSpecificNeurons && this.isUsingNumberOfLayers && !this.isUsingFileAsInput) {
                 if(this.isUsingBatchInputs && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     printInfo("Using construct 6.1");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
-                    printPositive("Neural network successfully built!");
-                    printInfo("Created dense layer neural network: " + built);
-                    printInfo("Number of layers set to " + this.numberOfLayers);
-                    printInfo("Initial weights set to", this.initialWeights);
-                    printInfo("Initial biases set to", this.initialBiases);
-                    printInfo("Initial inputs set to", this.initialInput);
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
-                    if (this.activationFunctionsMap.size() > 0) {printInfo("Initial activation function map set to", this.activationFunctionsMap);}
-                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndices[0]);}
-                    else {printInfo("Initial hot one vector set to", this.hotOneVec);}
                 }
                 else if(this.isUsingBatchInputs  && this.isUsingSpecificWeights) {
                     printInfo("Using construct 6.2");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
-                    printPositive("Neural network successfully built!");
-                    printInfo("Created dense layer neural network: " + built);
-                    printInfo("Number of layers set to " + this.numberOfLayers);
-                    printInfo("Initial weights set to", this.initialWeights);
-                    printInfo("Initial biases not set!");
-                    printInfo("Initial inputs set to", this.initialInput);
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
-                    if (this.activationFunctionsMap.size() > 0) {printInfo("Initial activation function map set to", this.activationFunctionsMap);}
-                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndices[0]);}
-                    else {printInfo("Initial hot one vector set to", this.hotOneVec);}
                 }
                 else if(this.isUsingBatchInputs) {
                     printInfo("Using construct 6.3");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialInput, this.activationFunction, this.activationFunctionsMap);
-                    printPositive("Neural network successfully built!");
-                    printInfo("Created dense layer neural network: " + built);
-                    printInfo("Number of layers set to " + this.numberOfLayers);
-                    printInfo("Initial weights not set!");
-                    printInfo("Initial biases not set!");
-                    printInfo("Initial inputs set to", this.initialInput);
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
-                    if (this.activationFunctionsMap.size() > 0) {printInfo("Initial activation function map set to", this.activationFunctionsMap);}
-                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndices[0]);}
-                    else {printInfo("Initial hot one vector set to", this.hotOneVec);}
                 }
                 else if(!this.isUsingBatchInputs && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printInfo("Using construct 6.4");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.activationFunction, this.activationFunctionsMap);
-                    printPositive("Neural network successfully built!");
-                    printInfo("Created dense layer neural network: " + built);
-                    printInfo("Number of layers set to " + this.numberOfLayers);
-                    printInfo("Initial weights not set!");
-                    printInfo("Initial biases not set!");
-                    printInfo("Initial inputs not set!");
-                    printInfo("Initial activation function set to " + this.activationFunction.name());
-                    if (this.activationFunctionsMap.size() > 0) {printInfo("Initial activation function map set to", this.activationFunctionsMap);}
-                    if (isUsingTrueValueIndex) {printInfo("Initial true value index set to", this.trueValueIndices[0]);}
-                    else {printInfo("Initial hot one vector set to", this.hotOneVec);}
                 }
             }
             else {
@@ -1098,11 +839,17 @@ public class DenseLayers {
                 }
                 throw new RuntimeException(bold(red("Builder Not Configured Properly!")));
             }
+            assert built != null;
 
+            printPositive("Neural network successfully built!");
+            printPositive("Created dense layer neural network: " + built);
+            printPositive("Number of layers set to " + this.numberOfLayers);
+            printPositive("Initial activation function set to " + this.activationFunction.name());
+            printPositive("Initial loss function set to " + this.lossFunction.name());
             if(hotOneVec != null && trueValueIndices != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
             // check if both the one hot vector mappings true values mappings are empty
             if(hotOneVec == null && trueValueIndices == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
-            if(lossFunction == DEFAULT_LOSS_FUNCTIONS.NLL_LOSS_FUNCTION && hotOneVec != null) {
+            if(hotOneVec != null) {
                 int hotValueIndex = 0;
                 for(int i = 0; i < hotOneVec.length; i++){
                     if(hotOneVec[built.batchCounter][i] != 0){
@@ -1110,22 +857,20 @@ public class DenseLayers {
                         break;
                     }
                 }
+
                 built.loss =  ErrorLossFunctions.lossFunction(lossFunction, hotValueIndex, built.getDecisionsIndex()[built.batchCounter], built.getLastLayer().getLayerOutputs());
             } else if (trueValueIndices != null){
                 built.loss = ErrorLossFunctions.lossFunction(lossFunction, trueValueIndices[built.batchCounter],  built.getDecisionsIndex()[built.batchCounter], built.getLastLayer().getLayerOutputs());
             }
 
-            assert built != null;
             built.lossFunction = lossFunction;
             built.trueValueIndices = trueValueIndices;
-
-            printGeneric(":::: Loss and Accuracy Data On Initialization::::");
             built.generateDecisionsMap(trueValueIndices[built.batchCounter]);
-            printInfo("Current iteration:", built.batchCounter);
-            printInfo("Index of neuron chosen for layer's prediction:", built.getDecisionsIndex()[built.batchCounter]);
+            printInfo("Loss and Accuracy Data For Batch: " + built.batchCounter);
             if (isUsingTrueValueIndex) {printInfo("True index passed in:", this.trueValueIndices[built.batchCounter]);}
             printInfo("Accuracy:", built.getAccuracy());
             printInfo("Loss:", built.getLoss());
+            printTitle("Finished Initialization");
             return built;
         }
     }

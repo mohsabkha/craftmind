@@ -2,6 +2,7 @@ package com.craftsentient.craftmind.utils;
 
 import com.craftsentient.craftmind.layer.DenseLayer;
 import com.craftsentient.craftmind.layers.DenseLayers;
+import com.craftsentient.craftmind.neuron.Neuron;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -81,6 +82,12 @@ public class PrintUtils {
 
 
     // generic
+    public static void printTitle(String data){
+        System.out.println(backgroundBlack(green(bold(":::: " + data + " ::::"))));
+    }
+    public static void printSubTitle(String data) {
+        System.out.println(backgroundBlack(cyan(bold(":::: " + data + " ::::"))));
+    }
     public static void printGeneric(String data){
         System.out.println(cyan(bold("[LOG] ") + data));
     }
@@ -691,9 +698,19 @@ public class PrintUtils {
         System.out.print("\n");
     }
 
+    public static void printNeurons(String label, Neuron neuron){
+        System.out.println(bold(green("Neuron " + label + " ")));
+        print("weights:", neuron.getWeights());
+        print("bias: ", neuron.getBias());
+    }
+
     public static void printLayer(String label, DenseLayer layer) {
-        System.out.println(bold(green("Layer " + label + " ")));
+        System.out.println(bold(blue("Layer " + label + " ")));
         print("Number of Neurons:", layer.getNeuronList().size());
+        for(int i = 0; i < layer.getNeuronList().size(); i++){
+            printNeurons(i + "", layer.getNeuronList().get(i));
+        }
+        System.out.println(bold(green("Overall Layer " + label + " Details")));
         print("Inputs: ", layer.getInputs());
         print("Outputs: ", layer.getLayerOutputs());
     }
@@ -705,5 +722,7 @@ public class PrintUtils {
             System.out.println();
         }
     }
+
+
 
 }

@@ -56,7 +56,8 @@ public class Neuron {
     }
 
     public double regenerateOutput(double[] inputs){
-        return MathUtils.arrayDotProduct(inputs, this.weights) + this.bias;
+        this.output = MathUtils.arrayDotProduct(inputs, this.weights) + this.bias;
+        return this.output;
     }
 
     public void addWeight(double value){
