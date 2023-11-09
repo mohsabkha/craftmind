@@ -38,7 +38,7 @@ public class MathUtils {
         if(b == null){
             throw new IllegalArgumentException("[arrayDotProduct(double[], double[])]: b is null");
         }
-        if(a.length != b.length) throw new IllegalArgumentException("Dimensions mismatch!");
+        if(a.length != b.length) throw new IllegalArgumentException("Dimensions mismatch! a.length=" + a.length + ", b.length=" + b.length);
         AtomicReference<Double> sum = new AtomicReference<>((double) 0);
         IntStream.range(0, a.length).parallel().forEachOrdered(i -> sum.updateAndGet(v -> (v + (a[i] * b[i]))));
         return sum.getAcquire();

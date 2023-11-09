@@ -15,6 +15,30 @@ class CraftmindApplicationTests {
                 {1, 2, 3, 2.5},
                 {2.0,7.0,-1.0,2.0},
                 {-1.5,2.7,3.3,-0.8},
+                {1, 2, 3, 2.5},
+                {2.0,7.0,-1.0,2.0},
+                {-1.5,2.7,3.3,-0.8},
+                {1, 2, 3, 2.5},
+                {2.0,7.0,-1.0,2.0},
+                {-1.5,2.7,3.3,-0.8},
+                {1, 2, 3, 2.5},
+                {2.0,7.0,-1.0,2.0},
+                {-1.5,2.7,3.3,-0.8},
+                {1, 2, 3, 2.5},
+                {2.0,7.0,-1.0,2.0},
+                {-1.5,2.7,3.3,-0.8},
+                {1, 2, 3, 2.5},
+                {2.0,7.0,-1.0,2.0},
+                {-1.5,2.7,3.3,-0.8},
+                {1, 2, 3, 2.5},
+                {2.0,7.0,-1.0,2.0},
+                {-1.5,2.7,3.3,-0.8},
+                {1, 2, 3, 2.5},
+                {2.0,7.0,-1.0,2.0},
+                {-1.5,2.7,3.3,-0.8},
+                {1, 2, 3, 2.5},
+                {2.0,7.0,-1.0,2.0},
+                {-1.5,2.7,3.3,-0.8}
         };
         double[][] weights = { // 1 per neuron
                 {0.2, 0.8, -0.5, 1.0},
@@ -29,9 +53,10 @@ class CraftmindApplicationTests {
                 .withInitialInput(inputs)
                 .withInitialBiases(biases)
                 .withInitialWeights(weights)
+                .withLearningRate(0.01)
                 .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .withLossFunction(DEFAULT_LOSS_FUNCTIONS.CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION)
-                .withTrueValueIndices(new int[] {2, 2, 2})
+                .withTrueValueIndices(new int[] {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2})
                 .build();
         builtLayerWithFile.train();
     }

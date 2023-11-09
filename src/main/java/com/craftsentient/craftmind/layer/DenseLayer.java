@@ -52,10 +52,10 @@ public class DenseLayer {
 
     public DenseLayer(double[][] weights, double[] inputs, DEFAULT_ACTIVATION_FUNCTIONS activationFunction) throws Exception {
         this.neuronList = new ArrayList<>();
-        this.neuronWeights = new double[0][0];
         this.neuronBiases = new double[0];
         this.layerOutputs = new double[0];
         this.activationFunction = activationFunction;
+        this.neuronWeights = weights;
         this.inputs = inputs;
         this.generateLayer(weights, neuronBiases);
         this.generateLayerOutput();
@@ -202,7 +202,6 @@ public class DenseLayer {
 
     public void generateLayer(double[][] weights, double[] biases) {
         this.neuronList = new ArrayList<>();
-        this.neuronWeights = weights;
         if(biases.length == 0){
             biases = new double[weights.length];
         }

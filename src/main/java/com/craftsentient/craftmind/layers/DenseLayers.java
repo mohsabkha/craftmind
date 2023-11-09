@@ -28,12 +28,12 @@ public class DenseLayers {
     private double accuracy;
     private double loss;
     private double sum;
-    private final double learningRate = 0.01;
+    private double learningRate = 0.01;
     private int[][] hotOneVec;
-    public static final double ALPHA = 1.0;
-    public static final double GAMMA = 1.0;
-    public static final double DELTA = 1.0;
-    public static final double MARGIN = 1.0;
+    public static double ALPHA = 1.0;
+    public static double GAMMA = 1.0;
+    public static double DELTA = 1.0;
+    public static double MARGIN = 1.0;
     private DEFAULT_LOSS_FUNCTIONS lossFunction;
     public static final Random random = new Random(0);
 
@@ -76,11 +76,13 @@ public class DenseLayers {
 
         IntStream.range(0, layers).forEach(i -> {
             DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
-            double[][] weights = randn(initialInput.length, initialInput[batchCounter].length);
+
             try {
                 if (i != 0) {
+                    double[][] weights = randn(initialInput.length, layerList.get(i - 1).getLayerOutputs().length);
                     layerList.add(new DenseLayer(weights, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse));
                 } else {
+                    double[][] weights = randn(initialInput.length, initialInput[batchCounter].length);
                     layerList.add(new DenseLayer(weights, initialInput[batchCounter], activationFunctionToUse));
                 }
             } catch (Exception e){
@@ -101,7 +103,7 @@ public class DenseLayers {
             DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             try {
                 if (i != 0) {
-                    double[][] weights = randn(initialWeights.length, initialInput[0].length);
+                    double[][] weights = randn(initialWeights.length, layerList.get(i - 1).getLayerOutputs().length);
                     layerList.add(new DenseLayer(weights, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse));
                 } else {
                     layerList.add(new DenseLayer(initialWeights, initialInput[0], activationFunctionToUse));
@@ -124,7 +126,7 @@ public class DenseLayers {
             DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             try {
                 if (i != 0) {
-                    double[][] weights = randn(initialWeights.length, initialInput[0].length);
+                    double[][] weights = randn(initialWeights.length, layerList.get(i - 1).getLayerOutputs().length);
                     layerList.add(new DenseLayer(weights, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse));
                 } else {
                     layerList.add(new DenseLayer(initialWeights, biases, initialInput[0], activationFunctionToUse));
@@ -170,12 +172,13 @@ public class DenseLayers {
 
         IntStream.range(0, layers).forEach(i -> {
             DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
-            double[][] weights = randn(numberOfNeurons, initialInput[0].length);
             try {
                 if (i != 0) {
+                    double[][] weights = randn(numberOfNeurons, layerList.get(i - 1).getLayerOutputs().length);
                     layerList.add(new DenseLayer(weights, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse));
                 }
                 else {
+                    double[][] weights = randn(numberOfNeurons, initialInput[0].length);
                     layerList.add(new DenseLayer(weights, initialInput[0], activationFunctionToUse));
                 }
             } catch (Exception e) {
@@ -588,6 +591,11 @@ public class DenseLayers {
         private String filePath = "";
         private boolean isUsingFileAsInput = false;
 
+        double learningRate = 0.01;
+        double alpha = 1.0;
+        double gamma = 1.0;
+        double delta = 1.0;
+        double margin = 1.0;
 
         public DenseLayersBuilder withTextFileAsInput(String filePath, String delimiter){
             this.filePath = filePath;
@@ -682,6 +690,11 @@ public class DenseLayers {
             return this;
         }
 
+        public DenseLayersBuilder withLearningRate(double learningRate){
+            this.learningRate = learningRate;
+            return this;
+        }
+
         public DenseLayersBuilder withTrueValueIndices(int[] trueValueIndices){
             this.isUsingTrueValueIndex = true;
             this.isUsingHotEncodedVec = false;
@@ -706,6 +719,26 @@ public class DenseLayers {
 
         public DenseLayersBuilder withLossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction){
             this.lossFunction = lossFunction;
+            return this;
+        }
+
+        public DenseLayersBuilder withAlpha(double alpha) {
+            this.alpha = alpha;
+            return this;
+        }
+
+        public DenseLayersBuilder withGamma(double gamma) {
+            this.gamma = gamma;
+            return this;
+        }
+
+        public DenseLayersBuilder withDelta(double delta) {
+            this.delta = delta;
+            return this;
+        }
+
+        public DenseLayersBuilder withMargin(double margin) {
+            this.margin = margin;
             return this;
         }
 
@@ -857,12 +890,15 @@ public class DenseLayers {
                         break;
                     }
                 }
-
                 built.loss =  ErrorLossFunctions.lossFunction(lossFunction, hotValueIndex, built.getDecisionsIndex()[built.batchCounter], built.getLastLayer().getLayerOutputs());
             } else if (trueValueIndices != null){
                 built.loss = ErrorLossFunctions.lossFunction(lossFunction, trueValueIndices[built.batchCounter],  built.getDecisionsIndex()[built.batchCounter], built.getLastLayer().getLayerOutputs());
             }
-
+            built.learningRate = learningRate;
+            built.ALPHA = alpha;
+            built.GAMMA = gamma;
+            built.DELTA = delta;
+            built.MARGIN = margin;
             built.lossFunction = lossFunction;
             built.trueValueIndices = trueValueIndices;
             built.generateDecisionsMap(trueValueIndices[built.batchCounter]);
