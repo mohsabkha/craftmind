@@ -30,12 +30,12 @@ public class DenseLayers {
     private double sum;
     private double learningRate = 0.01;
     private int[][] hotOneVec;
-    private static double ALPHA = 1.0;
-    private static double GAMMA = 1.0;
-    private static double DELTA = 1.0;
-    private static double MARGIN = 1.0;
+    public static double ALPHA = 1.0;
+    public static double GAMMA = 1.0;
+    public static double DELTA = 1.0;
+    public static double MARGIN = 1.0;
     private DEFAULT_LOSS_FUNCTIONS lossFunction;
-    private static final Random random = new Random(0);
+    public static final Random random = new Random(0);
 
     // individual batches
     private DenseLayers(int layers, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
@@ -467,10 +467,10 @@ public class DenseLayers {
         }
         return output;
     }
-    private ArrayList<Neuron> getNeuronsFromLayerAt(int index) {
+    public ArrayList<Neuron> getNeuronsFromLayerAt(int index) {
         return this.getLayerList().get(index).getNeuronList();
     }
-    private Neuron getNeuronFromLayerAt(int layerIndex, int nueronIndex) {
+    public Neuron getNeuronFromLayerAt(int layerIndex, int nueronIndex) {
         return this.getLayerList().get(layerIndex).getNeuronList().get(nueronIndex);
     }
     private double[] batchDecisions() {
@@ -481,7 +481,7 @@ public class DenseLayers {
     private double[] decision(double[] values) {
         return MathUtils.indexAndMax(values);
     }
-    private double[] getOutputs() {
+    public double[] getOutputs() {
         return getLayerAt(getLayerList().size()-1).getLayerOutputs();
     }
     private double accuracy(int trueIndex, int predictedIndex) {
