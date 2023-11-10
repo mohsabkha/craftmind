@@ -33,11 +33,10 @@ public class ErrorLossImpl {
         double pt = outputs[trueValueIndex];
 
         for (int i = 0; i < outputs.length; i++) {
+            double modulatingFactor = Math.pow(1 - pt, GAMMA);
             if (i == trueValueIndex) {
-                double modulatingFactor = Math.pow(1 - pt, GAMMA);
                 gradients[i] = modulatingFactor * (GAMMA * pt * Math.log(pt) + pt - 1);
             } else {
-                double modulatingFactor = Math.pow(1 - pt, GAMMA);
                 gradients[i] = modulatingFactor * outputs[i] * (GAMMA * Math.log(pt) + 1);
             }
         }
@@ -116,7 +115,7 @@ public class ErrorLossImpl {
                 // For non-true classes, if outputs are 0, the gradient is 0 as well because log(1) - log(1) = 0
                 if (outputs[i] > 0) {
                     double output = Math.max(outputs[i], 1e-15);  // Add epsilon to avoid log(0)
-                    gradients[i] = (1 / output) * (Math.log(1 + 0) - Math.log(1 + output));
+                    gradients[i] = (1 / output) * (Math.log(1) - Math.log(1 + output));
                 } else {
                     gradients[i] = 0; // If the output is exactly 0, then the gradient is 0.
                 }

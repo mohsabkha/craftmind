@@ -29,11 +29,11 @@ public class ActivationImpl {
         if (value <= 0) return alpha * Math.exp(value);
         else return beta * Math.exp(value);
     }
-    public static double[] exponentialElu(double values[],double alphas[], double betas[]) {
+    public static double[] exponentialElu(double[] values, double[] alphas, double[] betas) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = exponentialElu(values[i], alphas[i], betas[i]));
         return values;
     }
-    public static double[][] exponentialElu(double values[][],double alphas[][], double betas[][]) {
+    public static double[][] exponentialElu(double[][] values, double[][] alphas, double[][] betas) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = exponentialElu(values[i], alphas[i], betas[i]));
         return values;
     }
@@ -297,7 +297,7 @@ public class ActivationImpl {
 
     // TANH
     public static double tanh(double value) {
-        return (1 - (tanh(value) * tanh(value)));
+        return (1 - (Math.tanh(value) * Math.tanh(value)));
     }
     public static double[] tanh(double[] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = tanh(values[i]));
