@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 import static com.craftsentient.craftmind.activation.ActivationFunctions.activationFunction;
+import static com.craftsentient.craftmind.utils.PrintUtils.printInfo;
 
 @Getter
 @AllArgsConstructor
@@ -121,17 +122,14 @@ public class DenseLayer {
     private double[] generateLayerOutput(double[] inputs) throws Exception {
         this.layerOutputs = new double[0];
         IntStream.range(0, this.neuronBiases.length).forEachOrdered(i -> {
-            try {
-                this.addOutput(Neuron.generateOutput(inputs, this.neuronWeights[i], this.neuronBiases[i]));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            try { this.addOutput(Neuron.generateOutput(inputs, this.neuronWeights[i], this.neuronBiases[i])); }
+            catch (Exception e) { throw new RuntimeException(e); }
         });
         this.layerOutputs = activationFunction(this.activationFunction, this.layerOutputs);
-
         Integer maxIndexOpt = IntStream.range(0, this.layerOutputs.length)
                 .boxed()
                 .max((i, j) -> Double.compare(this.layerOutputs[i], this.layerOutputs[j])).get();
+        printInfo("Layer Outputs In [Layer.class]", this.layerOutputs);
         return this.layerOutputs;
     }
 

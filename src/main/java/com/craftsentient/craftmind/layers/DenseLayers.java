@@ -879,28 +879,22 @@ public class DenseLayers {
             printPositive("Number of layers set to " + this.numberOfLayers);
             printPositive("Initial activation function set to " + this.activationFunction.name());
             printPositive("Initial loss function set to " + this.lossFunction.name());
+            built.learningRate = learningRate;
+            built.lossFunction = lossFunction;
+            built.trueValueIndices = trueValueIndices;
+            ALPHA = alpha;
+            GAMMA = gamma;
+            DELTA = delta;
+            MARGIN = margin;
             if(hotOneVec != null && trueValueIndices != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
             // check if both the one hot vector mappings true values mappings are empty
             if(hotOneVec == null && trueValueIndices == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
             if(hotOneVec != null) {
                 int hotValueIndex = 0;
-                for(int i = 0; i < hotOneVec.length; i++){
-                    if(hotOneVec[built.batchCounter][i] != 0){
-                        hotValueIndex = i;
-                        break;
-                    }
-                }
                 built.loss =  ErrorLossFunctions.lossFunction(lossFunction, hotValueIndex, built.getDecisionsIndex()[built.batchCounter], built.getLastLayer().getLayerOutputs());
             } else if (trueValueIndices != null){
                 built.loss = ErrorLossFunctions.lossFunction(lossFunction, trueValueIndices[built.batchCounter],  built.getDecisionsIndex()[built.batchCounter], built.getLastLayer().getLayerOutputs());
             }
-            built.learningRate = learningRate;
-            built.ALPHA = alpha;
-            built.GAMMA = gamma;
-            built.DELTA = delta;
-            built.MARGIN = margin;
-            built.lossFunction = lossFunction;
-            built.trueValueIndices = trueValueIndices;
             built.generateDecisionsMap(trueValueIndices[built.batchCounter]);
             printInfo("Loss and Accuracy Data For Batch: " + built.batchCounter);
             if (isUsingTrueValueIndex) {printInfo("True index passed in:", this.trueValueIndices[built.batchCounter]);}

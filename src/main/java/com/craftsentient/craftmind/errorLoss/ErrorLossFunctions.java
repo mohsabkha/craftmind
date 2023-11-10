@@ -7,8 +7,26 @@ import static com.craftsentient.craftmind.layers.DenseLayers.*;
 import static com.craftsentient.craftmind.utils.PrintUtils.printGeneric;
 
 public class ErrorLossFunctions {
+    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex, int selectedOutputIndex, double[] outputs) {
+        return determineLossFunctionFromIndices(lossFunction, trueValueIndex, selectedOutputIndex, outputs);
+    }
+    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] hotOneVec, int selectedOutputIndex, double[] outputs) {
+        int trueValueIndex = 0;
+        for(int i = 0; i < hotOneVec.length; i++) {
+            if(hotOneVec[i] != 0){
+                trueValueIndex = i;
+                break;
+            }
+        }
+        return determineLossFunctionFromIndices(lossFunction, trueValueIndex, selectedOutputIndex, outputs);
+    }
 
-    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex, int selectedOutputIndex, double[] outputs){
+    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex[], int selectedOutputIndex[], double[][] outputs) {
+        return determineLossFunctionFromIndices(lossFunction, trueValueIndex, selectedOutputIndex, outputs);
+    }
+
+    // true value index and hot one vector
+    private static double determineLossFunctionFromIndices(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex, int selectedOutputIndex, double[] outputs) {
         switch (lossFunction){
             case BINARY_CROSS_ENTROPY_LOSS_FUNCTION -> { return binaryCrossEntropy(trueValueIndex, selectedOutputIndex, outputs); }
             case CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION -> { return categoricalCrossEntropy(trueValueIndex, outputs); }
@@ -22,13 +40,41 @@ public class ErrorLossFunctions {
             default -> throw new RuntimeException("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
+    private static double[] determineLossFunctionFromIndices(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex, int selectedOutputIndex, double[][] outputs) {
+        return new double[0];
+    }
+    private static double[][] determineLossFunctionFromIndices(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex, int selectedOutputIndex, double[][][] outputs) {
+        return new double[0][];
+    }
+    private static double[][][] determineLossFunctionFromIndices(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex, int selectedOutputIndex, double[][][][] outputs) {
+        return new double[0][][];
+    }
+
+    // true value indices and hot one vectors (batch)
+    private static double determineLossFunctionFromIndices(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex[], int selectedOutputIndex[], double[][] outputs) {
+        return 0.0;
+    }
+    private static double[] determineLossFunctionFromIndices(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex[], int selectedOutputIndex[], double[][][] outputs) {
+        return new double[0];
+    }
+    private static double[][] determineLossFunctionFromIndices(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex[], int selectedOutputIndex[], double[][][][]outputs) {
+        return new double[0][];
+    }
+
+    // true value indices and hot one vectors
+    private static double[][] determineLossFunctionFromIndices(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex[][], int selectedOutputIndex[][], double[][][] outputs) {
+        return new double[0][];
+    }
+    private static double[][][] determineLossFunctionFromIndices(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex[][], int selectedOutputIndex[][], double[][][][] outputs) {
+        return new double[0][][];
+    }
 
 
     /*
      * For binary classification
      * Compatible with most activation functions. Please use unbounded activation functions in output layer though
      */
-    private static double binaryCrossEntropy(int trueValueIndex, int selectedOutputIndex, double[] outputs){
+    private static double binaryCrossEntropy(int trueValueIndex, int selectedOutputIndex, double[] outputs) {
         return -outputs[trueValueIndex] * Math.log(outputs[selectedOutputIndex]) - (1 - outputs[trueValueIndex]) * Math.log(1 - outputs[selectedOutputIndex]);
     }
 
@@ -36,7 +82,7 @@ public class ErrorLossFunctions {
      * For binary classification
      * For this, the output should ideally be a -1 or 1, but passing in the index will auto convert to these values
      */
-    private static double binaryHinge(int trueValueIndex, int selectedOutputIndex, double[] outputs){
+    private static double binaryHinge(int trueValueIndex, int selectedOutputIndex, double[] outputs) {
         double margin = 0.5;
         int trueLabel = trueValueIndex * 2 - 1;
         int selectedLabel = selectedOutputIndex * 2 - 1;
@@ -48,7 +94,7 @@ public class ErrorLossFunctions {
      * For multi-class classification
      * Compatible with most activation functions. Please use unbounded activation functions in output layer though
      */
-    private static double categoricalCrossEntropy(int trueValueIndex, double[] outputs){
+    private static double categoricalCrossEntropy(int trueValueIndex, double[] outputs) {
         // Check if the predicted probability for the true class is within a valid range
         if (trueValueIndex < 0 || trueValueIndex >= outputs.length) {
             throw new IllegalArgumentException("True value index is out of bounds.");
@@ -65,7 +111,7 @@ public class ErrorLossFunctions {
      * For two concurrent Siamese networks
      * Compatible with most activation functions. Please use unbounded activation functions in output layer though
      */
-    public static double contrastive(double firstSiameseValue, double secondSiameseValue){
+    public static double contrastive(double firstSiameseValue, double secondSiameseValue) {
         double distance = firstSiameseValue - secondSiameseValue;
         double y;
         if(distance < MARGIN) {
@@ -76,7 +122,7 @@ public class ErrorLossFunctions {
         return (1 - y) * 0.5 * distance * distance + y * 0.5 * Math.pow(Math.max(0, MARGIN - distance), 2);
     }
 
-    private static double hinge(int trueValueIndex, double[] outputs){
+    private static double hinge(int trueValueIndex, double[] outputs) {
         double trueScore = outputs[trueValueIndex];
         double maxIncorrectScore = Double.NEGATIVE_INFINITY;
 
@@ -100,7 +146,7 @@ public class ErrorLossFunctions {
         return Math.log(Math.cosh(predictionError));
     }
 
-    public static double meanStandardLogarithmicError(int trueValueIndex, int selectedOutputIndex, double[] outputs){
+    public static double meanStandardLogarithmicError(int trueValueIndex, int selectedOutputIndex, double[] outputs) {
         return Math.pow(Math.log1p(outputs[trueValueIndex]) - Math.log1p(outputs[selectedOutputIndex]), 2);
     }
 
@@ -135,7 +181,7 @@ public class ErrorLossFunctions {
 
 
     // Contrastive, y = binary label (0 for similar, 1 for dissimilar)
-    public static double[] contrastive(double[] y, double[] distances){
+    public static double[] contrastive(double[] y, double[] distances) {
         double[] loss = new double[distances.length];
         double margin = 1;
         IntStream.range(0, loss.length).parallel().forEachOrdered(i -> loss[i] = contrastive(y[i], distances[i]));
@@ -187,7 +233,6 @@ public class ErrorLossFunctions {
      * alpha is a balancing factor
      * gamma is the focusing parameter to reduce contributions to easy examples
      */
-
     private static double hinge(double trueValue, double classifierOutput) {
         return Math.max(0, 1 - trueValue * classifierOutput);
     }
