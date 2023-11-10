@@ -1,8 +1,8 @@
 package com.craftsentient.craftmind.layers;
 
 import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATION_FUNCTIONS;
-import com.craftsentient.craftmind.derivitives.Activation;
-import com.craftsentient.craftmind.derivitives.ErrorLoss;
+import com.craftsentient.craftmind.derivitives.activationDerivatives.Activation;
+import com.craftsentient.craftmind.derivitives.errorLossDerivatives.ErrorLoss;
 import com.craftsentient.craftmind.errorLoss.DEFAULT_LOSS_FUNCTIONS;
 import com.craftsentient.craftmind.errorLoss.ErrorLossFunctions;
 import com.craftsentient.craftmind.layer.DenseLayer;
