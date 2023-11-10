@@ -4,7 +4,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
 import static com.craftsentient.craftmind.layers.DenseLayers.*;
-import static com.craftsentient.craftmind.utils.PrintUtils.printGeneric;
+import static com.craftsentient.craftmind.utils.PrintUtils.print;
+
 
 public class ErrorLossFunctions {
     public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex, int selectedOutputIndex, double[] outputs) {
@@ -359,7 +360,7 @@ public class ErrorLossFunctions {
     private static double negativeLogLikelihood(int trueClass, double[] outputs) {
         double predictedProbability = outputs[trueClass];
         double epsilon = 1e-15; // a small number to prevent log(0)
-        printGeneric("Predicted Probability = " + predictedProbability);
+        print("Predicted Probability = " + predictedProbability);
         predictedProbability = Math.max(outputs[trueClass], epsilon);
         return -Math.log(predictedProbability);
     }

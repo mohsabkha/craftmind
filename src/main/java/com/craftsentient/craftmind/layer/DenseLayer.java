@@ -105,7 +105,7 @@ public class DenseLayer {
         return this.layerOutputs;
     }
 
-    public double[] regenerateLayerOutput() throws Exception {
+    public double[] regenerateLayerOutput() {
         double[] newOutputs = new double[this.getLayerOutputs().length];
         IntStream.range(0, this.getLayerOutputs().length).forEachOrdered(i -> {
             Neuron neuron = this.getNeuronList().get(i);

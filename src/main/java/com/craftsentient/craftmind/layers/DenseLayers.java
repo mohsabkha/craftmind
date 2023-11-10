@@ -69,14 +69,10 @@ public class DenseLayers {
     private DenseLayers(int layers, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
-        // instantiate the decisions index
         this.decisionsIndex = new int[initialInput.length];
-        // instantiate the hash map for the values of the decision
         this.decisions = new HashMap<>();
-
         IntStream.range(0, layers).forEach(i -> {
             DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
-
             try {
                 if (i != 0) {
                     double[][] weights = randn(initialInput.length, layerList.get(i - 1).getLayerOutputs().length);
@@ -90,7 +86,6 @@ public class DenseLayers {
             }
         });
     }
-
     private DenseLayers(int layers, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
@@ -113,8 +108,7 @@ public class DenseLayers {
             }
         });
     }
-
-    private DenseLayers(int layers, double[][] initialWeights, double[]biases, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
+    private DenseLayers(int layers, double[][] initialWeights, double[] biases, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         this.layerList = new ArrayList<>();
         this.initialInput = initialInput;
         // instantiate the decisions index
@@ -136,7 +130,6 @@ public class DenseLayers {
             }
         });
     }
-
     private DenseLayers(int layers, int numberOfNeurons, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         this.layerList = new ArrayList<>();
         this.initialInput = randn(1,numberOfNeurons);
@@ -160,7 +153,6 @@ public class DenseLayers {
             }
         });
     }
-
     private DenseLayers(int layers, int numberOfNeurons, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         if(numberOfNeurons != initialInput.length) { throw new IllegalArgumentException("neuronsPerLayer of " + numberOfNeurons + " and initialInput size of " + initialInput.length + " do not match!");}
         this.initialInput = initialInput;
@@ -186,7 +178,6 @@ public class DenseLayers {
             }
         });
     }
-
     private DenseLayers(int layers, int numberOfNeurons, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
@@ -209,8 +200,7 @@ public class DenseLayers {
             }
         });
     }
-
-    private DenseLayers(int layers, int numberOfNeurons, double[][] initialWeights, double[]biases, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
+    private DenseLayers(int layers, int numberOfNeurons, double[][] initialWeights, double[] biases, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         this.layerList = new ArrayList<>();
         this.initialInput = initialInput;
         // instantiate the decisions index
@@ -232,7 +222,6 @@ public class DenseLayers {
             }
         });
     }
-
     private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         if(layers != numberOfNeuronsPerLayer.length) {
             throw new IllegalArgumentException(layers + " Layers given but only " + numberOfNeuronsPerLayer.length
@@ -261,7 +250,6 @@ public class DenseLayers {
             }
         });
     }
-
     private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         if(layers != numberOfNeuronsPerLayer.length) {
             throw new IllegalArgumentException(layers + " Layers given but only " + numberOfNeuronsPerLayer.length
@@ -290,7 +278,6 @@ public class DenseLayers {
             }
         });
     }
-
     private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         if(layers != numberOfNeuronsPerLayer.length) {
             throw new IllegalArgumentException(layers + " Layers given but only " + numberOfNeuronsPerLayer.length
@@ -317,8 +304,7 @@ public class DenseLayers {
             }
         });
     }
-
-    private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialWeights, double[]initialBiases, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
+    private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialWeights, double[] initialBiases, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         if(layers != numberOfNeuronsPerLayer.length) {
             throw new IllegalArgumentException(layers + " Layers given but only " + numberOfNeuronsPerLayer.length
                     + " layers described!\nAdjust neuronsPerLayer to be of same length as number of layers!");
@@ -349,8 +335,7 @@ public class DenseLayers {
         });
     }
 
-    // method to keep going depending on the accuracy and loss
-    public void train() throws Exception {
+    public void train() {
         if(batchCounter == this.initialInput.length - 1){
             return;
         }
@@ -359,12 +344,12 @@ public class DenseLayers {
             this.backPropagate();
             // increase batchCounter
             this.batchCounter++;
-            printInfo("training on input batch " + this.batchCounter);
+            print("training on input batch " + this.batchCounter);
             // set buffer to hold inputs
             double[][] inputs = new double[this.getLayerList().size()][];
 
             // do forward pass with next batch of input
-            printInfo("Beginning next forward pass...");
+            print("Beginning next forward pass...");
             for (int i = 0; i < this.getLayerList().size(); i++) {
                 if (i != 0) {
                     this.getLayerAt(i).setInputs(inputs[i-1]); // use previous layers input
@@ -392,18 +377,18 @@ public class DenseLayers {
 
                 this.loss = ErrorLossFunctions.lossFunction(lossFunction, trueValueIndices[this.batchCounter],  this.getDecisionsIndex()[this.batchCounter], this.getLastLayer().getLayerOutputs());
             }
-            printInfo("Loss and Accuracy Data For Batch: " + this.batchCounter);
-            printInfo("Accuracy:", this.getAccuracy());
-            printInfo("Loss:", this.getLoss());
-            printInfo("Layer Outputs:", this.getLastLayer().getLayerOutputs());
+            print("Loss and Accuracy Data For Batch: " + this.batchCounter);
+            print("Accuracy:", this.getAccuracy());
+            print("Loss:", this.getLoss());
+            print("Layer Outputs:", this.getLastLayer().getLayerOutputs());
             //printLayers("Layers", this);
         }
         printTitle("Training Complete!");
     }
-
-    // method to enable backpropagation and training
-    public void backPropagate(){
-        printInfo("Back-Propagating...");
+    public void miniBatchTrain() {}
+    public void batchTrain() {}
+    private void backPropagate() {
+        print("Back-Propagating...");
         // Output layer error gradient
         double[][] gradients = new double[this.layerList.size()][];
         // index of the output layer
@@ -461,16 +446,14 @@ public class DenseLayers {
         }
         printPositive("Finished back-propagation!\n");
     }
-     // calls the getDoubles random matrix generator
-    public static double[][] randn(int rows, int cols) {
+    public void miniBatchPropagate() {}
+    public void batchPropagate() {}
+    private static double[][] randn(int rows, int cols) {
         return getRandomMatrix(rows, cols);
     }
-
-    public static double[] randn(int elementCount){
+    private static double[] randn(int elementCount) {
         return getRandomArray(elementCount);
     }
-
-    // creates a metrix of randomly generated numbers
     private static double[][] getRandomMatrix(int rows, int cols) {
         double[][] output = new double[rows][cols];
         for (int i = 0; i < output.length; i++)
@@ -478,7 +461,6 @@ public class DenseLayers {
                 output[i][j] = (0.1 * random.nextGaussian());
         return output;
     }
-
     private static double[] getRandomArray(int elementCount) {
         double[] output = new double[elementCount];
         for(int i = 0; i < output.length; i++){
@@ -486,30 +468,23 @@ public class DenseLayers {
         }
         return output;
     }
-
-    public ArrayList<Neuron> getNeuronsFromLayerAt(int index){
+    public ArrayList<Neuron> getNeuronsFromLayerAt(int index) {
         return this.getLayerList().get(index).getNeuronList();
     }
-
-    public Neuron getNeuronFromLayerAt(int layerIndex, int nueronIndex){
+    public Neuron getNeuronFromLayerAt(int layerIndex, int nueronIndex) {
         return this.getLayerList().get(layerIndex).getNeuronList().get(nueronIndex);
     }
-
-    // gets the outputs (or decisions) of each layer in the network
-    private double[] batchDecisions(){
+    private double[] batchDecisions() {
         double[] decisions = new double[this.getLastLayer().getLayerOutputs().length];
         IntStream.range(0, decisions.length).parallel().forEachOrdered( i -> decisions[i] = decision(this.getLastLayer().getLayerOutputs())[1]);
         return decisions;
     }
-
-    private double[] decision(double[] values){
+    private double[] decision(double[] values) {
         return MathUtils.indexAndMax(values);
     }
-
-    public double[] getOutputs(){
+    public double[] getOutputs() {
         return getLayerAt(getLayerList().size()-1).getLayerOutputs();
     }
-
     private double accuracy(int trueIndex, int predictedIndex) {
         if(trueIndex == predictedIndex) {
             sum+=1;
@@ -517,11 +492,7 @@ public class DenseLayers {
         this.accuracy = sum / (batchCounter + 1);
         return this.accuracy;
     }
-
-    /**
-     * creates a map of decisions made in each layer, and notes the index of the node that was chosen in each layer
-     */
-    public void generateDecisionsMap(int trueValueIndex){
+    private void generateDecisionsMap(int trueValueIndex) {
         // go through and get the decision made at the output layer
         double[] indexAndMax = decision(this.getLastLayer().getLayerOutputs());
         // store the index of that decision for each cycle of training
@@ -535,22 +506,19 @@ public class DenseLayers {
     public DEFAULT_ACTIVATION_FUNCTIONS getActivationFunctionFrom(int index){
         return this.getLayerAt(index).getActivationFunction();
     }
-
-    public DenseLayer getLayerAt(int index){
+    public DenseLayer getLayerAt(int index) {
         return this.getLayerList().get(index);
     }
-
     public DenseLayer getFirstLayer() {
         return this.getLayerAt(0);
     }
-
     public DenseLayer getLastLayer() {
         return this.getLayerAt(this.getLayerList().size()-1);
     }
 
     // builder class for the neural network
     @NoArgsConstructor
-    public static class DenseLayersBuilder{
+    public static class DenseLayersBuilder {
         private ArrayList<DenseLayer> layerList;
         private boolean isUsingListOfLayers = true;
 
@@ -759,109 +727,109 @@ public class DenseLayers {
             if(!this.isUsingNumberOfLayers && !this.isUsingListOfLayers) throw new IllegalArgumentException("Please use the numberOfLayers() builder method to initialize, or provide an ArrayList<DenseLayer> using the withLayerList() builder method!");
             if(!this.isUsingSpecificNeurons && !this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingBatchInputs){
                 if(this.isUsingFileAsInput && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
-                    printInfo("Using construct 1.1");
+                    printTitle("Using construct 1.1");
                     built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(this.isUsingFileAsInput && this.isUsingSpecificWeights) {
-                    printInfo("Using construct 1.2");
+                    printTitle("Using construct 1.2");
                     built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(this.isUsingFileAsInput) {
-                    printInfo("Using construct 1.3");
+                    printTitle("Using construct 1.3");
                     built = new DenseLayers(this.numberOfLayers, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(!this.isUsingFileAsInput && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
-                    printInfo("Using construct 1.4");
+                    printTitle("Using construct 1.4");
                     built = new DenseLayers(this.numberOfLayers, this.activationFunction, this.activationFunctionsMap);
                 }
             }
             else if(this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingBatchInputs) {
                 if(this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
-                    printInfo("Using construct 2.1");
+                    printTitle("Using construct 2.1");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(this.isUsingFileAsInput  && this.isUsingSpecificWeights) {
-                    printInfo("Using construct 2.2");
+                    printTitle("Using construct 2.2");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(this.isUsingFileAsInput) {
-                    printInfo("Using construct 2.3");
+                    printTitle("Using construct 2.3");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(!this.isUsingFileAsInput && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
-                    printInfo("Using construct 2.4");
+                    printTitle("Using construct 2.4");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.activationFunction, this.activationFunctionsMap);
                 }
             }
             else if(this.isUsingSpecificNeurons && this.isUsingNumberOfLayers && !this.isUsingBatchInputs) {
                 if(this.isUsingFileAsInput && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
-                    printInfo("Using construct 3.1");
+                    printTitle("Using construct 3.1");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(this.isUsingFileAsInput && this.isUsingSpecificWeights) {
-                    printInfo("Using construct 3.2");
+                    printTitle("Using construct 3.2");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(this.isUsingFileAsInput) {
-                    printInfo("Using construct 3.3");
+                    printTitle("Using construct 3.3");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(!this.isUsingFileAsInput && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
-                    printInfo("Using construct 3.4");
+                    printTitle("Using construct 3.4");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.activationFunction, this.activationFunctionsMap);
                 }
             }
             else if(!this.isUsingSpecificNeurons && !this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingFileAsInput){
                 if(this.isUsingBatchInputs && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
-                    printInfo("Using construct 4.1");
+                    printTitle("Using construct 4.1");
                     built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(this.isUsingBatchInputs  && this.isUsingSpecificWeights) {
-                    printInfo("Using construct 4.2");
+                    printTitle("Using construct 4.2");
                     built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(this.isUsingBatchInputs) {
-                    printInfo("Using construct 4.3");
+                    printTitle("Using construct 4.3");
                     built = new DenseLayers(this.numberOfLayers, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(!this.isUsingBatchInputs && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
-                    printInfo("Using construct 4.4");
+                    printTitle("Using construct 4.4");
                     built = new DenseLayers(this.numberOfLayers, this.activationFunction, this.activationFunctionsMap);
                 }
             }
             else if(this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingFileAsInput) {
                 if(this.isUsingBatchInputs && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
-                    printInfo("Using construct 5.1");
+                    printTitle("Using construct 5.1");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(this.isUsingBatchInputs  && this.isUsingSpecificWeights) {
-                    printInfo("Using construct 5.2");
+                    printTitle("Using construct 5.2");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(this.isUsingBatchInputs) {
-                    printInfo("Using construct 5.3");
+                    printTitle("Using construct 5.3");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(!this.isUsingBatchInputs && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
-                    printInfo("Using construct 5.4");
+                    printTitle("Using construct 5.4");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.activationFunction, this.activationFunctionsMap);
                 }
             }
             else if(this.isUsingSpecificNeurons && this.isUsingNumberOfLayers && !this.isUsingFileAsInput) {
                 if(this.isUsingBatchInputs && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
-                    printInfo("Using construct 6.1");
+                    printTitle("Using construct 6.1");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(this.isUsingBatchInputs  && this.isUsingSpecificWeights) {
-                    printInfo("Using construct 6.2");
+                    printTitle("Using construct 6.2");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(this.isUsingBatchInputs) {
-                    printInfo("Using construct 6.3");
+                    printTitle("Using construct 6.3");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(!this.isUsingBatchInputs && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
-                    printInfo("Using construct 6.4");
+                    printTitle("Using construct 6.4");
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.activationFunction, this.activationFunctionsMap);
                 }
             }
@@ -896,10 +864,10 @@ public class DenseLayers {
                 built.loss = ErrorLossFunctions.lossFunction(lossFunction, trueValueIndices[built.batchCounter],  built.getDecisionsIndex()[built.batchCounter], built.getLastLayer().getLayerOutputs());
             }
             built.generateDecisionsMap(trueValueIndices[built.batchCounter]);
-            printInfo("Loss and Accuracy Data For Batch: " + built.batchCounter);
-            if (isUsingTrueValueIndex) {printInfo("True index passed in:", this.trueValueIndices[built.batchCounter]);}
-            printInfo("Accuracy:", built.getAccuracy());
-            printInfo("Loss:", built.getLoss());
+            printSubTitle("Loss and Accuracy Data For Batch: " + built.batchCounter);
+            if (isUsingTrueValueIndex) {print("True index passed in:", this.trueValueIndices[built.batchCounter]);}
+            print("Accuracy:", built.getAccuracy());
+            print("Loss:", built.getLoss());
             printTitle("Finished Initialization");
             return built;
         }

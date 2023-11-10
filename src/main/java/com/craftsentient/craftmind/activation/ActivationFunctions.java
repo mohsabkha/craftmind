@@ -53,7 +53,7 @@ public class ActivationFunctions {
             default -> throw new RuntimeException("Incorrect Activation Function Name Entered: " + activationFunction.name());
         }
     }
-    public static double[] activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double[] values) throws Exception {
+    public static double[] activationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double[] values) {
         switch (activationFunction) {
             case BENT_IDENTITY_ACTIVATION_FUNCTION -> { return bentIdentity(values); }
             case GAUSSIAN_ACTIVATION_FUNCTION -> { return gaussian(values); }
