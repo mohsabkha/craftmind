@@ -8,40 +8,12 @@ import java.util.ArrayList;
 
 @Component
 public interface Layer {
-    ArrayList<Neuron> neuronList = new ArrayList<>();
-    double[][] neuronWeights = new double[0][0];
-    double[] neuronBiases = new double[0];
-    double[] inputs = new double[0];
-    double[][] batchInputs = new double[0][0];
-    double[] layerOutputs = new double[0];
-    double[][] batchLayerOutputs = new double[0][0];
-    boolean isHiddenLayer = true;
-
-    public Object generateLayerOutput() throws Exception;
-
-    public double[][] generateBatchedLayerOutput(int batchSize);
-
-    public double[] generateNonBatchedLayerOutput(double[] inputs) throws Exception;
-
-    public void generateOutput(int batchSize);
 
     public void addOutput(double value) throws Exception;
 
-    public void addOutput(double[] values) throws Exception;
-
-    public void addNeuron(Neuron neuron);
-
     public void addNeurons(ArrayList<Neuron> neurons);
 
-    public void addWeights(double[][] weights);
-
-    public void addWeightsAndBiases(double[][] weights, double[] biases);
-
-    public void addInput(double inputValue);
-
     public void addInput(double[] inputsValues);
-
-    public void addInput(double[][] inputValues);
 
     public void useOutputFromPreviousLayerAsInput(Layer layer) throws Exception;
 
@@ -58,6 +30,4 @@ public interface Layer {
     public void generateLayer(double[][] weights, double[] biases, double[][] batchInputs);
 
     public Layer layerAddition(Layer a, Layer b);
-
-    Layer layer(Layer a, Layer b);
 }
