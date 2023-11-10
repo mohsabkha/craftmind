@@ -1,8 +1,11 @@
 package com.craftsentient.craftmind.neuron;
 
+import com.craftsentient.craftmind.utils.PrintUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
 
 public class NeuronTest {
 
@@ -40,5 +43,6 @@ public class NeuronTest {
     public void generateNeuronTest() {
         Neuron neuron = new Neuron(4, 1.0);
         Assertions.assertNotNull(neuron);
+
     }
 }
