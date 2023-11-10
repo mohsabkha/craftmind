@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 import static com.craftsentient.craftmind.activation.ActivationFunctions.activationFunction;
-import static com.craftsentient.craftmind.utils.PrintUtils.printInfo;
+import static com.craftsentient.craftmind.utils.PrintUtils.print;
 
 @Getter
 @AllArgsConstructor
@@ -129,7 +129,7 @@ public class DenseLayer {
         Integer maxIndexOpt = IntStream.range(0, this.layerOutputs.length)
                 .boxed()
                 .max((i, j) -> Double.compare(this.layerOutputs[i], this.layerOutputs[j])).get();
-        printInfo("Layer Outputs In [Layer.class]", this.layerOutputs);
+        print("Layer Outputs In [Layer.class]", this.layerOutputs);
         return this.layerOutputs;
     }
 
