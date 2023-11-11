@@ -9,17 +9,25 @@ public class ErrorLossFunctions {
     }
     public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] hotOneVec, int selectedOutputIndex, double[] outputs) {
         int trueValueIndex = 0;
-        for(int i = 0; i < hotOneVec.length; i++) {
-            if(hotOneVec[i] != 0){
-                trueValueIndex = i;
-                break;
-            }
-        }
+
         return determineLossFunctionFromIndices(lossFunction, trueValueIndex, selectedOutputIndex, outputs);
     }
 
-    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex[], int selectedOutputIndex[], double[][] outputs) {
-        return determineLossFunctionFromIndices(lossFunction, trueValueIndex, selectedOutputIndex, outputs);
+    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndices[], int selectedOutputIndex[], double[][] outputs) {
+        return determineLossFunctionFromIndices(lossFunction, trueValueIndices, selectedOutputIndex, outputs);
+    }
+    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int hotOneVectors[][], int selectedOutputIndex[], double[][] outputs) {
+        int trueValueIndices[] = new int[hotOneVectors.length];
+        for(int i = 0; i < hotOneVectors.length; i++) {
+            for(int j = 0; j < hotOneVectors[i].length; j++){
+                if(hotOneVectors[i][j] != 0){
+                    trueValueIndices[i] = j;
+                    break;
+                }
+            }
+
+        }
+        return determineLossFunctionFromIndices(lossFunction, trueValueIndices, selectedOutputIndex, outputs);
     }
 
     // true value index and hot one vector

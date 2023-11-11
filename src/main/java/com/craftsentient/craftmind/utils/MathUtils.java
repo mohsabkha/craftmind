@@ -279,6 +279,17 @@ public class MathUtils {
         return indices;
     }
 
+    public static int getHotOneVecIndexValue(int[] hotOneVec) {
+        int trueValueIndex = 0;
+        for(int i = 0; i < hotOneVec.length; i++) {
+            if(hotOneVec[i] != 0){
+                trueValueIndex = i;
+                break;
+            }
+        }
+        return trueValueIndex;
+    }
+
     public static double accuracySum(double[] trueValues, int[] predictedValues){
         if(trueValues.length != predictedValues.length){throw new IllegalArgumentException("Number of true values is not equal to number of predicted values");}
         AtomicReference<Double> totalCorrect = new AtomicReference<>((double)0);

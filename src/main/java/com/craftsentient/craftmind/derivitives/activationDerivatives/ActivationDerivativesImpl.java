@@ -6,7 +6,7 @@ import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATION_FUNCTIONS;
 
 import java.util.stream.IntStream;
 
-public class ActivationImpl {
+public class ActivationDerivativesImpl {
 
 
     //BENT IDENTITY

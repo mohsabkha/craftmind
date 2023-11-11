@@ -2,9 +2,9 @@ package com.craftsentient.craftmind.derivitives.activationDerivatives;
 
 import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATION_FUNCTIONS;
 
-import static com.craftsentient.craftmind.derivitives.activationDerivatives.ActivationImpl.*;
+import static com.craftsentient.craftmind.derivitives.activationDerivatives.ActivationDerivativesImpl.*;
 
-public class Activation {
+public class ActivationDerivatives {
     public static double derivative(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double value) {
         switch (activationFunction) {
             case BENT_IDENTITY_ACTIVATION_FUNCTION -> {

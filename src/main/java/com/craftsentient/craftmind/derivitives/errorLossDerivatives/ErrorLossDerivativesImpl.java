@@ -3,7 +3,7 @@ package com.craftsentient.craftmind.derivitives.errorLossDerivatives;
 import static com.craftsentient.craftmind.layers.DenseLayers.*;
 import static com.craftsentient.craftmind.layers.DenseLayers.DELTA;
 
-public class ErrorLossImpl {
+public class ErrorLossDerivativesImpl {
     public static double[] binaryCrossEntropy(int trueValueIndex, double[] outputs){
         double[] derivatives = new double[outputs.length];
         for (int i = 0; i < outputs.length; i++) {
