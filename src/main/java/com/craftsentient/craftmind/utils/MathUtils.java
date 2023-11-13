@@ -316,6 +316,13 @@ public class MathUtils {
         return totalCorrect.get();
     }
 
+    public static double sum(double[] array) {
+        double sum = 0;
+        for (int i = 0; i < array.length; i++) {
+            sum += array[i];
+        }
+        return sum;
+    }
 
     public static double accuracy(double[] trueValues, double[] predictedValues){
         double sum = accuracySum(trueValues, predictedValues);

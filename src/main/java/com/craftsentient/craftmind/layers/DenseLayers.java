@@ -28,7 +28,8 @@ public class DenseLayers {
     private double accuracy;
     private double loss;
     private double sum;
-    private double learningRate = 0.01;
+    private double learningRate = 1.0;
+    private double learningRateDecay = 1.0;
     private int[][] hotOneVec;
     public static double ALPHA = 1.0;
     public static double GAMMA = 1.0;
