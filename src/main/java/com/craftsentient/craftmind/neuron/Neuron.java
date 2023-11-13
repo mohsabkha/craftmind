@@ -70,7 +70,7 @@ public class Neuron {
     }
 
     public static double randn(){
-        return 0.01 * random.nextGaussian();
+        return 0.001 * random.nextGaussian();
     }
 
     public double[] randn(int inputs){

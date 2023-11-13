@@ -1,8 +1,8 @@
 package com.craftsentient.craftmind.layers;
 
 import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATION_FUNCTIONS;
-import com.craftsentient.craftmind.derivitives.Activation;
-import com.craftsentient.craftmind.derivitives.ErrorLoss;
+import com.craftsentient.craftmind.derivitives.activationDerivatives.ActivationDerivatives;
+import com.craftsentient.craftmind.derivitives.errorLossDerivatives.ErrorLossDerivatives;
 import com.craftsentient.craftmind.errorLoss.DEFAULT_LOSS_FUNCTIONS;
 import com.craftsentient.craftmind.errorLoss.ErrorLossFunctions;
 import com.craftsentient.craftmind.layer.DenseLayer;
@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import java.util.*;
 import java.util.stream.IntStream;
 
+import static com.craftsentient.craftmind.utils.MathUtils.getHotOneVecIndexValue;
 import static com.craftsentient.craftmind.utils.PrintUtils.*;
 
 @Getter
@@ -38,7 +39,6 @@ public class DenseLayers {
     private DEFAULT_LOSS_FUNCTIONS lossFunction;
     public static final Random random = new Random(0);
 
-    // individual batches
     private DenseLayers(int layers, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         // create layer list
         this.layerList = new ArrayList<>();
@@ -48,6 +48,7 @@ public class DenseLayers {
         this.decisionsIndex = new int[initialInput.length];
         // instantiate the hash map for the values of the decision
         this.decisions = new HashMap<>();
+
         // loop over layer count and generate network
         IntStream.range(0, layers).forEach(i -> {
             // set activation function
@@ -66,6 +67,7 @@ public class DenseLayers {
             }
         });
     }
+
     private DenseLayers(int layers, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
@@ -394,7 +396,7 @@ public class DenseLayers {
         // index of the output layer
         int outputIndex = this.getLayerList().size() - 1;
         // loss function derivative
-        gradients[outputIndex] = ErrorLoss.derivative(
+        gradients[outputIndex] = ErrorLossDerivatives.derivative(
                 lossFunction,
                 this.getTrueValueIndices()[batchCounter],
                 this.getDecisionsIndex()[batchCounter],
@@ -419,7 +421,7 @@ public class DenseLayers {
             // create gradient for current layer
             gradients[index] = new double[this.getLayerAt(index).getNeuronList().size()];
             // activation funciton derivative
-            double[] derivatives = Activation.derivative(
+            double[] derivatives = ActivationDerivatives.derivative(
                     this.getLayerAt(index).getActivationFunction(),
                     this.getLayerAt(index).getLayerOutputs()
             );
@@ -446,8 +448,6 @@ public class DenseLayers {
         }
         printPositive("Finished back-propagation!\n");
     }
-    public void miniBatchPropagate() {}
-    public void batchPropagate() {}
     private static double[][] randn(int rows, int cols) {
         return getRandomMatrix(rows, cols);
     }
@@ -502,6 +502,17 @@ public class DenseLayers {
         // determine the accuracy of the decision
         this.accuracy = accuracy(trueValueIndex, this.decisionsIndex[batchCounter]);
     }
+    private void generateDecisionsMap(int[] hotOneVec) {
+        // go through and get the decision made at the output layer
+        double[] indexAndMax = decision(this.getLastLayer().getLayerOutputs());
+        // store the index of that decision for each cycle of training
+        this.decisionsIndex[batchCounter] = (int)indexAndMax[0];
+        // store the actual value of the decision as well
+        this.decisions.put(batchCounter, indexAndMax[1]);
+        // determine the accuracy of the decision
+        this.accuracy = accuracy(getHotOneVecIndexValue(this.hotOneVec[batchCounter]), this.decisionsIndex[batchCounter]);
+    }
+
 
     public DEFAULT_ACTIVATION_FUNCTIONS getActivationFunctionFrom(int index){
         return this.getLayerAt(index).getActivationFunction();
@@ -526,24 +537,28 @@ public class DenseLayers {
         private final Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap = new HashMap<>();
         private boolean hasSetSpecificLayerActivationFunctions = false;
 
+        //
         private DEFAULT_LOSS_FUNCTIONS lossFunction = DEFAULT_LOSS_FUNCTIONS.NLL_LOSS_FUNCTION;
         private int[][] hotOneVec;
         private int[] trueValueIndices;
         private double[] trueValues;
+        private double[][][] trueValuesMatrix;
         private final Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap = new HashMap<>();
-        private final Map<Integer, int[][]> hotOneMap = new HashMap<>();
-        private final Map<Integer, int[]> trueValueIndexMap = new HashMap<>();
+
         private boolean hasSetSpecificLayerLossFunctions = false;
         private boolean isUsingTrueValueIndex = false;
-        private boolean isUsingHotEncodedVec = true;
-        private boolean isUsingTrueValues = true;
+        private boolean isUsingHotEncodedVec = false;
+        private boolean isUsingTrueValues = false;
 
         private int numberOfLayers = 1;
         private boolean isUsingNumberOfLayers = false;
 
         private int numberOfInputs;
         private double[][] initialInput;
+        private double[][][] initialMatrixInput;
+        private boolean isUsingStochasticGradientDescent = true;
         private boolean isUsingBatchInputs = false;
+        private boolean isUsingMiniBatch = false;
 
         private double[][] initialWeights;
         private boolean isUsingSpecificWeights = false;
@@ -556,7 +571,6 @@ public class DenseLayers {
         private boolean isUsingSpecificNeurons = false;
         private int numberOfNeurons;
         private boolean isUsingNumberOfNeurons = false;
-        private String filePath = "";
         private boolean isUsingFileAsInput = false;
 
         double learningRate = 0.01;
@@ -565,8 +579,7 @@ public class DenseLayers {
         double delta = 1.0;
         double margin = 1.0;
 
-        public DenseLayersBuilder withTextFileAsInput(String filePath, String delimiter){
-            this.filePath = filePath;
+        public DenseLayersBuilder withTextFileAsInput(String filePath, String delimiter) {
             this.isUsingFileAsInput = true;
             if (filePath.charAt(filePath.length()-1) == 't' && filePath.charAt(filePath.length()-2) == 'x' && filePath.charAt(filePath.length()-3) == 't' && filePath.charAt(filePath.length()-4) == '.'){
                 this.initialInput = FileUtils.readTextFile(filePath, delimiter);
@@ -579,64 +592,62 @@ public class DenseLayers {
             return this;
         }
 
-        public DenseLayersBuilder withLayerList(ArrayList<DenseLayer> layerList){
+        public DenseLayersBuilder withLayerList(ArrayList<DenseLayer> layerList) {
             this.isUsingListOfLayers = true;
             this.layerList = layerList;
             return this;
         }
 
-        public DenseLayersBuilder withNumberOfLayers(int numberOfLayers){
+        public DenseLayersBuilder withNumberOfLayers(int numberOfLayers) {
             this.isUsingNumberOfLayers = true;
             this.numberOfLayers = numberOfLayers;
             return this;
         }
 
-        public DenseLayersBuilder withNumberOfInputs(int numberOfInputs){
-            this.isUsingBatchInputs = false;
+        public DenseLayersBuilder withNumberOfInputs(int numberOfInputs) {
             this.numberOfInputs = numberOfInputs;
             return this;
         }
 
-        public DenseLayersBuilder withInitialInput(double[][] initialInput){
-            this.isUsingBatchInputs = true;
+        public DenseLayersBuilder withInitialInput(double[][] initialInput) {
             this.isUsingFileAsInput = false;
             this.initialInput = initialInput;
             return this;
         }
 
-        public DenseLayersBuilder withInitialWeights(double[][] initialWeights){
+        public DenseLayersBuilder withInitialWeights(double[][] initialWeights) {
             this.isUsingSpecificWeights = true;
             this.initialWeights = initialWeights;
             return this;
         }
 
-        public DenseLayersBuilder withSpecificBiasForNeuronInLayer(int layer, int neuron, double bias){
+        public DenseLayersBuilder withSpecificBiasForNeuronInLayer(int layer, int neuron, double bias) {
             this.isSettingSpecificBiases = true;
             this.layerList.get(layer).getNeuronList().get(neuron).setBias(bias);
             return this;
         }
 
-        public DenseLayersBuilder withInitialBiases(double[] initialBiases){
+        public DenseLayersBuilder withInitialBiases(double[] initialBiases) {
             this.isUsingSpecificBiases = true;
             this.initialBiases = initialBiases;
             return this;
         }
 
-        public DenseLayersBuilder withNumberOfNeuronsPerLayer(int[] numberOfNeuronsPerLayer){
+        public DenseLayersBuilder withNumberOfNeuronsPerLayer(int[] numberOfNeuronsPerLayer) {
             this.isUsingSpecificNeurons = true;
             this.isUsingNumberOfNeurons = false;
             this.numberOfNeuronsPerLayer = numberOfNeuronsPerLayer;
             return this;
         }
 
-        public DenseLayersBuilder withNumberOfNeurons(int numberOfNeurons){
+        public DenseLayersBuilder withNumberOfNeurons(int numberOfNeurons) {
             this.isUsingNumberOfNeurons = true;
             this.isUsingSpecificNeurons = false;
             this.numberOfNeurons = numberOfNeurons;
             return this;
         }
 
-        public DenseLayersBuilder withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction){
+        public DenseLayersBuilder withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction) {
             this.activationFunction = activationFunction;
             return this;
         }
@@ -651,41 +662,45 @@ public class DenseLayers {
             return this;
         }
 
-        public DenseLayersBuilder withActivationFunctionForOutput(DEFAULT_ACTIVATION_FUNCTIONS activationFunction){
+        public DenseLayersBuilder withActivationFunctionForOutput(DEFAULT_ACTIVATION_FUNCTIONS activationFunction) {
             if(numberOfLayers > 1){
                 activationFunctionsMap.put(numberOfLayers-1, activationFunction);
             }
             return this;
         }
 
-        public DenseLayersBuilder withLearningRate(double learningRate){
+        public DenseLayersBuilder withLearningRate(double learningRate) {
             this.learningRate = learningRate;
             return this;
         }
 
-        public DenseLayersBuilder withTrueValueIndices(int[] trueValueIndices){
+        public DenseLayersBuilder withTrueValueIndices(int[] trueValueIndices) {
             this.isUsingTrueValueIndex = true;
             this.isUsingHotEncodedVec = false;
             this.trueValueIndices = trueValueIndices;
             return this;
         }
 
-
-        public DenseLayersBuilder withTrueValues(double[] trueValues){
+        public DenseLayersBuilder withTrueValues(double[] trueValues) {
             this.isUsingTrueValues = true;
             this.trueValues = trueValues;
             return this;
         }
 
-        public DenseLayersBuilder withHotOneVector(int[][] hotOneVec){
+        public DenseLayersBuilder withTrueValues(double[][][] trueValues) {
+            this.isUsingTrueValues = true;
+            this.trueValuesMatrix = trueValues;
+            return this;
+        }
+
+        public DenseLayersBuilder withHotOneVector(int[][] hotOneVec) {
             this.isUsingTrueValueIndex = false;
             this.isUsingHotEncodedVec = true;
             this.hotOneVec = hotOneVec;
             return this;
         }
 
-
-        public DenseLayersBuilder withLossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction){
+        public DenseLayersBuilder withLossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction) {
             this.lossFunction = lossFunction;
             return this;
         }
@@ -710,22 +725,36 @@ public class DenseLayers {
             return this;
         }
 
-        public DenseLayersBuilder withLossFunctionAndHotEncodedVectors(DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] hotOneOutput){
+        public DenseLayersBuilder withLossFunctionAndHotEncodedVectors(DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] hotOneOutput) {
             this.lossFunction = lossFunction;
             this.hotOneVec = hotOneOutput;
             return this;
         }
 
-        public DenseLayersBuilder withLossFunctionAndTrueValues(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueValueIndices){
+        public DenseLayersBuilder withLossFunctionAndTrueValues(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueValueIndices) {
             this.lossFunction = lossFunction;
             this.trueValueIndices = trueValueIndices;
             return this;
         }
 
+        public DenseLayersBuilder withMiniBatchProcessing(int miniBatchSize){
+            this.isUsingBatchInputs = false;
+            this.isUsingStochasticGradientDescent = false;
+            this.isUsingMiniBatch = true;
+            return this;
+        }
+
+        public DenseLayersBuilder withFullBatchProcessing(){
+            this.isUsingMiniBatch = false;
+            this.isUsingStochasticGradientDescent = false;
+            this.isUsingBatchInputs = true;
+            return this;
+        }
+
         public DenseLayers build() {
             DenseLayers built = null;
-            if(!this.isUsingNumberOfLayers && !this.isUsingListOfLayers) throw new IllegalArgumentException("Please use the numberOfLayers() builder method to initialize, or provide an ArrayList<DenseLayer> using the withLayerList() builder method!");
-            if(!this.isUsingSpecificNeurons && !this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingBatchInputs){
+            if(!this.isUsingNumberOfLayers && !this.isUsingListOfLayers) { throw new IllegalArgumentException("Please use the numberOfLayers() builder method to initialize, or provide an ArrayList<DenseLayer> using the withLayerList() builder method!"); }
+            if(!this.isUsingSpecificNeurons && !this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingBatchInputs) {
                 if(this.isUsingFileAsInput && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     printTitle("Using construct 1.1");
                     built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
@@ -779,7 +808,7 @@ public class DenseLayers {
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.activationFunction, this.activationFunctionsMap);
                 }
             }
-            else if(!this.isUsingSpecificNeurons && !this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingFileAsInput){
+            else if(!this.isUsingSpecificNeurons && !this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingFileAsInput) {
                 if(this.isUsingBatchInputs && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     printTitle("Using construct 4.1");
                     built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
@@ -835,7 +864,7 @@ public class DenseLayers {
             }
             else {
                 built = new DenseLayers(2, DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION, this.activationFunctionsMap);
-                if(this.isUsingBatchInputs && this.isUsingFileAsInput){
+                if(this.isUsingBatchInputs && this.isUsingFileAsInput) {
                     throw new RuntimeException(bold(red("Builder Not Configured Properly! Do Not Use File As Input and Batch Input Together!")));
                 }
                 throw new RuntimeException(bold(red("Builder Not Configured Properly!")));
@@ -847,31 +876,33 @@ public class DenseLayers {
             printPositive("Number of layers set to " + this.numberOfLayers);
             printPositive("Initial activation function set to " + this.activationFunction.name());
             printPositive("Initial loss function set to " + this.lossFunction.name());
-            if(hotOneVec != null && trueValueIndices != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
-            // check if both the one hot vector mappings true values mappings are empty
-            if(hotOneVec == null && trueValueIndices == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
-            if(hotOneVec != null) {
-                int hotValueIndex = 0;
-                for(int i = 0; i < hotOneVec.length; i++){
-                    if(hotOneVec[built.batchCounter][i] != 0){
-                        hotValueIndex = i;
-                        break;
-                    }
-                }
-                built.loss =  ErrorLossFunctions.lossFunction(lossFunction, hotValueIndex, built.getDecisionsIndex()[built.batchCounter], built.getLastLayer().getLayerOutputs());
-            } else if (trueValueIndices != null){
-                built.loss = ErrorLossFunctions.lossFunction(lossFunction, trueValueIndices[built.batchCounter],  built.getDecisionsIndex()[built.batchCounter], built.getLastLayer().getLayerOutputs());
-            }
             built.learningRate = learningRate;
+            built.lossFunction = lossFunction;
+            if(isUsingTrueValueIndex) {
+                built.trueValueIndices = trueValueIndices;
+                printPositive("True Values Set!");
+            } else {
+                built.hotOneVec = hotOneVec;
+                printPositive("Hot Vector Set!");
+            }
             ALPHA = alpha;
             GAMMA = gamma;
             DELTA = delta;
             MARGIN = margin;
-            built.lossFunction = lossFunction;
-            built.trueValueIndices = trueValueIndices;
-            built.generateDecisionsMap(trueValueIndices[built.batchCounter]);
+            if(built.hotOneVec != null && built.trueValueIndices != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
+            // check if both the one hot vector mappings true values mappings are empty
+            if(built.hotOneVec == null && trueValueIndices == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
+            if(built.hotOneVec != null) {
+                built.loss =  ErrorLossFunctions.lossFunction(lossFunction, built.hotOneVec[built.batchCounter], built.getDecisionsIndex()[built.batchCounter], built.getLastLayer().getLayerOutputs());
+                built.generateDecisionsMap(built.hotOneVec[built.batchCounter]);
+            } else if (built.trueValueIndices != null){
+                built.loss = ErrorLossFunctions.lossFunction(lossFunction, trueValueIndices[built.batchCounter],  built.getDecisionsIndex()[built.batchCounter], built.getLastLayer().getLayerOutputs());
+                built.generateDecisionsMap(built.trueValueIndices[built.batchCounter]);
+            }
+
             printSubTitle("Loss and Accuracy Data For Batch: " + built.batchCounter);
-            if (isUsingTrueValueIndex) {print("True index passed in:", this.trueValueIndices[built.batchCounter]);}
+            if (this.isUsingTrueValueIndex) { print("True index passed in:", built.trueValueIndices[built.batchCounter]); }
+            if (this.isUsingHotEncodedVec) { print("Hot Encoded Vector", built.hotOneVec[built.batchCounter]); }
             print("Accuracy:", built.getAccuracy());
             print("Loss:", built.getLoss());
             printTitle("Finished Initialization");

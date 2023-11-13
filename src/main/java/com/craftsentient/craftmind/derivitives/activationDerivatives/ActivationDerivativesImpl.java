@@ -1,115 +1,12 @@
-package com.craftsentient.craftmind.derivitives;
+package com.craftsentient.craftmind.derivitives.activationDerivatives;
 
 import com.craftsentient.craftmind.activation.ActivationFunctions;
+import com.craftsentient.craftmind.activation.ActivationFunctionsImpl;
 import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATION_FUNCTIONS;
 
 import java.util.stream.IntStream;
 
-public class Activation {
-    public static double derivative(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double value) {
-        switch (activationFunction) {
-            case BENT_IDENTITY_ACTIVATION_FUNCTION -> {
-                return bentIdentity(value);
-            }
-            case GAUSSIAN_ACTIVATION_FUNCTION -> {
-                return gaussian(value);
-            }
-            case HARD_SIGMOID_ACTIVATION_FUNCTION -> {
-                return hardSigmoid(value);
-            }
-            case LINEAR_ACTIVATION_FUNCTION -> {
-                return linear(value);
-            }
-            case MISH_ACTIVATION_FUNCTION -> {
-                return mish(value);
-            }
-            case RELU_ACTIVATION_FUNCTION -> {
-                return rectifiedLinearUnit(value);
-            }
-            case RELU_6_ACTIVATION_FUNCTION -> {
-                return rectifiedLinearUnit6(value);
-            }
-            case SELU_ACTIVATION_FUNCTION -> {
-                return scaledExponentialLinear(value);
-            }
-            case SIGMOID_ACTIVATION_FUNCTION -> {
-                return sigmoid(value);
-            }
-            case SOFTPLUS_ACTIVATION_FUNCTION -> {
-                return softplus(value);
-            }
-            case SOFTSIGN_ACTIVATION_FUNCTION -> {
-                return softsign(value);
-            }
-            case TANH_ACTIVATION_FUNCTION -> {
-                return tanh(value);
-            }
-            default -> throw new RuntimeException("Incorrect Activation Function Name Entered: " + activationFunction.name());
-        }
-    }
-    public static double derivative(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double value, double alpha, double beta) {
-        switch (activationFunction) {
-            case SWISH_ACTIVATION_FUNCTION -> { return swish(value, beta); }
-            case EXPONENTIAL_ELU_ACTIVATION_FUNCTION -> { return exponentialElu(value, alpha, beta); }
-            case LEAKY_RELU_ACTIVATION_FUNCTION -> { return leakyRelu(value, alpha); }
-            case PARAMETRIC_RELU_ACTIVATION_FUNCTION -> { return parametricRelu(value,alpha); }
-            default -> throw new RuntimeException("Incorrect Activation Function Name Entered: " + activationFunction.name());
-        }
-    }
-    public static double[] derivative(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double[] values) {
-        switch (activationFunction) {
-            case BENT_IDENTITY_ACTIVATION_FUNCTION -> { return bentIdentity(values); }
-            case GAUSSIAN_ACTIVATION_FUNCTION -> { return gaussian(values); }
-            case HARD_SIGMOID_ACTIVATION_FUNCTION -> { return hardSigmoid(values); }
-            case LINEAR_ACTIVATION_FUNCTION -> { return linear(values); }
-            case MISH_ACTIVATION_FUNCTION -> { return mish(values); }
-            case RELU_ACTIVATION_FUNCTION -> { return rectifiedLinearUnit(values); }
-            case RELU_6_ACTIVATION_FUNCTION -> { return rectifiedLinearUnit6(values); }
-            case SELU_ACTIVATION_FUNCTION -> { return scaledExponentialLinear(values); }
-            case SIGMOID_ACTIVATION_FUNCTION -> { return sigmoid(values); }
-            case SOFTMAX_ACTIVATION_FUNCTION -> { return cappedSoftmax(values); }
-            case SOFTPLUS_ACTIVATION_FUNCTION -> { return softplus(values); }
-            case SOFTSIGN_ACTIVATION_FUNCTION -> { return softsign(values); }
-            case TANH_ACTIVATION_FUNCTION -> { return tanh(values); }
-            default -> throw new RuntimeException("Incorrect Activation Function Name Entered: " + activationFunction.name());
-        }
-    }
-    public static double[] derivative(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double values[], double alphas[], double betas[]) {
-        switch (activationFunction) {
-            case SWISH_ACTIVATION_FUNCTION -> { return swish(values, betas); }
-            case EXPONENTIAL_ELU_ACTIVATION_FUNCTION -> { return exponentialElu(values, alphas, betas); }
-            case PARAMETRIC_RELU_ACTIVATION_FUNCTION -> { return parametricRelu(values,alphas); }
-            default -> throw new RuntimeException("Incorrect Activation Function Name Entered: " + activationFunction.name());
-        }
-    }
-    public static double[][] derivative(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double[][] values) {
-        switch (activationFunction) {
-            case BENT_IDENTITY_ACTIVATION_FUNCTION -> { return bentIdentity(values); }
-            case GAUSSIAN_ACTIVATION_FUNCTION -> { return gaussian(values); }
-            case HARD_SIGMOID_ACTIVATION_FUNCTION -> { return hardSigmoid(values); }
-            case LINEAR_ACTIVATION_FUNCTION -> { return linear(values); }
-            case MISH_ACTIVATION_FUNCTION -> { return mish(values); }
-            case RELU_ACTIVATION_FUNCTION -> { return rectifiedLinearUnit(values); }
-            case RELU_6_ACTIVATION_FUNCTION -> { return rectifiedLinearUnit6(values); }
-            case SELU_ACTIVATION_FUNCTION -> { return scaledExponentialLinear(values); }
-            case SIGMOID_ACTIVATION_FUNCTION -> { return sigmoid(values); }
-            case SOFTMAX_ACTIVATION_FUNCTION -> { return cappedSoftmax(values); }
-            case SOFTPLUS_ACTIVATION_FUNCTION -> { return softplus(values); }
-            case SOFTSIGN_ACTIVATION_FUNCTION -> { return softsign(values); }
-            case TANH_ACTIVATION_FUNCTION -> { return tanh(values); }
-            default -> throw new RuntimeException("Incorrect Activation Function Name Entered: " + activationFunction.name());
-        }
-    }
-    public static double[][] derivative(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double values[][], double alphas[][], double betas[][]) {
-        switch (activationFunction) {
-            case SWISH_ACTIVATION_FUNCTION -> { return swish(values, betas); }
-            case EXPONENTIAL_ELU_ACTIVATION_FUNCTION -> { return exponentialElu(values, alphas, betas); }
-            case PARAMETRIC_RELU_ACTIVATION_FUNCTION -> { return parametricRelu(values,alphas); }
-            default -> throw new RuntimeException("Incorrect Activation Function Name Entered: " + activationFunction.name());
-        }
-    }
-
-
+public class ActivationDerivativesImpl {
 
 
     //BENT IDENTITY
@@ -132,11 +29,11 @@ public class Activation {
         if (value <= 0) return alpha * Math.exp(value);
         else return beta * Math.exp(value);
     }
-    public static double[] exponentialElu(double values[],double alphas[], double betas[]) {
+    public static double[] exponentialElu(double[] values, double[] alphas, double[] betas) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = exponentialElu(values[i], alphas[i], betas[i]));
         return values;
     }
-    public static double[][] exponentialElu(double values[][],double alphas[][], double betas[][]) {
+    public static double[][] exponentialElu(double[][] values, double[][] alphas, double[][] betas) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = exponentialElu(values[i], alphas[i], betas[i]));
         return values;
     }
@@ -204,8 +101,9 @@ public class Activation {
     // MISH_ACTIVATION
     public static double mish(double value) {
         return
-                ActivationFunctions.tanh(ActivationFunctions.softplus(value)) +
-                        (value * (1 - (ActivationFunctions.tanh(ActivationFunctions.softplus(value)) * ActivationFunctions.tanh(ActivationFunctions.softplus(value)))) * ActivationFunctions.sigmoid(value));
+                ActivationFunctionsImpl.tanh(ActivationFunctionsImpl.softplus(value)) +
+                        (value * (1 - (ActivationFunctionsImpl.tanh(ActivationFunctionsImpl.softplus(value)) *
+                                ActivationFunctionsImpl.tanh(ActivationFunctionsImpl.softplus(value)))) * ActivationFunctionsImpl.sigmoid(value));
     }
     public static double[] mish(double[] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> {
@@ -293,8 +191,8 @@ public class Activation {
 
     // SIGMOID_ACTIVATION
     public static double sigmoid(double value) {
-        return ActivationFunctions.sigmoid(value) *
-                (1 - ActivationFunctions.sigmoid(value));
+        return ActivationFunctionsImpl.sigmoid(value) *
+                (1 - ActivationFunctionsImpl.sigmoid(value));
     }
     public static double[] sigmoid(double[] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> {
@@ -345,7 +243,7 @@ public class Activation {
 
     // SOFTPLUS
     public static double softplus(double value) {
-        return ActivationFunctions.sigmoid(value);
+        return ActivationFunctionsImpl.sigmoid(value);
     }
     public static double[] softplus(double[] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> {
@@ -379,7 +277,7 @@ public class Activation {
 
     // SWISH
     public static double swish(double value, double beta) {
-        return (1 + value - (value * ActivationFunctions.sigmoid(value))) * ActivationFunctions.sigmoid(value);
+        return (1 + value - (value * ActivationFunctionsImpl.sigmoid(value))) * ActivationFunctionsImpl.sigmoid(value);
     }
     public static double[] swish(double[] values, double[] beta) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> {
@@ -399,7 +297,7 @@ public class Activation {
 
     // TANH
     public static double tanh(double value) {
-        return (1 - (tanh(value) * tanh(value)));
+        return (1 - (Math.tanh(value) * Math.tanh(value)));
     }
     public static double[] tanh(double[] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> values[i] = tanh(values[i]));

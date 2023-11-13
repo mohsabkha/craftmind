@@ -2,6 +2,7 @@ package com.craftsentient.craftmind.layers;
 
 import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATION_FUNCTIONS;
 import com.craftsentient.craftmind.layer.DenseLayer;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -67,9 +68,9 @@ public class LayersTest {
         new DenseLayers.DenseLayersBuilder()
                 .withNumberOfLayers(7)
                 .withNumberOfNeuronsPerLayer(new int[]{2, 5, 9, 2, 5, 4, 10})
-                .withTrueValueIndices(new int[]{8})
+                .withHotOneVector(new int[][] {{0,0,0,0,0,0,0,1,0,0}})
                 .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
-                .build().train();//.printLayers("NETWORK 2B NEW");
+                .build().train();
     }
 
     @Test
@@ -81,7 +82,8 @@ public class LayersTest {
                 .withInitialInput(inputs)
                 .withTrueValueIndices(new int[]{0,2,1})
                 .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
-                .build().train();//.printLayers("NETWORK 3A NEW");
+                .build()
+                .train();
     }
 
     @Test
@@ -93,7 +95,10 @@ public class LayersTest {
                 .withInitialInput(inputs)
                 .withTrueValueIndices(new int[]{0,0,1})
                 .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
-                .build().train();//.printLayers("NETWORK 3B NEW");
+                .withActivationFunctionForSingleLayer(3,DEFAULT_ACTIVATION_FUNCTIONS.RELU_ACTIVATION_FUNCTION)
+                .withActivationFunctionForMultipleLayers(5,6, DEFAULT_ACTIVATION_FUNCTIONS.RELU_ACTIVATION_FUNCTION)
+                .build()
+                .train();
     }
 
     @Test
@@ -105,7 +110,12 @@ public class LayersTest {
                 .withInitialInput(inputs)
                 .withTrueValueIndices(new int[] {2,1,1})
                 .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
-                .build().train();//.printLayers("NETWORK 3C NEW");
+                .withAlpha(2.0)
+                .withGamma(3.0)
+                .withMargin(1.0)
+                .withDelta(2.5)
+                .build()
+                .train();
     }
 
     @Test
@@ -117,7 +127,8 @@ public class LayersTest {
                 .withInitialInput(inputs)
                 .withTrueValueIndices(new int[]{1,2,0})
                 .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
-                .build().train();//.printLayers("NETWORK 4A NEW");
+                .build()
+                .train();
     }
 
     @Test
@@ -130,7 +141,8 @@ public class LayersTest {
                 .withInitialWeights(weights)
                 .withInitialInput(inputs)
                 .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
-                .build().train();//.printLayers("NETWORK 4B NEW");
+                .build()
+                .train();
     }
 
     @Test
@@ -142,7 +154,8 @@ public class LayersTest {
                 .withInitialWeights(weights)
                 .withInitialInput(inputs)
                 .withTrueValueIndices(new int[]{0,2,0})
-                .build().train();
+                .build()
+                .train();
     }
 
     @Test

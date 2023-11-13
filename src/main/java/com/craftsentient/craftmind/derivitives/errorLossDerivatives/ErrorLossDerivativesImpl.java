@@ -1,28 +1,9 @@
-package com.craftsentient.craftmind.derivitives;
-
-import com.craftsentient.craftmind.errorLoss.DEFAULT_LOSS_FUNCTIONS;
-
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.IntStream;
+package com.craftsentient.craftmind.derivitives.errorLossDerivatives;
 
 import static com.craftsentient.craftmind.layers.DenseLayers.*;
+import static com.craftsentient.craftmind.layers.DenseLayers.DELTA;
 
-public class ErrorLoss {
-    public static double[] derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex, int selectedOutputIndex, double[] outputs){
-        switch (lossFunction) {
-            case BINARY_CROSS_ENTROPY_LOSS_FUNCTION -> { return binaryCrossEntropy(trueValueIndex, outputs); }
-            case CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION -> { return categoricalCrossEntropy(trueValueIndex, outputs); }
-            case FOCAL_LOSS_FUNCTION -> { return focal(trueValueIndex, outputs); }
-            case HINGE_LOSS_FUNCTION -> { return hinge(trueValueIndex, outputs); }
-            case HUBER_LOSS_FUNCTION -> { return huber(trueValueIndex, outputs); }
-            case LOG_COSH_LOSS_FUNCTION -> { return logCosh(trueValueIndex, outputs); }
-            case MSLE_LOSS_FUNCTION -> {  return meanStandardLogarithmicError(trueValueIndex, outputs); }
-            case NLL_LOSS_FUNCTION -> { return negativeLogLikelihood(trueValueIndex, outputs); }
-            case SQUARED_HINGE_LOSS_FUNCTION -> { return squaredHinge(trueValueIndex, outputs); }
-            default -> throw new RuntimeException("Incorrect Loss Function Name Entered: " + lossFunction.name());
-        }
-    }
-
+public class ErrorLossDerivativesImpl {
     public static double[] binaryCrossEntropy(int trueValueIndex, double[] outputs){
         double[] derivatives = new double[outputs.length];
         for (int i = 0; i < outputs.length; i++) {
@@ -41,11 +22,8 @@ public class ErrorLoss {
         double[] derivatives = new double[outputs.length];
 
         for (int i = 0; i < outputs.length; i++) {
-            if (i == trueValueIndex) {
-                derivatives[i] = -(1 - outputs[i]);
-            } else {
-                derivatives[i] = outputs[i];
-            }
+            if (i == trueValueIndex) { derivatives[i] = -(1 - outputs[i]); }
+            else { derivatives[i] = outputs[i];}
         }
         return derivatives;
     }
@@ -55,11 +33,10 @@ public class ErrorLoss {
         double pt = outputs[trueValueIndex];
 
         for (int i = 0; i < outputs.length; i++) {
+            double modulatingFactor = Math.pow(1 - pt, GAMMA);
             if (i == trueValueIndex) {
-                double modulatingFactor = Math.pow(1 - pt, GAMMA);
                 gradients[i] = modulatingFactor * (GAMMA * pt * Math.log(pt) + pt - 1);
             } else {
-                double modulatingFactor = Math.pow(1 - pt, GAMMA);
                 gradients[i] = modulatingFactor * outputs[i] * (GAMMA * Math.log(pt) + 1);
             }
         }
@@ -138,7 +115,7 @@ public class ErrorLoss {
                 // For non-true classes, if outputs are 0, the gradient is 0 as well because log(1) - log(1) = 0
                 if (outputs[i] > 0) {
                     double output = Math.max(outputs[i], 1e-15);  // Add epsilon to avoid log(0)
-                    gradients[i] = (1 / output) * (Math.log(1 + 0) - Math.log(1 + output));
+                    gradients[i] = (1 / output) * (Math.log(1) - Math.log(1 + output));
                 } else {
                     gradients[i] = 0; // If the output is exactly 0, then the gradient is 0.
                 }
@@ -157,30 +134,19 @@ public class ErrorLoss {
     public static double[] squaredHinge(int trueValueIndex, double[] outputs) {
         double[] derivatives = new double[outputs.length];
         double sumPositiveMargins = 0.0;
-
         // Calculate the sum of the positive margins for the true class
         for (int j = 0; j < outputs.length; j++) {
-            if (j != trueValueIndex) {
-                sumPositiveMargins += Math.max(0, 1 - (outputs[trueValueIndex] - outputs[j]));
-            }
+            if (j != trueValueIndex) { sumPositiveMargins += Math.max(0, 1 - (outputs[trueValueIndex] - outputs[j])); }
         }
-
         // Calculate the derivative for each class
         for (int k = 0; k < outputs.length; k++) {
-            if (k == trueValueIndex) {
-                // Derivative for the true class
-                derivatives[k] = -2 * sumPositiveMargins;
-            } else {
-                // Derivative for non-true classes
+            if (k == trueValueIndex) { derivatives[k] = -2 * sumPositiveMargins; }
+            else {
                 double margin = 1 - (outputs[trueValueIndex] - outputs[k]);
-                if (margin > 0) {
-                    derivatives[k] = 2 * margin;
-                } else {
-                    derivatives[k] = 0;
-                }
+                if (margin > 0) { derivatives[k] = 2 * margin; }
+                else { derivatives[k] = 0; }
             }
         }
-
         return derivatives;
     }
 }
