@@ -6,6 +6,9 @@ import com.craftsentient.craftmind.layers.DenseLayers;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static com.craftsentient.craftmind.testDataGenerator.DataGenerator.createData;
+import static com.craftsentient.craftmind.utils.PrintUtils.printTitle;
+
 
 @SpringBootTest
 class CraftmindApplicationTests {
@@ -103,6 +106,38 @@ class CraftmindApplicationTests {
     public void mainTest() {
         String [] args = new String[0];
         CraftmindApplication.main(args);
+    }
+
+    @Test
+    public void testWithSpiralData(){
+            // Example usage
+        double[][] X; // x y coordinates
+        int[] y; // true values
+        int samples = 33; // Number of samples per class
+        int classes = 6;   // Number of classes
+
+        Object[] data = createData(samples, classes);
+        X = (double[][]) data[0];
+        y = (int[]) data[1];
+
+        double[][] weights = { // 1 per neuron
+                {0.2, 0.8},
+                {2.0, -0.91}
+        };
+        double[] biases = {24, 10}; // 1 per neuron
+
+        DenseLayers builtLayerWithFile = new DenseLayers.DenseLayersBuilder()
+                .withNumberOfLayers(3)
+                .withNumberOfNeuronsPerLayer(new int[]{2,64,6})
+                .withInitialInput(X)
+                .withInitialBiases(biases)
+                .withInitialWeights(weights)
+                .withLearningRate(1.0)
+                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
+                .withLossFunction(DEFAULT_LOSS_FUNCTIONS.CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION)
+                .withTrueValueIndices(y)
+                .build();
+        builtLayerWithFile.train();
     }
 
 }
