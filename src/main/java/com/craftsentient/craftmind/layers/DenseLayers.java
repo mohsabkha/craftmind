@@ -512,7 +512,6 @@ public class DenseLayers {
         this.accuracy = accuracy(getHotOneVecIndexValue(this.hotOneVec[batchCounter]), this.decisionsIndex[batchCounter]);
     }
 
-
     public DEFAULT_ACTIVATION_FUNCTIONS getActivationFunctionFrom(int index){
         return this.getLayerAt(index).getActivationFunction();
     }
@@ -679,6 +678,19 @@ public class DenseLayers {
             this.trueValueIndices = trueValueIndices;
             return this;
         }
+
+//        public DenseLayersBuilder withTextFileAsTrueValueIndices(String filePath, String delimiter) {
+//            this.isUsingFileAsInput = true;
+//            if (filePath.charAt(filePath.length()-1) == 't' && filePath.charAt(filePath.length()-2) == 'x' && filePath.charAt(filePath.length()-3) == 't' && filePath.charAt(filePath.length()-4) == '.'){
+//                this.trueValueIndices = FileUtils.readTextFile(filePath, delimiter);
+//
+//            } else if (filePath.charAt(filePath.length()-1) == 'v' && filePath.charAt(filePath.length()-2) == 's' && filePath.charAt(filePath.length()-3) == 'c' && filePath.charAt(filePath.length()-4) == '.'){
+//                this.initialInput = FileUtils.readCsvFile(filePath);
+//            } else {
+//                throw new IllegalArgumentException("Error: file must be of type txt or csv");
+//            }
+//            return this;
+//        }
 
         public DenseLayersBuilder withTrueValues(double[] trueValues) {
             this.isUsingTrueValues = true;

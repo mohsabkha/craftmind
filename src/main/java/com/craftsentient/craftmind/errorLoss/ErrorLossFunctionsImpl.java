@@ -296,7 +296,6 @@ public class ErrorLossFunctionsImpl {
     public static double negativeLogLikelihood(int trueClass, double[] outputs) {
         double predictedProbability = outputs[trueClass];
         double epsilon = 1e-15; // a small number to prevent log(0)
-        print("Predicted Probability = " + predictedProbability);
         predictedProbability = Math.max(outputs[trueClass], epsilon);
         return -Math.log(predictedProbability);
     }

@@ -12,9 +12,8 @@ class CraftmindApplicationTests {
     @Test
     public void neuralNetworkTest() throws Exception {
         double[][] inputs = {
-                {1, 2, 3, 2.5},
-                {2.0,7.0,-1.0,2.0},
-                {-1.5,2.7,3.3,-0.8}
+                {1, 2, 3, 2.5}, {2.0,7.0,-1.0,2.0}, {-1.5,2.7,3.3,-0.8},
+
         };
         double[][] weights = { // 1 per neuron
                 {0.2, 0.8, -0.5, 1.0},
@@ -26,8 +25,8 @@ class CraftmindApplicationTests {
 
         DenseLayers builtLayerWithFile = new DenseLayers.DenseLayersBuilder()
                 .withNumberOfLayers(3)
-                .withNumberOfNeuronsPerLayer(new int[]{4,64,3})
-                .withInitialInput(inputs)
+                .withNumberOfNeuronsPerLayer(new int[]{4,250,3})
+                .withTextFileAsInput("src/main/resources/inputs.txt", ",")
                 .withInitialBiases(biases)
                 .withInitialWeights(weights)
                 .withLearningRate(0.01)
@@ -35,6 +34,64 @@ class CraftmindApplicationTests {
                 .withActivationFunctionForOutput(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .withLossFunction(DEFAULT_LOSS_FUNCTIONS.CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION)
                 .withTrueValueIndices(new int[] {
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
+                        0, 1, 2,
                         0, 1, 2,
                         0, 1, 2
                 })
