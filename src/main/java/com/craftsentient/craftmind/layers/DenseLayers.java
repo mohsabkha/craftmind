@@ -6,6 +6,7 @@ import com.craftsentient.craftmind.derivitives.errorLossDerivatives.ErrorLossDer
 import com.craftsentient.craftmind.errorLoss.DEFAULT_LOSSES;
 import com.craftsentient.craftmind.errorLoss.ErrorLossFunctions;
 import com.craftsentient.craftmind.layer.DenseLayer;
+import com.craftsentient.craftmind.learningRate.DEFAULT_LEARNING_RATE_DECAY;
 import com.craftsentient.craftmind.utils.FileUtils;
 import com.craftsentient.craftmind.utils.MathUtils;
 import com.craftsentient.craftmind.neuron.Neuron;
@@ -33,7 +34,8 @@ public class DenseLayers {
     private double loss;
     private double sum;
     private double learningRate = 1.0;
-    private double learningRateDecay = 1.0;
+    private double learningRateDecay = 0.0;
+    private DEFAULT_LEARNING_RATE_DECAY decayFunction;
     private int[][] hotOneVec;
     public static double ALPHA = 1.0;
     public static double GAMMA = 1.0;
@@ -621,6 +623,7 @@ public class DenseLayers {
 
         double learningRate = 0.01;
         double learningRateDecay = 0;
+        DEFAULT_LEARNING_RATE_DECAY decayFunction = DEFAULT_LEARNING_RATE_DECAY.EPOCH;
 
         double alpha = 1.0;
         double gamma = 1.0;
@@ -728,6 +731,17 @@ public class DenseLayers {
         }
 
         public DenseLayersBuilder withLearningRateDecay(double learningRateDecay) {
+            this.learningRateDecay = learningRateDecay;
+            return this;
+        }
+
+        public DenseLayersBuilder withLearningRateDecayFunction(DEFAULT_LEARNING_RATE_DECAY decayFunction) {
+            this.decayFunction = decayFunction;
+            return this;
+        }
+
+        public DenseLayersBuilder withLearningRateDecay(DEFAULT_LEARNING_RATE_DECAY decayFunction, double learningRateDecay) {
+            this.decayFunction = decayFunction;
             this.learningRateDecay = learningRateDecay;
             return this;
         }
@@ -946,6 +960,7 @@ public class DenseLayers {
             assert built != null;
             built.learningRate = this.learningRate;
             built.learningRateDecay = this.learningRateDecay;
+            built.decayFunction = this.decayFunction;
             built.lossFunction = this.lossFunction;
             built.miniBatchSize = this.miniBatchSize;
             if(isUsingTrueValueIndex) {
