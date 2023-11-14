@@ -620,6 +620,8 @@ public class DenseLayers {
         private boolean isUsingFileAsInput = false;
 
         double learningRate = 0.01;
+        double learningRateDecay = 0;
+
         double alpha = 1.0;
         double gamma = 1.0;
         double delta = 1.0;
@@ -722,6 +724,11 @@ public class DenseLayers {
 
         public DenseLayersBuilder withLearningRate(double learningRate) {
             this.learningRate = learningRate;
+            return this;
+        }
+
+        public DenseLayersBuilder withLearningRateDecay(double learningRateDecay) {
+            this.learningRateDecay = learningRateDecay;
             return this;
         }
 
@@ -943,8 +950,8 @@ public class DenseLayers {
             printPositive("Number of layers set to " + this.numberOfLayers);
             printPositive("Initial activation function set to " + this.activationFunction.name());
             printPositive("Loss function set to " + this.lossFunction.name());
-
             built.learningRate = this.learningRate;
+            built.learningRateDecay = this.learningRateDecay;
             built.lossFunction = this.lossFunction;
             built.miniBatchSize = this.miniBatchSize;
             if(isUsingTrueValueIndex) {
