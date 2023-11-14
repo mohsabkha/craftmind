@@ -113,7 +113,7 @@ class CraftmindApplicationTests {
             // Example usage
         double[][] X; // x y coordinates
         int[] y; // true values
-        int samples = 33; // Number of samples per class
+        int samples = 100; // Number of samples per class
         int classes = 3;   // Number of classes
 
         Object[] data = createData(samples, classes);
@@ -129,7 +129,7 @@ class CraftmindApplicationTests {
         DenseLayers builtLayerWithFile = new DenseLayers.DenseLayersBuilder()
                 .withNumberOfLayers(3)
                 .withNumberOfNeuronsPerLayer(new int[]{2,64,3})
-                .withMiniBatchProcessing(3)
+                .withMiniBatchProcessing(1)
                 .withInitialInput(X)
                 .withInitialBiases(biases)
                 .withInitialWeights(weights)

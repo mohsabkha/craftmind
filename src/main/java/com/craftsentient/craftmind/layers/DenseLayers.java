@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 import java.util.*;
 import java.util.stream.IntStream;
 
+import static com.craftsentient.craftmind.learningRate.LearningRate.updateLearningRate;
 import static com.craftsentient.craftmind.utils.MathUtils.getHotOneVecIndexValue;
 import static com.craftsentient.craftmind.utils.PrintUtils.*;
 
@@ -354,9 +355,7 @@ public class DenseLayers {
                     break;
                 }
                 this.dataCounter++;
-                // set buffer to hold inputs
-                double[][] inputs = new double[this.getLayerList().size()][];
-                forward(inputs);
+                forward();
                 tempLoss += generateLoss();
             }
             this.loss = tempLoss / miniBatchSize;
@@ -380,9 +379,7 @@ public class DenseLayers {
                     break;
                 }
                 this.dataCounter++;
-                // set buffer to hold inputs
-                double[][] inputs = new double[this.getLayerList().size()][];
-                forward(inputs);
+                forward();
                 tempLoss += generateLoss();
             }
             this.loss = tempLoss / miniBatchSize;
@@ -418,27 +415,15 @@ public class DenseLayers {
         return loss;
     }
 
-    private void forward(double[][] inputs) {
+    private void forward() {
         // do forward pass with next batch of input
-        IntStream.range(0, inputs.length).parallel().forEachOrdered(i -> {
+        IntStream.range(0, this.getLayerList().size()).parallel().forEachOrdered(i -> {
             if (i != 0) {
-                this.getLayerAt(i).setInputs(inputs[i-1]); // use previous layers input
+                this.getLayerAt(i).setInputs(this.getLayerAt(i-1).getLayerOutputs()); // use previous layers input
             } else {
-                this.getLayerAt(i).setInputs(this.initialInput[dataCounter]); // use user provided input
+                this.getLayerAt(i).setInputs(this.initialInput[dataCounter]); // use user-provided input
             }
-            inputs[i] = this.getLayerAt(i).regenerateLayerOutput();
-        });
-    }
-
-    private void initialForward(double[][] inputs) {
-        // do forward pass with next batch of input
-        IntStream.range(0, inputs.length).parallel().forEachOrdered(i -> {
-            if (i != 0) {
-                this.getLayerAt(i).setInputs(inputs[i-1]); // use previous layers input
-            } else {
-                this.getLayerAt(i).setInputs(this.initialInput[dataCounter]); // use user provided input
-            }
-            inputs[i] = this.getLayerAt(i).regenerateLayerOutput();
+            this.getLayerAt(i).regenerateLayerOutput();
         });
     }
 
@@ -497,6 +482,10 @@ public class DenseLayers {
                     neuron.setWeight(k, neuron.getWeights()[k] - deltaWeight);
                 }
             }
+        }
+        // decay learning rate
+        if(this.decayFunction == DEFAULT_LEARNING_RATE_DECAY.EPOCH){
+            this.learningRate = updateLearningRate(this.decayFunction, this.learningRate, this.learningRateDecay, this.batchCounter);
         }
         printPositive("Finished back-propagation!");
     }
@@ -1000,9 +989,7 @@ public class DenseLayers {
                     break;
                 }
                 built.dataCounter++;
-                // set buffer to hold inputs
-                double[][] inputs = new double[built.getLayerList().size()][];
-                built.forward(inputs);
+                built.forward();
                 tl += built.generateLoss();
             }
             built.loss = tl / built.miniBatchSize;

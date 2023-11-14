@@ -1,8 +1,7 @@
 package com.craftsentient.craftmind.learningRate;
 
 
-import static com.craftsentient.craftmind.learningRate.LearningRateImpl.epochDecay;
-import static com.craftsentient.craftmind.learningRate.LearningRateImpl.stepDecay;
+import static com.craftsentient.craftmind.learningRate.LearningRateImpl.*;
 
 public class LearningRate {
     public static double updateLearningRate(DEFAULT_LEARNING_RATE_DECAY decayFunction, double learningRate, double decayRate, int iteration){
@@ -14,7 +13,7 @@ public class LearningRate {
                 return stepDecay(learningRate, decayRate, iteration);
             }
             case EXPONENTIAL: {
-
+                //return exponentialDecay()
             }
             case ADAGRAD: {
 
