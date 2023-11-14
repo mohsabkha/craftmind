@@ -366,6 +366,30 @@ public class DenseLayers {
             print("Layer Outputs:", this.getLastLayer().getLayerOutputs());
             print("");
         });
+        if(this.initialInput.length % miniBatchSize != 0){
+            print("Processing Remaining Data Points...");
+            double tempLoss = 0;
+            // call back-propagate
+            this.backPropagate();
+            // mini batch processing
+            for(int x = 0; x < (miniBatchSize - (this.initialInput.length % miniBatchSize)); x++){
+                if(dataCounter >= this.initialInput.length - 1){
+                    break;
+                }
+                this.dataCounter++;
+                // set buffer to hold inputs
+                double[][] inputs = new double[this.getLayerList().size()][];
+                forward(inputs);
+                tempLoss += generateLoss();
+            }
+            this.loss = tempLoss / miniBatchSize;
+            this.batchCounter++;
+            print("Loss and Accuracy Data For Batch: " + this.batchCounter);
+            print("Accuracy:", this.getAccuracy());
+            print("Loss:", this.getLoss());
+            print("Layer Outputs:", this.getLastLayer().getLayerOutputs());
+            print("");
+        }
         printTitle("Training Complete!");
     }
 

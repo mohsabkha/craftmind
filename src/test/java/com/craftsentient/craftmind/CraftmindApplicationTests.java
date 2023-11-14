@@ -33,7 +33,7 @@ class CraftmindApplicationTests {
                 .withInitialBiases(biases)
                 .withInitialWeights(weights)
                 .withLearningRate(0.01)
-                .withMiniBatchProcessing(1)
+                .withMiniBatchProcessing(7)
                 .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.RELU_ACTIVATION_FUNCTION)
                 .withActivationFunctionForOutput(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .withLossFunction(DEFAULT_LOSS_FUNCTIONS.CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION)
