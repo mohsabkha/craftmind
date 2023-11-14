@@ -1,29 +1,31 @@
 package com.craftsentient.craftmind.learningRate;
 
 
+import static com.craftsentient.craftmind.learningRate.LearningRateImpl.epochDecay;
+import static com.craftsentient.craftmind.learningRate.LearningRateImpl.stepDecay;
+
 public class LearningRate {
+    public static double updateLearningRate(DEFAULT_LEARNING_RATE_DECAY decayFunction, double learningRate, double decayRate, int iteration){
+        switch (decayFunction){
+            case EPOCH: {
+                return epochDecay(learningRate, decayRate, iteration);
+            }
+            case STEP: {
+                return stepDecay(learningRate, decayRate, iteration);
+            }
+            case EXPONENTIAL: {
 
-    public static double epochDecay(double learningRate, double decayRate, int iteration) {
-        return learningRate * (1 / (1 + decayRate * iteration));
-    }
+            }
+            case ADAGRAD: {
 
-    public static double stepDecay(double learningRate, double decayRate, int step) {
-        return learningRate * Math.pow(decayRate, step);
-    }
+            }
+            case RMSPROP: {
 
-    public static double exponentialDecay(double learningRate, double decayRate, int epoch) {
-        return learningRate * Math.exp(-decayRate * epoch);
-    }
+            }
+            case ADAM: {
 
-    public static double AdagradAdaptiveDecay(double learningRate, double decayRate, double gradient, int iteration, double alpha) {
-        return learningRate / Math.sqrt(gradient + alpha);
-    }
-
-    public static double rmsPropAdaptiveDecay(){
-        return 0.0;
-    }
-
-    public static double adamAdaptiveDecay(){
-        return 0.0;
+            }
+            default: return 0.01;
+        }
     }
 }

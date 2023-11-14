@@ -9,10 +9,8 @@ public class ErrorLossFunctions {
     }
     public static double lossFunction(DEFAULT_LOSSES lossFunction, int[] hotOneVec, int selectedOutputIndex, double[] outputs) {
         int trueValueIndex = 0;
-
         return determineLossFunctionFromIndices(lossFunction, trueValueIndex, selectedOutputIndex, outputs);
     }
-
     public static double lossFunction(DEFAULT_LOSSES lossFunction, int trueValueIndices[], int selectedOutputIndex[], double[][] outputs) {
         return determineLossFunctionFromIndices(lossFunction, trueValueIndices, selectedOutputIndex, outputs);
     }
@@ -29,6 +27,7 @@ public class ErrorLossFunctions {
         }
         return determineLossFunctionFromIndices(lossFunction, trueValueIndices, selectedOutputIndex, outputs);
     }
+
 
     // true value index and hot one vector
     private static double determineLossFunctionFromIndices(DEFAULT_LOSSES lossFunction, int trueValueIndex, int selectedOutputIndex, double[] outputs) {
