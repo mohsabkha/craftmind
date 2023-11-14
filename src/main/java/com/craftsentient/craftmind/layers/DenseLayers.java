@@ -6,6 +6,7 @@ import com.craftsentient.craftmind.derivitives.errorLossDerivatives.ErrorLossDer
 import com.craftsentient.craftmind.errorLoss.DEFAULT_LOSS_FUNCTIONS;
 import com.craftsentient.craftmind.errorLoss.ErrorLossFunctions;
 import com.craftsentient.craftmind.layer.DenseLayer;
+import com.craftsentient.craftmind.layer.Layer;
 import com.craftsentient.craftmind.utils.FileUtils;
 import com.craftsentient.craftmind.utils.MathUtils;
 import com.craftsentient.craftmind.neuron.Neuron;
@@ -17,12 +18,15 @@ import java.util.stream.IntStream;
 
 import static com.craftsentient.craftmind.utils.MathUtils.getHotOneVecIndexValue;
 import static com.craftsentient.craftmind.utils.PrintUtils.*;
+import static java.lang.Thread.sleep;
 
 @Getter
 public class DenseLayers {
     private final ArrayList<DenseLayer> layerList;
     private final double[][] initialInput;
+    private int dataCounter = 0;
     private int batchCounter = 0;
+    private int miniBatchSize = 1;
     private final Map<Integer, Double> decisions;
     private final int[] decisionsIndex;
     private int[] trueValueIndices;
@@ -67,7 +71,6 @@ public class DenseLayers {
             }
         });
     }
-
     private DenseLayers(int layers, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
@@ -80,8 +83,8 @@ public class DenseLayers {
                     double[][] weights = randn(initialInput.length, layerList.get(i - 1).getLayerOutputs().length);
                     layerList.add(new DenseLayer(weights, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse));
                 } else {
-                    double[][] weights = randn(initialInput.length, initialInput[batchCounter].length);
-                    layerList.add(new DenseLayer(weights, initialInput[batchCounter], activationFunctionToUse));
+                    double[][] weights = randn(initialInput.length, initialInput[dataCounter].length);
+                    layerList.add(new DenseLayer(weights, initialInput[dataCounter], activationFunctionToUse));
                 }
             } catch (Exception e){
                 throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation! " + e.getMessage());
@@ -328,67 +331,90 @@ public class DenseLayers {
                     DenseLayer layer = new DenseLayer(weights, biases, layerList.get(i - 1).getLayerOutputs(), activationFunctionToUse);
                     layerList.add(layer);
                 } else {
-                    DenseLayer layer = new DenseLayer(initialWeights, initialBiases, initialInput[batchCounter], activationFunctionToUse);
+                    DenseLayer layer = new DenseLayer(initialWeights, initialBiases, initialInput[dataCounter], activationFunctionToUse);
                     layerList.add(layer);
                 }
             } catch (Exception e) {
                 throw new RuntimeException("[DenseLayers Constructor] Error During Layer Creation! " + e.getMessage());
             }
         });
+        printPositive("Construct built!");
     }
 
     public void train() {
-        if(batchCounter == this.initialInput.length - 1){
-            return;
-        }
-        for(int k = 0; k < this.initialInput.length-1; k++) {
+        if(dataCounter == this.initialInput.length - 1){ return; }
+        IntStream.range(0, ((this.initialInput.length-1)/miniBatchSize)).parallel().forEachOrdered(y -> {
+            double tempLoss = 0;
             // call back-propagate
             this.backPropagate();
-            // increase batchCounter
+            // mini batch processing
+            for(int x = 0; x < miniBatchSize; x++){
+                if(dataCounter >= this.initialInput.length - 1){
+                    break;
+                }
+                this.dataCounter++;
+                // set buffer to hold inputs
+                double[][] inputs = new double[this.getLayerList().size()][];
+                forward(inputs);
+                tempLoss += generateLoss();
+            }
+            this.loss = tempLoss / miniBatchSize;
             this.batchCounter++;
-            print("training on input batch " + this.batchCounter);
-            // set buffer to hold inputs
-            double[][] inputs = new double[this.getLayerList().size()][];
-
-            // do forward pass with next batch of input
-            print("Beginning next forward pass...");
-            for (int i = 0; i < this.getLayerList().size(); i++) {
-                if (i != 0) {
-                    this.getLayerAt(i).setInputs(inputs[i-1]); // use previous layers input
-                } else {
-                    this.getLayerAt(i).setInputs(this.initialInput[batchCounter]); // use user provided input
-                }
-                inputs[i] = this.getLayerAt(i).regenerateLayerOutput();
-            }
-
-            if(hotOneVec != null && trueValueIndices != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
-            // check if both the one hot vector mappings true values mappings are empty
-            if(hotOneVec == null && trueValueIndices == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
-            assert trueValueIndices != null;
-            this.generateDecisionsMap(trueValueIndices[this.batchCounter]);
-            if(hotOneVec != null) {
-                int hotValueIndex = 0;
-                for(int i = 0; i < hotOneVec.length; i++){
-                    if(hotOneVec[this.batchCounter][i] != 0){
-                        hotValueIndex = i;
-                        break;
-                    }
-                }
-                this.loss = ErrorLossFunctions.lossFunction(lossFunction, hotValueIndex, this.getDecisionsIndex()[this.batchCounter], this.getLastLayer().getLayerOutputs());
-            } else if (trueValueIndices != null){
-
-                this.loss = ErrorLossFunctions.lossFunction(lossFunction, trueValueIndices[this.batchCounter],  this.getDecisionsIndex()[this.batchCounter], this.getLastLayer().getLayerOutputs());
-            }
             print("Loss and Accuracy Data For Batch: " + this.batchCounter);
             print("Accuracy:", this.getAccuracy());
             print("Loss:", this.getLoss());
             print("Layer Outputs:", this.getLastLayer().getLayerOutputs());
-            //printLayers("Layers", this);
-        }
+            print("");
+        });
         printTitle("Training Complete!");
     }
-    public void miniBatchTrain() {}
-    public void batchTrain() {}
+
+    private double generateLoss(){
+        double loss = 0;
+        if(hotOneVec != null && trueValueIndices != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
+        // check if both the one hot vector mappings true values mappings are empty
+        if(hotOneVec == null && trueValueIndices == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
+        assert trueValueIndices != null;
+        this.generateDecisionsMap(trueValueIndices[this.dataCounter]);
+        if(hotOneVec != null) {
+            int hotValueIndex = 0;
+            for(int i = 0; i < hotOneVec.length; i++){
+                if(hotOneVec[this.dataCounter][i] != 0){
+                    hotValueIndex = i;
+                    break;
+                }
+            }
+            loss = ErrorLossFunctions.lossFunction(lossFunction, hotValueIndex, this.getDecisionsIndex()[this.dataCounter], this.getLastLayer().getLayerOutputs());
+        } else if (trueValueIndices != null){
+            loss =  ErrorLossFunctions.lossFunction(lossFunction, trueValueIndices[this.dataCounter],  this.getDecisionsIndex()[this.dataCounter], this.getLastLayer().getLayerOutputs());
+        }
+        return loss;
+    }
+
+    private void forward(double[][] inputs) {
+        // do forward pass with next batch of input
+        IntStream.range(0, inputs.length).parallel().forEachOrdered(i -> {
+            if (i != 0) {
+                this.getLayerAt(i).setInputs(inputs[i-1]); // use previous layers input
+            } else {
+                this.getLayerAt(i).setInputs(this.initialInput[dataCounter]); // use user provided input
+            }
+            inputs[i] = this.getLayerAt(i).regenerateLayerOutput();
+        });
+    }
+
+    private void initialForward(double[][] inputs) {
+        // do forward pass with next batch of input
+        IntStream.range(0, inputs.length).parallel().forEachOrdered(i -> {
+            if (i != 0) {
+                this.getLayerAt(i).setInputs(inputs[i-1]); // use previous layers input
+            } else {
+                this.getLayerAt(i).setInputs(this.initialInput[dataCounter]); // use user provided input
+            }
+            inputs[i] = this.getLayerAt(i).regenerateLayerOutput();
+        });
+    }
+
     private void backPropagate() {
         print("Back-Propagating...");
         // Output layer error gradient
@@ -398,8 +424,8 @@ public class DenseLayers {
         // loss function derivative
         gradients[outputIndex] = ErrorLossDerivatives.derivative(
                 lossFunction,
-                this.getTrueValueIndices()[batchCounter],
-                this.getDecisionsIndex()[batchCounter],
+                this.getTrueValueIndices()[dataCounter],
+                this.getDecisionsIndex()[dataCounter],
                 this.getLayerAt(outputIndex).getLayerOutputs()
         );
         // Update output layer weights and biases
@@ -416,11 +442,11 @@ public class DenseLayers {
             }
         }
 
-        // Backpropagate through the hidden layers
+        // Backpropagation through the hidden layers
         for (int index = outputIndex - 1; index >= 0; index--) {
             // create gradient for current layer
             gradients[index] = new double[this.getLayerAt(index).getNeuronList().size()];
-            // activation funciton derivative
+            // activation function derivative
             double[] derivatives = ActivationDerivatives.derivative(
                     this.getLayerAt(index).getActivationFunction(),
                     this.getLayerAt(index).getLayerOutputs()
@@ -438,7 +464,7 @@ public class DenseLayers {
                 Neuron neuron = this.getNeuronFromLayerAt(index, j);
                 // update biases
                 neuron.setBias(neuron.getBias() - (this.learningRate * gradients[index][j]));
-                double[] inputs = (index == 0) ? this.getInitialInput()[batchCounter] :
+                double[] inputs = (index == 0) ? this.getInitialInput()[dataCounter] :
                         this.getLayerAt(index - 1).getLayerOutputs();
                 for (int k = 0; k < neuron.getWeights().length; k++) {
                     double deltaWeight = this.learningRate * gradients[index][j] * inputs[k];
@@ -446,8 +472,9 @@ public class DenseLayers {
                 }
             }
         }
-        printPositive("Finished back-propagation!\n");
+        printPositive("Finished back-propagation!");
     }
+
     private static double[][] randn(int rows, int cols) {
         return getRandomMatrix(rows, cols);
     }
@@ -471,8 +498,8 @@ public class DenseLayers {
     public ArrayList<Neuron> getNeuronsFromLayerAt(int index) {
         return this.getLayerList().get(index).getNeuronList();
     }
-    public Neuron getNeuronFromLayerAt(int layerIndex, int nueronIndex) {
-        return this.getLayerList().get(layerIndex).getNeuronList().get(nueronIndex);
+    public Neuron getNeuronFromLayerAt(int layerIndex, int neuronIndex) {
+        return this.getLayerList().get(layerIndex).getNeuronList().get(neuronIndex);
     }
     private double[] batchDecisions() {
         double[] decisions = new double[this.getLastLayer().getLayerOutputs().length];
@@ -489,28 +516,24 @@ public class DenseLayers {
         if(trueIndex == predictedIndex) {
             sum+=1;
         }
-        this.accuracy = sum / (batchCounter + 1);
+        this.accuracy = sum / (dataCounter + 1);
         return this.accuracy;
     }
     private void generateDecisionsMap(int trueValueIndex) {
         // go through and get the decision made at the output layer
         double[] indexAndMax = decision(this.getLastLayer().getLayerOutputs());
         // store the index of that decision for each cycle of training
-        this.decisionsIndex[batchCounter] = (int)indexAndMax[0];
+        this.decisionsIndex[dataCounter] = (int)indexAndMax[0];
         // store the actual value of the decision as well
-        this.decisions.put(batchCounter, indexAndMax[1]);
+        this.decisions.put(dataCounter, indexAndMax[1]);
         // determine the accuracy of the decision
-        this.accuracy = accuracy(trueValueIndex, this.decisionsIndex[batchCounter]);
+        this.accuracy = accuracy(trueValueIndex, this.decisionsIndex[dataCounter]);
     }
     private void generateDecisionsMap(int[] hotOneVec) {
-        // go through and get the decision made at the output layer
         double[] indexAndMax = decision(this.getLastLayer().getLayerOutputs());
-        // store the index of that decision for each cycle of training
-        this.decisionsIndex[batchCounter] = (int)indexAndMax[0];
-        // store the actual value of the decision as well
-        this.decisions.put(batchCounter, indexAndMax[1]);
-        // determine the accuracy of the decision
-        this.accuracy = accuracy(getHotOneVecIndexValue(this.hotOneVec[batchCounter]), this.decisionsIndex[batchCounter]);
+        this.decisionsIndex[dataCounter] = (int)indexAndMax[0];
+        this.decisions.put(dataCounter, indexAndMax[1]);
+        this.accuracy = accuracy(getHotOneVecIndexValue(this.hotOneVec[dataCounter]), this.decisionsIndex[dataCounter]);
     }
 
     public DEFAULT_ACTIVATION_FUNCTIONS getActivationFunctionFrom(int index){
@@ -556,8 +579,8 @@ public class DenseLayers {
         private double[][] initialInput;
         private double[][][] initialMatrixInput;
         private boolean isUsingStochasticGradientDescent = true;
-        private boolean isUsingBatchInputs = false;
-        private boolean isUsingMiniBatch = false;
+        private boolean isUsingBatchInputs = true;
+        private int miniBatchSize = 1;
 
         private double[][] initialWeights;
         private boolean isUsingSpecificWeights = false;
@@ -580,10 +603,15 @@ public class DenseLayers {
 
         public DenseLayersBuilder withTextFileAsInput(String filePath, String delimiter) {
             this.isUsingFileAsInput = true;
-            if (filePath.charAt(filePath.length()-1) == 't' && filePath.charAt(filePath.length()-2) == 'x' && filePath.charAt(filePath.length()-3) == 't' && filePath.charAt(filePath.length()-4) == '.'){
-                this.initialInput = FileUtils.readTextFile(filePath, delimiter);
+            this.isUsingBatchInputs = false;
+            char char1 = filePath.charAt(filePath.length()-1);
+            char char2 = filePath.charAt(filePath.length()-2);
+            char char3 = filePath.charAt(filePath.length()-3);
+            char char4 = filePath.charAt(filePath.length()-4);
+            if (char1 == 't' && char2 == 'x' && char3 == 't' && char4 == '.'){
+                this.initialInput = (double[][])FileUtils.readTextFile(filePath, delimiter);
 
-            } else if (filePath.charAt(filePath.length()-1) == 'v' && filePath.charAt(filePath.length()-2) == 's' && filePath.charAt(filePath.length()-3) == 'c' && filePath.charAt(filePath.length()-4) == '.'){
+            } else if (char1 == 'v' && char2 == 's' && char3 == 'c' && char4 == '.'){
                 this.initialInput = FileUtils.readCsvFile(filePath);
             } else {
                 throw new IllegalArgumentException("Error: file must be of type txt or csv");
@@ -680,18 +708,22 @@ public class DenseLayers {
             return this;
         }
 
-//        public DenseLayersBuilder withTextFileAsTrueValueIndices(String filePath, String delimiter) {
-//            this.isUsingFileAsInput = true;
-//            if (filePath.charAt(filePath.length()-1) == 't' && filePath.charAt(filePath.length()-2) == 'x' && filePath.charAt(filePath.length()-3) == 't' && filePath.charAt(filePath.length()-4) == '.'){
-//                this.trueValueIndices = FileUtils.readTextFile(filePath, delimiter);
-//
-//            } else if (filePath.charAt(filePath.length()-1) == 'v' && filePath.charAt(filePath.length()-2) == 's' && filePath.charAt(filePath.length()-3) == 'c' && filePath.charAt(filePath.length()-4) == '.'){
-//                this.initialInput = FileUtils.readCsvFile(filePath);
-//            } else {
-//                throw new IllegalArgumentException("Error: file must be of type txt or csv");
-//            }
-//            return this;
-//        }
+        public DenseLayersBuilder withTextFileAsTrueValueIndices(String filePath, String delimiter) {
+            this.isUsingFileAsInput = true;
+            char char1 = filePath.charAt(filePath.length()-1);
+            char char2 = filePath.charAt(filePath.length()-2);
+            char char3 = filePath.charAt(filePath.length()-3);
+            char char4 = filePath.charAt(filePath.length()-4);
+            if (char1 == 't' && char2 == 'x' && char3 == 't' && char4 == '.'){
+                this.trueValueIndices = (int[])FileUtils.readTextFile(filePath, delimiter);
+
+            } else if (char1 == 'v' && char2 == 's' && char3 == 'c' && char4 == '.'){
+                this.initialInput = FileUtils.readCsvFile(filePath);
+            } else {
+                throw new IllegalArgumentException("Error: file must be of type txt or csv");
+            }
+            return this;
+        }
 
         public DenseLayersBuilder withTrueValues(double[] trueValues) {
             this.isUsingTrueValues = true;
@@ -750,14 +782,11 @@ public class DenseLayers {
         }
 
         public DenseLayersBuilder withMiniBatchProcessing(int miniBatchSize){
-            this.isUsingBatchInputs = false;
-            this.isUsingStochasticGradientDescent = false;
-            this.isUsingMiniBatch = true;
+            this.miniBatchSize = miniBatchSize;
             return this;
         }
 
         public DenseLayersBuilder withFullBatchProcessing(){
-            this.isUsingMiniBatch = false;
             this.isUsingStochasticGradientDescent = false;
             this.isUsingBatchInputs = true;
             return this;
@@ -766,6 +795,7 @@ public class DenseLayers {
         public DenseLayers build() {
             DenseLayers built = null;
             if(!this.isUsingNumberOfLayers && !this.isUsingListOfLayers) { throw new IllegalArgumentException("Please use the numberOfLayers() builder method to initialize, or provide an ArrayList<DenseLayer> using the withLayerList() builder method!"); }
+
             if(!this.isUsingSpecificNeurons && !this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingBatchInputs) {
                 if(this.isUsingFileAsInput && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     printTitle("Using construct 1.1");
@@ -779,7 +809,7 @@ public class DenseLayers {
                     printTitle("Using construct 1.3");
                     built = new DenseLayers(this.numberOfLayers, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
-                else if(!this.isUsingFileAsInput && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
+                else if(!this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printTitle("Using construct 1.4");
                     built = new DenseLayers(this.numberOfLayers, this.activationFunction, this.activationFunctionsMap);
                 }
@@ -875,6 +905,7 @@ public class DenseLayers {
                 }
             }
             else {
+                printTitle("Using construct 7");
                 built = new DenseLayers(2, DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION, this.activationFunctionsMap);
                 if(this.isUsingBatchInputs && this.isUsingFileAsInput) {
                     throw new RuntimeException(bold(red("Builder Not Configured Properly! Do Not Use File As Input and Batch Input Together!")));
@@ -887,37 +918,54 @@ public class DenseLayers {
             printPositive("Created dense layer neural network: " + built);
             printPositive("Number of layers set to " + this.numberOfLayers);
             printPositive("Initial activation function set to " + this.activationFunction.name());
-            printPositive("Initial loss function set to " + this.lossFunction.name());
-            built.learningRate = learningRate;
-            built.lossFunction = lossFunction;
+            printPositive("Loss function set to " + this.lossFunction.name());
+
+            built.learningRate = this.learningRate;
+            built.lossFunction = this.lossFunction;
+            built.miniBatchSize = this.miniBatchSize;
             if(isUsingTrueValueIndex) {
-                built.trueValueIndices = trueValueIndices;
+                built.trueValueIndices = this.trueValueIndices;
                 printPositive("True Values Set!");
             } else {
-                built.hotOneVec = hotOneVec;
+                built.hotOneVec = this.hotOneVec;
                 printPositive("Hot Vector Set!");
             }
-            ALPHA = alpha;
-            GAMMA = gamma;
-            DELTA = delta;
-            MARGIN = margin;
+            ALPHA = this.alpha;
+            GAMMA = this.gamma;
+            DELTA = this.delta;
+            MARGIN = this.margin;
             if(built.hotOneVec != null && built.trueValueIndices != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
             // check if both the one hot vector mappings true values mappings are empty
             if(built.hotOneVec == null && trueValueIndices == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
             if(built.hotOneVec != null) {
-                built.loss =  ErrorLossFunctions.lossFunction(lossFunction, built.hotOneVec[built.batchCounter], built.getDecisionsIndex()[built.batchCounter], built.getLastLayer().getLayerOutputs());
-                built.generateDecisionsMap(built.hotOneVec[built.batchCounter]);
-            } else if (built.trueValueIndices != null){
-                built.loss = ErrorLossFunctions.lossFunction(lossFunction, trueValueIndices[built.batchCounter],  built.getDecisionsIndex()[built.batchCounter], built.getLastLayer().getLayerOutputs());
-                built.generateDecisionsMap(built.trueValueIndices[built.batchCounter]);
-            }
+                built.generateDecisionsMap(built.hotOneVec[built.miniBatchSize]);
+                built.loss =  ErrorLossFunctions.lossFunction(lossFunction, built.hotOneVec[built.miniBatchSize], built.getDecisionsIndex()[built.miniBatchSize], built.getLastLayer().getLayerOutputs());
 
-            printSubTitle("Loss and Accuracy Data For Batch: " + built.batchCounter);
-            if (this.isUsingTrueValueIndex) { print("True index passed in:", built.trueValueIndices[built.batchCounter]); }
-            if (this.isUsingHotEncodedVec) { print("Hot Encoded Vector", built.hotOneVec[built.batchCounter]); }
+            } else if (built.trueValueIndices != null){
+                built.generateDecisionsMap(built.trueValueIndices[built.miniBatchSize]);
+                built.loss = ErrorLossFunctions.lossFunction(lossFunction, trueValueIndices[built.miniBatchSize],  built.getDecisionsIndex()[built.miniBatchSize], built.getLastLayer().getLayerOutputs());
+            }
+            double tl = built.loss;
+            for(int y = 0; y < built.miniBatchSize-1; y++) {
+                if(built.dataCounter >= built.initialInput.length - 1){
+                    break;
+                }
+                built.dataCounter++;
+                // set buffer to hold inputs
+                double[][] inputs = new double[built.getLayerList().size()][];
+                built.forward(inputs);
+                tl += built.generateLoss();
+            }
+            built.loss = tl / built.miniBatchSize;
+            printSubTitle("Starting back propagation!");
+            built.backPropagate();
+            printSubTitle("Initialization Stats:");
+            print("Loss and Accuracy Data For Batch: " + built.batchCounter);
             print("Accuracy:", built.getAccuracy());
             print("Loss:", built.getLoss());
-            printTitle("Finished Initialization");
+            print("Layer Outputs:", built.getLastLayer().getLayerOutputs());
+            printTitle("Finished Initialization!");
+            print("");
             return built;
         }
     }

@@ -129,7 +129,6 @@ public class DenseLayer {
         Integer maxIndexOpt = IntStream.range(0, this.layerOutputs.length)
                 .boxed()
                 .max((i, j) -> Double.compare(this.layerOutputs[i], this.layerOutputs[j])).get();
-        print("Layer Outputs In [Layer.class]", this.layerOutputs);
         return this.layerOutputs;
     }
 

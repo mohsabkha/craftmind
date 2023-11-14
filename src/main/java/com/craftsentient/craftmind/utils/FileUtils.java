@@ -9,7 +9,7 @@ import java.util.stream.IntStream;
 
 public class FileUtils {
 
-    public static double[][] readTextFile(String filePath, String delimiter){
+    public static Object readTextFile(String filePath, String delimiter){
         ArrayList<double[]> inputs = new ArrayList<>();
         try {
             FileReader fileReader = new FileReader(filePath);

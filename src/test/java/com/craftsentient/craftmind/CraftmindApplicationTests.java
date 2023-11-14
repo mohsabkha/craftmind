@@ -33,6 +33,7 @@ class CraftmindApplicationTests {
                 .withInitialBiases(biases)
                 .withInitialWeights(weights)
                 .withLearningRate(0.01)
+                .withMiniBatchProcessing(1)
                 .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.RELU_ACTIVATION_FUNCTION)
                 .withActivationFunctionForOutput(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .withLossFunction(DEFAULT_LOSS_FUNCTIONS.CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION)
@@ -114,7 +115,7 @@ class CraftmindApplicationTests {
         double[][] X; // x y coordinates
         int[] y; // true values
         int samples = 33; // Number of samples per class
-        int classes = 6;   // Number of classes
+        int classes = 3;   // Number of classes
 
         Object[] data = createData(samples, classes);
         X = (double[][]) data[0];
@@ -128,7 +129,8 @@ class CraftmindApplicationTests {
 
         DenseLayers builtLayerWithFile = new DenseLayers.DenseLayersBuilder()
                 .withNumberOfLayers(3)
-                .withNumberOfNeuronsPerLayer(new int[]{2,64,6})
+                .withNumberOfNeuronsPerLayer(new int[]{2,64,3})
+                .withMiniBatchProcessing(3)
                 .withInitialInput(X)
                 .withInitialBiases(biases)
                 .withInitialWeights(weights)
