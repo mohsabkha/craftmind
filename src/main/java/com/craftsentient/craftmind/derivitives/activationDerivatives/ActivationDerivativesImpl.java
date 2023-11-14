@@ -2,7 +2,7 @@ package com.craftsentient.craftmind.derivitives.activationDerivatives;
 
 import com.craftsentient.craftmind.activation.ActivationFunctions;
 import com.craftsentient.craftmind.activation.ActivationFunctionsImpl;
-import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATION_FUNCTIONS;
+import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATIONS;
 
 import java.util.stream.IntStream;
 
@@ -171,7 +171,7 @@ public class ActivationDerivativesImpl {
         double LAMBDA = 1.0507;
         double ALPHA = 1.67326;
         if (value > 0) return LAMBDA;
-        else return LAMBDA * (ALPHA + ActivationFunctions.activationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SELU_ACTIVATION_FUNCTION, value));
+        else return LAMBDA * (ALPHA + ActivationFunctions.activationFunction(DEFAULT_ACTIVATIONS.SELU_ACTIVATION_FUNCTION, value));
     }
     public static double[] scaledExponentialLinear(double[] values) {
         IntStream.range(0, values.length).parallel().forEachOrdered(i -> {

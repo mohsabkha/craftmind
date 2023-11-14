@@ -1,6 +1,6 @@
 package com.craftsentient.craftmind.errorLoss;
 
-public enum DEFAULT_LOSS_FUNCTIONS {
+public enum DEFAULT_LOSSES {
     BINARY_CROSS_ENTROPY_LOSS_FUNCTION,
     CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION,
     CONTRASTIVE_LOSS_FUNCTION,

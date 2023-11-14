@@ -1,8 +1,6 @@
 package com.craftsentient.craftmind.layers;
 
-import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATION_FUNCTIONS;
-import com.craftsentient.craftmind.layer.DenseLayer;
-import org.junit.jupiter.api.Assertions;
+import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATIONS;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -43,7 +41,7 @@ public class LayersTest {
                 .withNumberOfLayers(7)
                 .withNumberOfNeurons(7)
                 .withTrueValueIndices(new int[]{1})
-                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTPLUS_ACTIVATION_FUNCTION)
+                .withActivationFunction(DEFAULT_ACTIVATIONS.SOFTPLUS_ACTIVATION_FUNCTION)
                 .build().train();//.printLayers("NETWORK 2 NEW");
     }
 
@@ -56,7 +54,7 @@ public class LayersTest {
                 .withNumberOfInputs(27)
                 .withNumberOfNeurons(64)
                 .withTrueValueIndices(new int[]{0})
-                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
+                .withActivationFunction(DEFAULT_ACTIVATIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .build().train();//.printLayers("NETWORK 2A NEW");
     }
 
@@ -69,7 +67,7 @@ public class LayersTest {
                 .withNumberOfLayers(7)
                 .withNumberOfNeuronsPerLayer(new int[]{2, 5, 9, 2, 5, 4, 10})
                 .withHotOneVector(new int[][] {{0,0,0,0,0,0,0,1,0,0}})
-                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
+                .withActivationFunction(DEFAULT_ACTIVATIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .build().train();
     }
 
@@ -81,7 +79,7 @@ public class LayersTest {
                 .withNumberOfLayers(3)
                 .withInitialInput(inputs)
                 .withTrueValueIndices(new int[]{0,2,1})
-                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
+                .withActivationFunction(DEFAULT_ACTIVATIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .build()
                 .train();
     }
@@ -94,9 +92,9 @@ public class LayersTest {
                 .withNumberOfNeurons(3)
                 .withInitialInput(inputs)
                 .withTrueValueIndices(new int[]{0,0,1})
-                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
-                .withActivationFunctionForSingleLayer(3,DEFAULT_ACTIVATION_FUNCTIONS.RELU_ACTIVATION_FUNCTION)
-                .withActivationFunctionForMultipleLayers(5,6, DEFAULT_ACTIVATION_FUNCTIONS.RELU_ACTIVATION_FUNCTION)
+                .withActivationFunction(DEFAULT_ACTIVATIONS.SOFTMAX_ACTIVATION_FUNCTION)
+                .withActivationFunctionForSingleLayer(3, DEFAULT_ACTIVATIONS.RELU_ACTIVATION_FUNCTION)
+                .withActivationFunctionForMultipleLayers(5,6, DEFAULT_ACTIVATIONS.RELU_ACTIVATION_FUNCTION)
                 .build()
                 .train();
     }
@@ -109,7 +107,7 @@ public class LayersTest {
                 .withNumberOfNeuronsPerLayer(new int[]{3, 5, 9})
                 .withInitialInput(inputs)
                 .withTrueValueIndices(new int[] {2,1,1})
-                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
+                .withActivationFunction(DEFAULT_ACTIVATIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .withAlpha(2.0)
                 .withGamma(3.0)
                 .withMargin(1.0)
@@ -126,7 +124,7 @@ public class LayersTest {
                 .withInitialWeights(weights)
                 .withInitialInput(inputs)
                 .withTrueValueIndices(new int[]{1,2,0})
-                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
+                .withActivationFunction(DEFAULT_ACTIVATIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .build()
                 .train();
     }
@@ -140,7 +138,7 @@ public class LayersTest {
                 .withTrueValueIndices(new int[]{1,2,0})
                 .withInitialWeights(weights)
                 .withInitialInput(inputs)
-                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
+                .withActivationFunction(DEFAULT_ACTIVATIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .build()
                 .train();
     }
@@ -181,7 +179,7 @@ public class LayersTest {
                 .withInitialBiases(biases)
                 .withInitialInput(inputs)
                 .withTrueValueIndices(new int[]{1,2,2})
-                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
+                .withActivationFunction(DEFAULT_ACTIVATIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .build().train();//.printLayers("NETWORK 5B NEW");
     }
 
@@ -195,7 +193,7 @@ public class LayersTest {
                 .withInitialBiases(biases)
                 .withInitialInput(inputs)
                 .withTrueValueIndices(new int[]{1,2,0})
-                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
+                .withActivationFunction(DEFAULT_ACTIVATIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .build().train();//.printLayers("NETWORK 5C NEW");
     }
 
@@ -208,7 +206,7 @@ public class LayersTest {
                 .withInitialBiases(biases)
                 .withTextFileAsInput("src/main/resources/inputs.txt", ",")
                 .withTrueValueIndices(new int[]{1,2,0})
-                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
+                .withActivationFunction(DEFAULT_ACTIVATIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .build().train();//.printLayers("NETWORK 5C NEW");
 
     }

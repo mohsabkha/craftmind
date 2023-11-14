@@ -1,12 +1,11 @@
 package com.craftsentient.craftmind.layers;
 
-import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATION_FUNCTIONS;
+import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATIONS;
 import com.craftsentient.craftmind.derivitives.activationDerivatives.ActivationDerivatives;
 import com.craftsentient.craftmind.derivitives.errorLossDerivatives.ErrorLossDerivatives;
-import com.craftsentient.craftmind.errorLoss.DEFAULT_LOSS_FUNCTIONS;
+import com.craftsentient.craftmind.errorLoss.DEFAULT_LOSSES;
 import com.craftsentient.craftmind.errorLoss.ErrorLossFunctions;
 import com.craftsentient.craftmind.layer.DenseLayer;
-import com.craftsentient.craftmind.layer.Layer;
 import com.craftsentient.craftmind.utils.FileUtils;
 import com.craftsentient.craftmind.utils.MathUtils;
 import com.craftsentient.craftmind.neuron.Neuron;
@@ -18,7 +17,7 @@ import java.util.stream.IntStream;
 
 import static com.craftsentient.craftmind.utils.MathUtils.getHotOneVecIndexValue;
 import static com.craftsentient.craftmind.utils.PrintUtils.*;
-import static java.lang.Thread.sleep;
+
 
 @Getter
 public class DenseLayers {
@@ -40,10 +39,10 @@ public class DenseLayers {
     public static double GAMMA = 1.0;
     public static double DELTA = 1.0;
     public static double MARGIN = 1.0;
-    private DEFAULT_LOSS_FUNCTIONS lossFunction;
+    private DEFAULT_LOSSES lossFunction;
     public static final Random random = new Random(0);
 
-    private DenseLayers(int layers, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
+    private DenseLayers(int layers, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
         // create layer list
         this.layerList = new ArrayList<>();
         // create an initial input array of random numbers of size layers
@@ -56,7 +55,7 @@ public class DenseLayers {
         // loop over layer count and generate network
         IntStream.range(0, layers).forEach(i -> {
             // set activation function
-            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
+            DEFAULT_ACTIVATIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             // randomly initialize weights matrix
             double[][] weights = randn(layers, layers);
             try {
@@ -71,13 +70,13 @@ public class DenseLayers {
             }
         });
     }
-    private DenseLayers(int layers, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
+    private DenseLayers(int layers, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
         this.decisionsIndex = new int[initialInput.length];
         this.decisions = new HashMap<>();
         IntStream.range(0, layers).forEach(i -> {
-            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
+            DEFAULT_ACTIVATIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             try {
                 if (i != 0) {
                     double[][] weights = randn(initialInput.length, layerList.get(i - 1).getLayerOutputs().length);
@@ -91,7 +90,7 @@ public class DenseLayers {
             }
         });
     }
-    private DenseLayers(int layers, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
+    private DenseLayers(int layers, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
         // instantiate the decisions index
@@ -100,7 +99,7 @@ public class DenseLayers {
         this.decisions = new HashMap<>();
 
         IntStream.range(0, layers).forEach(i -> {
-            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
+            DEFAULT_ACTIVATIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             try {
                 if (i != 0) {
                     double[][] weights = randn(initialWeights.length, layerList.get(i - 1).getLayerOutputs().length);
@@ -113,7 +112,7 @@ public class DenseLayers {
             }
         });
     }
-    private DenseLayers(int layers, double[][] initialWeights, double[] biases, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
+    private DenseLayers(int layers, double[][] initialWeights, double[] biases, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
         this.layerList = new ArrayList<>();
         this.initialInput = initialInput;
         // instantiate the decisions index
@@ -122,7 +121,7 @@ public class DenseLayers {
         this.decisions = new HashMap<>();
 
         IntStream.range(0, layers).forEach(i -> {
-            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
+            DEFAULT_ACTIVATIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             try {
                 if (i != 0) {
                     double[][] weights = randn(initialWeights.length, layerList.get(i - 1).getLayerOutputs().length);
@@ -135,7 +134,7 @@ public class DenseLayers {
             }
         });
     }
-    private DenseLayers(int layers, int numberOfNeurons, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
+    private DenseLayers(int layers, int numberOfNeurons, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
         this.layerList = new ArrayList<>();
         this.initialInput = randn(1,numberOfNeurons);
         // instantiate the decisions index
@@ -144,7 +143,7 @@ public class DenseLayers {
         this.decisions = new HashMap<>();
 
         IntStream.range(0, layers).forEach(i -> {
-            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
+            DEFAULT_ACTIVATIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             double[][] weights = randn(numberOfNeurons, numberOfNeurons);
             try {
                 if (i != 0) {
@@ -158,7 +157,7 @@ public class DenseLayers {
             }
         });
     }
-    private DenseLayers(int layers, int numberOfNeurons, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
+    private DenseLayers(int layers, int numberOfNeurons, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
         if(numberOfNeurons != initialInput.length) { throw new IllegalArgumentException("neuronsPerLayer of " + numberOfNeurons + " and initialInput size of " + initialInput.length + " do not match!");}
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
@@ -168,7 +167,7 @@ public class DenseLayers {
         this.decisions = new HashMap<>();
 
         IntStream.range(0, layers).forEach(i -> {
-            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
+            DEFAULT_ACTIVATIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             try {
                 if (i != 0) {
                     double[][] weights = randn(numberOfNeurons, layerList.get(i - 1).getLayerOutputs().length);
@@ -183,7 +182,7 @@ public class DenseLayers {
             }
         });
     }
-    private DenseLayers(int layers, int numberOfNeurons, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
+    private DenseLayers(int layers, int numberOfNeurons, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
         // instantiate the decisions index
@@ -192,7 +191,7 @@ public class DenseLayers {
         this.decisions = new HashMap<>();
 
         IntStream.range(0, layers).forEach(i -> {
-            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
+            DEFAULT_ACTIVATIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             try {
                 if (i != 0) {
                     double[][] weights = randn(numberOfNeurons, numberOfNeurons);
@@ -205,7 +204,7 @@ public class DenseLayers {
             }
         });
     }
-    private DenseLayers(int layers, int numberOfNeurons, double[][] initialWeights, double[] biases, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
+    private DenseLayers(int layers, int numberOfNeurons, double[][] initialWeights, double[] biases, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
         this.layerList = new ArrayList<>();
         this.initialInput = initialInput;
         // instantiate the decisions index
@@ -214,7 +213,7 @@ public class DenseLayers {
         this.decisions = new HashMap<>();
 
         IntStream.range(0, layers).forEach(i -> {
-            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
+            DEFAULT_ACTIVATIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             try {
                 if (i != 0) {
                     double[][] weights = randn(numberOfNeurons, numberOfNeurons);
@@ -227,7 +226,7 @@ public class DenseLayers {
             }
         });
     }
-    private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
+    private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
         if(layers != numberOfNeuronsPerLayer.length) {
             throw new IllegalArgumentException(layers + " Layers given but only " + numberOfNeuronsPerLayer.length
                     + " layers described!\nAdjust neuronsPerLayer to be of same length as number of layers!");
@@ -240,7 +239,7 @@ public class DenseLayers {
         this.decisions = new HashMap<>();
 
         IntStream.range(0, layers).forEach(i -> {
-            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
+            DEFAULT_ACTIVATIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             double[][] weights;
             try {
                 if (i != 0) {
@@ -255,7 +254,7 @@ public class DenseLayers {
             }
         });
     }
-    private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
+    private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
         if(layers != numberOfNeuronsPerLayer.length) {
             throw new IllegalArgumentException(layers + " Layers given but only " + numberOfNeuronsPerLayer.length
                     + " layers described!\nAdjust neuronsPerLayer to be of same length as number of layers!");
@@ -268,7 +267,7 @@ public class DenseLayers {
         this.decisions = new HashMap<>();
 
         IntStream.range(0, layers).forEach(i -> {
-            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
+            DEFAULT_ACTIVATIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             double[][] weights;
             try {
                 if (i != 0) {
@@ -283,7 +282,7 @@ public class DenseLayers {
             }
         });
     }
-    private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
+    private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
         if(layers != numberOfNeuronsPerLayer.length) {
             throw new IllegalArgumentException(layers + " Layers given but only " + numberOfNeuronsPerLayer.length
                     + " layers described!\nAdjust neuronsPerLayer to be of same length as number of layers!");
@@ -296,7 +295,7 @@ public class DenseLayers {
         this.decisions = new HashMap<>();
 
         IntStream.range(0, layers).forEach(i -> {
-            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
+            DEFAULT_ACTIVATIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             try {
                 if (i != 0) {
                     double[][] weights = randn(numberOfNeuronsPerLayer[i], numberOfNeuronsPerLayer[i - 1]);
@@ -309,7 +308,7 @@ public class DenseLayers {
             }
         });
     }
-    private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialWeights, double[] initialBiases, double[][] initialInput, DEFAULT_ACTIVATION_FUNCTIONS activationFunction, Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap) {
+    private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialWeights, double[] initialBiases, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
         if(layers != numberOfNeuronsPerLayer.length) {
             throw new IllegalArgumentException(layers + " Layers given but only " + numberOfNeuronsPerLayer.length
                     + " layers described!\nAdjust neuronsPerLayer to be of same length as number of layers!");
@@ -323,7 +322,7 @@ public class DenseLayers {
 
         // create first layer by multiplying the initial input by the  initial weights and adding the initial biases
         IntStream.range(0, layers).forEach(i -> {
-            DEFAULT_ACTIVATION_FUNCTIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
+            DEFAULT_ACTIVATIONS activationFunctionToUse = activationFunctionsMap.getOrDefault(i, activationFunction);
             try {
                 if (i != 0) {
                     double[][] weights = randn(numberOfNeuronsPerLayer[i], numberOfNeuronsPerLayer[i - 1]);
@@ -366,6 +365,8 @@ public class DenseLayers {
             print("Layer Outputs:", this.getLastLayer().getLayerOutputs());
             print("");
         });
+
+        // if not all inputs processed, process remaining
         if(this.initialInput.length % miniBatchSize != 0){
             print("Processing Remaining Data Points...");
             double tempLoss = 0;
@@ -440,7 +441,6 @@ public class DenseLayers {
     }
 
     private void backPropagate() {
-        print("Back-Propagating...");
         // Output layer error gradient
         double[][] gradients = new double[this.layerList.size()][];
         // index of the output layer
@@ -560,7 +560,7 @@ public class DenseLayers {
         this.accuracy = accuracy(getHotOneVecIndexValue(this.hotOneVec[dataCounter]), this.decisionsIndex[dataCounter]);
     }
 
-    public DEFAULT_ACTIVATION_FUNCTIONS getActivationFunctionFrom(int index){
+    public DEFAULT_ACTIVATIONS getActivationFunctionFrom(int index){
         return this.getLayerAt(index).getActivationFunction();
     }
     public DenseLayer getLayerAt(int index) {
@@ -579,17 +579,17 @@ public class DenseLayers {
         private ArrayList<DenseLayer> layerList;
         private boolean isUsingListOfLayers = true;
 
-        private DEFAULT_ACTIVATION_FUNCTIONS activationFunction = DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION;
-        private final Map<Integer, DEFAULT_ACTIVATION_FUNCTIONS> activationFunctionsMap = new HashMap<>();
+        private DEFAULT_ACTIVATIONS activationFunction = DEFAULT_ACTIVATIONS.SOFTMAX_ACTIVATION_FUNCTION;
+        private final Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap = new HashMap<>();
         private boolean hasSetSpecificLayerActivationFunctions = false;
 
         //
-        private DEFAULT_LOSS_FUNCTIONS lossFunction = DEFAULT_LOSS_FUNCTIONS.NLL_LOSS_FUNCTION;
+        private DEFAULT_LOSSES lossFunction = DEFAULT_LOSSES.NLL_LOSS_FUNCTION;
         private int[][] hotOneVec;
         private int[] trueValueIndices;
         private double[] trueValues;
         private double[][][] trueValuesMatrix;
-        private final Map<Integer, DEFAULT_LOSS_FUNCTIONS> lossFunctionsMap = new HashMap<>();
+        private final Map<Integer, DEFAULT_LOSSES> lossFunctionsMap = new HashMap<>();
 
         private boolean hasSetSpecificLayerLossFunctions = false;
         private boolean isUsingTrueValueIndex = false;
@@ -700,22 +700,22 @@ public class DenseLayers {
             return this;
         }
 
-        public DenseLayersBuilder withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS activationFunction) {
+        public DenseLayersBuilder withActivationFunction(DEFAULT_ACTIVATIONS activationFunction) {
             this.activationFunction = activationFunction;
             return this;
         }
 
-        public DenseLayersBuilder withActivationFunctionForSingleLayer(int layer, DEFAULT_ACTIVATION_FUNCTIONS activationFunction) {
+        public DenseLayersBuilder withActivationFunctionForSingleLayer(int layer, DEFAULT_ACTIVATIONS activationFunction) {
             activationFunctionsMap.put(layer, activationFunction);
             return this;
         }
 
-        public DenseLayersBuilder withActivationFunctionForMultipleLayers(int startingLayer, int endingLayer, DEFAULT_ACTIVATION_FUNCTIONS activationFunction) {
+        public DenseLayersBuilder withActivationFunctionForMultipleLayers(int startingLayer, int endingLayer, DEFAULT_ACTIVATIONS activationFunction) {
             IntStream.range(startingLayer, endingLayer+1).forEachOrdered( i -> activationFunctionsMap.put(i, activationFunction));
             return this;
         }
 
-        public DenseLayersBuilder withActivationFunctionForOutput(DEFAULT_ACTIVATION_FUNCTIONS activationFunction) {
+        public DenseLayersBuilder withActivationFunctionForOutput(DEFAULT_ACTIVATIONS activationFunction) {
             if(numberOfLayers > 1){
                 activationFunctionsMap.put(numberOfLayers-1, activationFunction);
             }
@@ -775,7 +775,7 @@ public class DenseLayers {
             return this;
         }
 
-        public DenseLayersBuilder withLossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction) {
+        public DenseLayersBuilder withLossFunction(DEFAULT_LOSSES lossFunction) {
             this.lossFunction = lossFunction;
             return this;
         }
@@ -800,13 +800,13 @@ public class DenseLayers {
             return this;
         }
 
-        public DenseLayersBuilder withLossFunctionAndHotEncodedVectors(DEFAULT_LOSS_FUNCTIONS lossFunction, int[][] hotOneOutput) {
+        public DenseLayersBuilder withLossFunctionAndHotEncodedVectors(DEFAULT_LOSSES lossFunction, int[][] hotOneOutput) {
             this.lossFunction = lossFunction;
             this.hotOneVec = hotOneOutput;
             return this;
         }
 
-        public DenseLayersBuilder withLossFunctionAndTrueValues(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] trueValueIndices) {
+        public DenseLayersBuilder withLossFunctionAndTrueValues(DEFAULT_LOSSES lossFunction, int[] trueValueIndices) {
             this.lossFunction = lossFunction;
             this.trueValueIndices = trueValueIndices;
             return this;
@@ -937,19 +937,13 @@ public class DenseLayers {
             }
             else {
                 printTitle("Using construct 7");
-                built = new DenseLayers(2, DEFAULT_ACTIVATION_FUNCTIONS.LINEAR_ACTIVATION_FUNCTION, this.activationFunctionsMap);
+                built = new DenseLayers(2, DEFAULT_ACTIVATIONS.LINEAR_ACTIVATION_FUNCTION, this.activationFunctionsMap);
                 if(this.isUsingBatchInputs && this.isUsingFileAsInput) {
                     throw new RuntimeException(bold(red("Builder Not Configured Properly! Do Not Use File As Input and Batch Input Together!")));
                 }
                 throw new RuntimeException(bold(red("Builder Not Configured Properly!")));
             }
             assert built != null;
-
-            printPositive("Neural network successfully built!");
-            printPositive("Created dense layer neural network: " + built);
-            printPositive("Number of layers set to " + this.numberOfLayers);
-            printPositive("Initial activation function set to " + this.activationFunction.name());
-            printPositive("Loss function set to " + this.lossFunction.name());
             built.learningRate = this.learningRate;
             built.learningRateDecay = this.learningRateDecay;
             built.lossFunction = this.lossFunction;
@@ -976,6 +970,15 @@ public class DenseLayers {
                 built.generateDecisionsMap(built.trueValueIndices[built.miniBatchSize]);
                 built.loss = ErrorLossFunctions.lossFunction(lossFunction, trueValueIndices[built.miniBatchSize],  built.getDecisionsIndex()[built.miniBatchSize], built.getLastLayer().getLayerOutputs());
             }
+            printPositive("Neural network successfully built!");
+            printPositive("Created dense layer neural network: " + built);
+            printPositive("Number of layers set to " + this.numberOfLayers);
+            printPositive("Initial activation function set to " + this.activationFunction.name());
+            printPositive("Loss function set to " + this.lossFunction.name());
+            printPositive("Learning rate set to " + built.learningRate);
+            printPositive("Learning rate decay set to " + built.learningRateDecay);
+            printPositive("Batch size set to " + built.miniBatchSize);
+
             double tl = built.loss;
             for(int y = 0; y < built.miniBatchSize-1; y++) {
                 if(built.dataCounter >= built.initialInput.length - 1){
@@ -988,7 +991,6 @@ public class DenseLayers {
                 tl += built.generateLoss();
             }
             built.loss = tl / built.miniBatchSize;
-            printSubTitle("Starting back propagation!");
             built.backPropagate();
             printSubTitle("Initialization Stats:");
             print("Loss and Accuracy Data For Batch: " + built.batchCounter);

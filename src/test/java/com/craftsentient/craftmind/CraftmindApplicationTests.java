@@ -1,13 +1,12 @@
 package com.craftsentient.craftmind;
 
-import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATION_FUNCTIONS;
-import com.craftsentient.craftmind.errorLoss.DEFAULT_LOSS_FUNCTIONS;
+import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATIONS;
+import com.craftsentient.craftmind.errorLoss.DEFAULT_LOSSES;
 import com.craftsentient.craftmind.layers.DenseLayers;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static com.craftsentient.craftmind.testDataGenerator.DataGenerator.createData;
-import static com.craftsentient.craftmind.utils.PrintUtils.printTitle;
 
 
 @SpringBootTest
@@ -34,9 +33,9 @@ class CraftmindApplicationTests {
                 .withInitialWeights(weights)
                 .withLearningRate(0.01)
                 .withMiniBatchProcessing(7)
-                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.RELU_ACTIVATION_FUNCTION)
-                .withActivationFunctionForOutput(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
-                .withLossFunction(DEFAULT_LOSS_FUNCTIONS.CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION)
+                .withActivationFunction(DEFAULT_ACTIVATIONS.RELU_ACTIVATION_FUNCTION)
+                .withActivationFunctionForOutput(DEFAULT_ACTIVATIONS.SOFTMAX_ACTIVATION_FUNCTION)
+                .withLossFunction(DEFAULT_LOSSES.CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION)
                 .withTrueValueIndices(new int[] {
                         0, 1, 2,
                         0, 1, 2,
@@ -135,8 +134,8 @@ class CraftmindApplicationTests {
                 .withInitialBiases(biases)
                 .withInitialWeights(weights)
                 .withLearningRate(1.0)
-                .withActivationFunction(DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION)
-                .withLossFunction(DEFAULT_LOSS_FUNCTIONS.CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION)
+                .withActivationFunction(DEFAULT_ACTIVATIONS.SOFTMAX_ACTIVATION_FUNCTION)
+                .withLossFunction(DEFAULT_LOSSES.CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION)
                 .withTrueValueIndices(y)
                 .build();
         builtLayerWithFile.train();

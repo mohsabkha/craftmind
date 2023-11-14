@@ -1,6 +1,6 @@
 package com.craftsentient.craftmind.layer;
 
-import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATION_FUNCTIONS;
+import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATIONS;
 import com.craftsentient.craftmind.utils.MathUtils;
 import com.craftsentient.craftmind.neuron.Neuron;
 import lombok.*;
@@ -29,7 +29,7 @@ public class DenseLayer {
     @Setter
     private double[] layerOutputs;
     @Setter
-    private DEFAULT_ACTIVATION_FUNCTIONS activationFunction;
+    private DEFAULT_ACTIVATIONS activationFunction;
 
     public DenseLayer() {
         this.neuronList = new ArrayList<>();
@@ -37,10 +37,10 @@ public class DenseLayer {
         this.neuronBiases = new double[0];
         this.inputs = new double[0];
         this.layerOutputs = new double[0];
-        this.activationFunction = DEFAULT_ACTIVATION_FUNCTIONS.SOFTMAX_ACTIVATION_FUNCTION;
+        this.activationFunction = DEFAULT_ACTIVATIONS.SOFTMAX_ACTIVATION_FUNCTION;
     }
 
-    public DenseLayer(double[][] weights, DEFAULT_ACTIVATION_FUNCTIONS activationFunction) throws Exception {
+    public DenseLayer(double[][] weights, DEFAULT_ACTIVATIONS activationFunction) throws Exception {
         this.neuronList = new ArrayList<>();
         this.neuronWeights = new double[0][0];
         this.neuronBiases = new double[0];
@@ -51,7 +51,7 @@ public class DenseLayer {
         this.generateLayerOutput();
     }
 
-    public DenseLayer(double[][] weights, double[] inputs, DEFAULT_ACTIVATION_FUNCTIONS activationFunction) throws Exception {
+    public DenseLayer(double[][] weights, double[] inputs, DEFAULT_ACTIVATIONS activationFunction) throws Exception {
         this.neuronList = new ArrayList<>();
         this.neuronBiases = new double[0];
         this.layerOutputs = new double[0];
@@ -62,7 +62,7 @@ public class DenseLayer {
         this.generateLayerOutput();
     }
 
-    public DenseLayer(double[][] weights, double[] biases, double[] inputs, DEFAULT_ACTIVATION_FUNCTIONS activationFunction) throws Exception {
+    public DenseLayer(double[][] weights, double[] biases, double[] inputs, DEFAULT_ACTIVATIONS activationFunction) throws Exception {
         this.neuronList = new ArrayList<>();
         this.layerOutputs = new double[0];
         this.neuronWeights = weights;
@@ -73,7 +73,7 @@ public class DenseLayer {
         this.generateLayerOutput();
     }
 
-    public DenseLayer(int numberOfNeurons, DEFAULT_ACTIVATION_FUNCTIONS activationFunction) throws Exception {
+    public DenseLayer(int numberOfNeurons, DEFAULT_ACTIVATIONS activationFunction) throws Exception {
         this.neuronList = new ArrayList<>();
         this.neuronWeights = new double[0][0];
         this.neuronBiases = new double[0];

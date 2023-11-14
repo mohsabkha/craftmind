@@ -4,19 +4,19 @@ import static com.craftsentient.craftmind.errorLoss.ErrorLossFunctionsImpl.*;
 
 
 public class ErrorLossFunctions {
-    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex, int selectedOutputIndex, double[] outputs) {
+    public static double lossFunction(DEFAULT_LOSSES lossFunction, int trueValueIndex, int selectedOutputIndex, double[] outputs) {
         return determineLossFunctionFromIndices(lossFunction, trueValueIndex, selectedOutputIndex, outputs);
     }
-    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int[] hotOneVec, int selectedOutputIndex, double[] outputs) {
+    public static double lossFunction(DEFAULT_LOSSES lossFunction, int[] hotOneVec, int selectedOutputIndex, double[] outputs) {
         int trueValueIndex = 0;
 
         return determineLossFunctionFromIndices(lossFunction, trueValueIndex, selectedOutputIndex, outputs);
     }
 
-    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndices[], int selectedOutputIndex[], double[][] outputs) {
+    public static double lossFunction(DEFAULT_LOSSES lossFunction, int trueValueIndices[], int selectedOutputIndex[], double[][] outputs) {
         return determineLossFunctionFromIndices(lossFunction, trueValueIndices, selectedOutputIndex, outputs);
     }
-    public static double lossFunction(DEFAULT_LOSS_FUNCTIONS lossFunction, int hotOneVectors[][], int selectedOutputIndex[], double[][] outputs) {
+    public static double lossFunction(DEFAULT_LOSSES lossFunction, int hotOneVectors[][], int selectedOutputIndex[], double[][] outputs) {
         int trueValueIndices[] = new int[hotOneVectors.length];
         for(int i = 0; i < hotOneVectors.length; i++) {
             for(int j = 0; j < hotOneVectors[i].length; j++){
@@ -31,7 +31,7 @@ public class ErrorLossFunctions {
     }
 
     // true value index and hot one vector
-    private static double determineLossFunctionFromIndices(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex, int selectedOutputIndex, double[] outputs) {
+    private static double determineLossFunctionFromIndices(DEFAULT_LOSSES lossFunction, int trueValueIndex, int selectedOutputIndex, double[] outputs) {
         switch (lossFunction){
             case BINARY_CROSS_ENTROPY_LOSS_FUNCTION -> { return binaryCrossEntropy(trueValueIndex, selectedOutputIndex, outputs); }
             case CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION -> { return categoricalCrossEntropy(trueValueIndex, outputs); }
@@ -45,32 +45,32 @@ public class ErrorLossFunctions {
             default -> throw new RuntimeException("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
-    private static double[] determineLossFunctionFromIndices(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex, int selectedOutputIndex, double[][] outputs) {
+    private static double[] determineLossFunctionFromIndices(DEFAULT_LOSSES lossFunction, int trueValueIndex, int selectedOutputIndex, double[][] outputs) {
         return new double[0];
     }
-    private static double[][] determineLossFunctionFromIndices(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex, int selectedOutputIndex, double[][][] outputs) {
+    private static double[][] determineLossFunctionFromIndices(DEFAULT_LOSSES lossFunction, int trueValueIndex, int selectedOutputIndex, double[][][] outputs) {
         return new double[0][];
     }
-    private static double[][][] determineLossFunctionFromIndices(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex, int selectedOutputIndex, double[][][][] outputs) {
+    private static double[][][] determineLossFunctionFromIndices(DEFAULT_LOSSES lossFunction, int trueValueIndex, int selectedOutputIndex, double[][][][] outputs) {
         return new double[0][][];
     }
 
     // true value indices and hot one vectors (batch)
-    private static double determineLossFunctionFromIndices(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex[], int selectedOutputIndex[], double[][] outputs) {
+    private static double determineLossFunctionFromIndices(DEFAULT_LOSSES lossFunction, int trueValueIndex[], int selectedOutputIndex[], double[][] outputs) {
         return 0.0;
     }
-    private static double[] determineLossFunctionFromIndices(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex[], int selectedOutputIndex[], double[][][] outputs) {
+    private static double[] determineLossFunctionFromIndices(DEFAULT_LOSSES lossFunction, int trueValueIndex[], int selectedOutputIndex[], double[][][] outputs) {
         return new double[0];
     }
-    private static double[][] determineLossFunctionFromIndices(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex[], int selectedOutputIndex[], double[][][][]outputs) {
+    private static double[][] determineLossFunctionFromIndices(DEFAULT_LOSSES lossFunction, int trueValueIndex[], int selectedOutputIndex[], double[][][][]outputs) {
         return new double[0][];
     }
 
     // true value indices and hot one vectors
-    private static double[][] determineLossFunctionFromIndices(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex[][], int selectedOutputIndex[][], double[][][] outputs) {
+    private static double[][] determineLossFunctionFromIndices(DEFAULT_LOSSES lossFunction, int trueValueIndex[][], int selectedOutputIndex[][], double[][][] outputs) {
         return new double[0][];
     }
-    private static double[][][] determineLossFunctionFromIndices(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex[][], int selectedOutputIndex[][], double[][][][] outputs) {
+    private static double[][][] determineLossFunctionFromIndices(DEFAULT_LOSSES lossFunction, int trueValueIndex[][], int selectedOutputIndex[][], double[][][][] outputs) {
         return new double[0][][];
     }
 

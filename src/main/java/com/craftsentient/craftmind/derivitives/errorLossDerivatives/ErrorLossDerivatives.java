@@ -1,11 +1,11 @@
 package com.craftsentient.craftmind.derivitives.errorLossDerivatives;
 
-import com.craftsentient.craftmind.errorLoss.DEFAULT_LOSS_FUNCTIONS;
+import com.craftsentient.craftmind.errorLoss.DEFAULT_LOSSES;
 
 import static com.craftsentient.craftmind.derivitives.errorLossDerivatives.ErrorLossDerivativesImpl.*;
 
 public class ErrorLossDerivatives {
-    public static double[] derivative(DEFAULT_LOSS_FUNCTIONS lossFunction, int trueValueIndex, int selectedOutputIndex, double[] outputs){
+    public static double[] derivative(DEFAULT_LOSSES lossFunction, int trueValueIndex, int selectedOutputIndex, double[] outputs){
         switch (lossFunction) {
             case BINARY_CROSS_ENTROPY_LOSS_FUNCTION -> { return binaryCrossEntropy(trueValueIndex, outputs); }
             case CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION -> { return categoricalCrossEntropy(trueValueIndex, outputs); }

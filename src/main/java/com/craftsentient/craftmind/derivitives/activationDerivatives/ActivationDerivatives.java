@@ -1,11 +1,11 @@
 package com.craftsentient.craftmind.derivitives.activationDerivatives;
 
-import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATION_FUNCTIONS;
+import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATIONS;
 
 import static com.craftsentient.craftmind.derivitives.activationDerivatives.ActivationDerivativesImpl.*;
 
 public class ActivationDerivatives {
-    public static double derivative(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double value) {
+    public static double derivative(DEFAULT_ACTIVATIONS activationFunction, double value) {
         switch (activationFunction) {
             case BENT_IDENTITY_ACTIVATION_FUNCTION -> {
                 return bentIdentity(value);
@@ -47,7 +47,7 @@ public class ActivationDerivatives {
         }
     }
 
-    public static double derivative(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double value, double alpha, double beta) {
+    public static double derivative(DEFAULT_ACTIVATIONS activationFunction, double value, double alpha, double beta) {
         switch (activationFunction) {
             case SWISH_ACTIVATION_FUNCTION -> {
                 return swish(value, beta);
@@ -65,7 +65,7 @@ public class ActivationDerivatives {
         }
     }
 
-    public static double[] derivative(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double[] values) {
+    public static double[] derivative(DEFAULT_ACTIVATIONS activationFunction, double[] values) {
         switch (activationFunction) {
             case BENT_IDENTITY_ACTIVATION_FUNCTION -> {
                 return bentIdentity(values);
@@ -110,7 +110,7 @@ public class ActivationDerivatives {
         }
     }
 
-    public static double[] derivative(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double values[], double alphas[], double betas[]) {
+    public static double[] derivative(DEFAULT_ACTIVATIONS activationFunction, double values[], double alphas[], double betas[]) {
         switch (activationFunction) {
             case SWISH_ACTIVATION_FUNCTION -> {
                 return swish(values, betas);
@@ -125,7 +125,7 @@ public class ActivationDerivatives {
         }
     }
 
-    public static double[][] derivative(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double[][] values) {
+    public static double[][] derivative(DEFAULT_ACTIVATIONS activationFunction, double[][] values) {
         switch (activationFunction) {
             case BENT_IDENTITY_ACTIVATION_FUNCTION -> {
                 return bentIdentity(values);
@@ -170,7 +170,7 @@ public class ActivationDerivatives {
         }
     }
 
-    public static double[][] derivative(DEFAULT_ACTIVATION_FUNCTIONS activationFunction, double values[][], double alphas[][], double betas[][]) {
+    public static double[][] derivative(DEFAULT_ACTIVATIONS activationFunction, double values[][], double alphas[][], double betas[][]) {
         switch (activationFunction) {
             case SWISH_ACTIVATION_FUNCTION -> {
                 return swish(values, betas);
