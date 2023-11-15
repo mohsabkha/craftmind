@@ -13,16 +13,16 @@ public class LearningRate {
                 return stepDecay(learningRate, decayRate, iteration);
             }
             case EXPONENTIAL: {
-                //return exponentialDecay()
+                // return exponentialDecay();
             }
             case ADAGRAD: {
-
+                return adamAdaptiveDecay();
             }
             case RMSPROP: {
-
+                return rmsPropAdaptiveDecay();
             }
             case ADAM: {
-
+                return adamAdaptiveDecay();
             }
             default: return 0.01;
         }
