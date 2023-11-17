@@ -28,6 +28,7 @@ public class DenseLayers {
     private int dataCounter = 0;
     private int batchCounter = 0;
     private int miniBatchSize = 1;
+    private int epoch = 1;
     private final Map<Integer, Double> decisions;
     private final int[] decisionsIndex;
     private int[] trueValueIndices;
@@ -345,51 +346,60 @@ public class DenseLayers {
 
     public void train() {
         if(dataCounter == this.initialInput.length - 1){ return; }
-        IntStream.range(0, ((this.initialInput.length-1)/miniBatchSize)).parallel().forEachOrdered(y -> {
-            double tempLoss = 0;
-            // call back-propagate
-            this.backPropagate();
-            // mini batch processing
-            for(int x = 0; x < miniBatchSize; x++){
-                if(dataCounter >= this.initialInput.length - 1){
-                    break;
+        int epochCounter = 0;
+        while(epochCounter < this.epoch) {
+            IntStream.range(0, ((this.initialInput.length-1)/miniBatchSize)).parallel().forEachOrdered(y -> {
+                double tempLoss = 0;
+                // call back-propagate
+                this.backPropagate();
+                // mini batch processing
+                for(int x = 0; x < miniBatchSize; x++){
+                    if(dataCounter >= this.initialInput.length - 1){
+                        break;
+                    }
+                    this.dataCounter++;
+                    forward();
+                    tempLoss += generateLoss();
                 }
-                this.dataCounter++;
-                forward();
-                tempLoss += generateLoss();
-            }
-            this.loss = tempLoss / miniBatchSize;
-            this.batchCounter++;
-            print("Loss and Accuracy Data For Batch: " + this.batchCounter);
-            print("Accuracy:", this.getAccuracy());
-            print("Loss:", this.getLoss());
-            print("Layer Outputs:", this.getLastLayer().getLayerOutputs());
-            print("");
-        });
+                this.loss = tempLoss / miniBatchSize;
+                this.batchCounter++;
+                print("Loss and Accuracy Data For Batch: " + this.batchCounter);
+                print("Accuracy:", this.getAccuracy());
+                print("Loss:", this.getLoss());
+                print("Layer Outputs:", this.getLastLayer().getLayerOutputs());
+                print("");
+            });
 
-        // if not all inputs processed, process remaining
-        if(this.initialInput.length % miniBatchSize != 0){
-            print("Processing Remaining Data Points...");
-            double tempLoss = 0;
-            // call back-propagate
-            this.backPropagate();
-            // mini batch processing
-            for(int x = 0; x < (miniBatchSize - (this.initialInput.length % miniBatchSize)); x++){
-                if(dataCounter >= this.initialInput.length - 1){
-                    break;
+            // if not all inputs processed, process remaining
+            if(this.initialInput.length % miniBatchSize != 0){
+                print("Processing Remaining Data Points...");
+                double tempLoss = 0;
+                // call back-propagate
+                this.backPropagate();
+                // mini batch processing
+                for(int x = 0; x < (miniBatchSize - (this.initialInput.length % miniBatchSize)); x++){
+                    if(dataCounter >= this.initialInput.length - 1){
+                        break;
+                    }
+                    this.dataCounter++;
+                    forward();
+                    tempLoss += generateLoss();
                 }
-                this.dataCounter++;
-                forward();
-                tempLoss += generateLoss();
+                this.loss = tempLoss / miniBatchSize;
+                this.batchCounter++;
+                print("Loss and Accuracy Data For Batch: " + this.batchCounter);
+                print("Accuracy:", this.getAccuracy());
+                print("Loss:", this.getLoss());
+                print("Layer Outputs:", this.getLastLayer().getLayerOutputs());
+                print("");
             }
-            this.loss = tempLoss / miniBatchSize;
-            this.batchCounter++;
-            print("Loss and Accuracy Data For Batch: " + this.batchCounter);
-            print("Accuracy:", this.getAccuracy());
-            print("Loss:", this.getLoss());
-            print("Layer Outputs:", this.getLastLayer().getLayerOutputs());
-            print("");
+            this.batchCounter = 0;
+            this.dataCounter = 0;
+            this.accuracy = 0;
+            this.sum = 0;
+            epochCounter++;
         }
+
         printTitle("Training Complete!");
     }
 
@@ -613,6 +623,7 @@ public class DenseLayers {
         private boolean isUsingStochasticGradientDescent = true;
         private boolean isUsingBatchInputs = false;
         private int miniBatchSize = 1;
+        private int epoch = 1;
 
         private double[][] initialWeights;
         private boolean isUsingSpecificWeights = false;
@@ -833,6 +844,11 @@ public class DenseLayers {
             return this;
         }
 
+        public DenseLayersBuilder withEpoch(int epoch) {
+            this.epoch = epoch;
+            return this;
+        }
+
         public DenseLayersBuilder withMiniBatchProcessing(int miniBatchSize){
             this.miniBatchSize = miniBatchSize;
             return this;
@@ -971,6 +987,7 @@ public class DenseLayers {
             built.decayFunction = this.decayFunction;
             built.lossFunction = this.lossFunction;
             built.miniBatchSize = this.miniBatchSize;
+            built.epoch = this.epoch;
             if(isUsingTrueValueIndex) {
                 built.trueValueIndices = this.trueValueIndices;
                 printPositive("True Values Set!");
