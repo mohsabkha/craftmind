@@ -77,33 +77,4 @@ class CraftmindApplicationTests {
                 .build();
         builtLayerWithFile.train();
     }
-
-    @Test
-    public void algos(){
-        System.out.println(algo1(500000));
-    }
-
-    public int algo1(int n) {
-        if(n <= 1) { return 0; }
-        int[] nums = new int[n];
-
-        for(int i = 2; i < n; i++) {
-            if(nums[i] != -1){
-                for(int j = i; j < n; j+=i) {
-                    if(i != j) {
-                        nums[j] = -1;
-                    }
-                }
-            }
-
-        }
-        int counter = 0;
-        for(int k = 2; k < n; k++){
-            if(nums[k] == 0){
-                counter++;
-            }
-        }
-        return counter;
-    }
-
 }
