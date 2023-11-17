@@ -395,22 +395,29 @@ public class DenseLayers {
 
     private double generateLoss(){
         double loss = 0;
-        if(hotOneVec != null && trueValueIndices != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
+        if(this.hotOneVec != null && this.trueValueIndices != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
         // check if both the one hot vector mappings true values mappings are empty
-        if(hotOneVec == null && trueValueIndices == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
-        assert trueValueIndices != null;
-        this.generateDecisionsMap(trueValueIndices[this.dataCounter]);
-        if(hotOneVec != null) {
+        if(this.hotOneVec == null && this.trueValueIndices == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
+
+        if(this.hotOneVec != null) {
             int hotValueIndex = 0;
-            for(int i = 0; i < hotOneVec.length; i++){
-                if(hotOneVec[this.dataCounter][i] != 0){
+            if(this.hotOneVec.length <= this.dataCounter) {
+                throw new RuntimeException("Too few true values for the number of inputs given!");
+            }
+            for(int i = 0; i < this.hotOneVec.length; i++){
+                if(this.hotOneVec[this.dataCounter][i] != 0){
                     hotValueIndex = i;
                     break;
                 }
             }
+            this.generateDecisionsMap(hotValueIndex);
             loss = ErrorLossFunctions.lossFunction(lossFunction, hotValueIndex, this.getDecisionsIndex()[this.dataCounter], this.getLastLayer().getLayerOutputs());
-        } else if (trueValueIndices != null){
-            loss =  ErrorLossFunctions.lossFunction(lossFunction, trueValueIndices[this.dataCounter],  this.getDecisionsIndex()[this.dataCounter], this.getLastLayer().getLayerOutputs());
+        } else if (this.trueValueIndices != null){
+            if(trueValueIndices.length <= this.dataCounter) {
+                throw new RuntimeException("Too few true values for the number of inputs given!");
+            }
+            this.generateDecisionsMap(trueValueIndices[this.dataCounter]);
+            loss =  ErrorLossFunctions.lossFunction(lossFunction, this.trueValueIndices[this.dataCounter],  this.getDecisionsIndex()[this.dataCounter], this.getLastLayer().getLayerOutputs());
         }
         return loss;
     }
@@ -433,12 +440,22 @@ public class DenseLayers {
         // index of the output layer
         int outputIndex = this.getLayerList().size() - 1;
         // loss function derivative
-        gradients[outputIndex] = ErrorLossDerivatives.derivative(
-                lossFunction,
-                this.getTrueValueIndices()[dataCounter],
-                this.getDecisionsIndex()[dataCounter],
-                this.getLayerAt(outputIndex).getLayerOutputs()
-        );
+        if(this.trueValueIndices != null){
+            gradients[outputIndex] = ErrorLossDerivatives.derivative(
+                    lossFunction,
+                    this.getTrueValueIndices()[dataCounter],
+                    this.getDecisionsIndex()[dataCounter],
+                    this.getLayerAt(outputIndex).getLayerOutputs()
+            );
+        } else {
+            gradients[outputIndex] = ErrorLossDerivatives.derivative(
+                    lossFunction,
+                    this.getHotOneVec()[dataCounter],
+                    this.getDecisionsIndex()[dataCounter],
+                    this.getLayerAt(outputIndex).getLayerOutputs()
+            );
+        }
+
         // Update output layer weights and biases
         for (int j = 0; j < this.getLayerAt(outputIndex).getNeuronList().size(); j++) {
             // update biases
@@ -594,7 +611,7 @@ public class DenseLayers {
         private double[][] initialInput;
         private double[][][] initialMatrixInput;
         private boolean isUsingStochasticGradientDescent = true;
-        private boolean isUsingBatchInputs = true;
+        private boolean isUsingBatchInputs = false;
         private int miniBatchSize = 1;
 
         private double[][] initialWeights;
@@ -656,6 +673,7 @@ public class DenseLayers {
 
         public DenseLayersBuilder withInitialInput(double[][] initialInput) {
             this.isUsingFileAsInput = false;
+            this.isUsingBatchInputs = true;
             this.initialInput = initialInput;
             return this;
         }
@@ -884,6 +902,7 @@ public class DenseLayers {
                     built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.activationFunction, this.activationFunctionsMap);
                 }
             }
+            // neurons are not being specified, file input is not being used
             else if(!this.isUsingSpecificNeurons && !this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingFileAsInput) {
                 if(this.isUsingBatchInputs && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     printTitle("Using construct 4.1");
@@ -967,12 +986,21 @@ public class DenseLayers {
             // check if both the one hot vector mappings true values mappings are empty
             if(built.hotOneVec == null && trueValueIndices == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
             if(built.hotOneVec != null) {
-                built.generateDecisionsMap(built.hotOneVec[built.miniBatchSize]);
-                built.loss =  ErrorLossFunctions.lossFunction(lossFunction, built.hotOneVec[built.miniBatchSize], built.getDecisionsIndex()[built.miniBatchSize], built.getLastLayer().getLayerOutputs());
-
+                if(built.hotOneVec.length <= miniBatchSize){
+                    built.generateDecisionsMap(built.hotOneVec[built.hotOneVec.length-1]);
+                    built.loss =  ErrorLossFunctions.lossFunction(lossFunction, built.hotOneVec[built.hotOneVec.length-1], built.getDecisionsIndex()[built.hotOneVec.length-1], built.getLastLayer().getLayerOutputs());
+                } else {
+                    built.generateDecisionsMap(built.hotOneVec[built.miniBatchSize]);
+                    built.loss =  ErrorLossFunctions.lossFunction(lossFunction, built.hotOneVec[built.miniBatchSize], built.getDecisionsIndex()[built.miniBatchSize], built.getLastLayer().getLayerOutputs());
+                }
             } else if (built.trueValueIndices != null){
-                built.generateDecisionsMap(built.trueValueIndices[built.miniBatchSize]);
-                built.loss = ErrorLossFunctions.lossFunction(lossFunction, trueValueIndices[built.miniBatchSize],  built.getDecisionsIndex()[built.miniBatchSize], built.getLastLayer().getLayerOutputs());
+                if(built.trueValueIndices.length <= miniBatchSize){
+                    built.generateDecisionsMap(built.trueValueIndices[built.trueValueIndices.length-1]);
+                    built.loss = ErrorLossFunctions.lossFunction(lossFunction, built.trueValueIndices[built.trueValueIndices.length-1],  built.getDecisionsIndex()[built.trueValueIndices.length-1], built.getLastLayer().getLayerOutputs());
+                } else {
+                    built.generateDecisionsMap(built.trueValueIndices[built.miniBatchSize]);
+                    built.loss = ErrorLossFunctions.lossFunction(lossFunction, trueValueIndices[built.miniBatchSize],  built.getDecisionsIndex()[built.miniBatchSize], built.getLastLayer().getLayerOutputs());
+                }
             }
             printPositive("Neural network successfully built!");
             printPositive("Created dense layer neural network: " + built);
@@ -984,7 +1012,11 @@ public class DenseLayers {
             printPositive("Batch size set to " + built.miniBatchSize);
 
             double tl = built.loss;
-            for(int y = 0; y < built.miniBatchSize-1; y++) {
+            int counter = miniBatchSize;
+            if(built.miniBatchSize == 1){
+                counter = 2;
+            }
+            for(int y = 0; y < counter-1; y++) {
                 if(built.dataCounter >= built.initialInput.length - 1){
                     break;
                 }

@@ -23,7 +23,6 @@ public class ErrorLossFunctions {
                     break;
                 }
             }
-
         }
         return determineLossFunctionFromIndices(lossFunction, trueValueIndices, selectedOutputIndex, outputs);
     }

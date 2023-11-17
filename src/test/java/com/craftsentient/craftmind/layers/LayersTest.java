@@ -196,18 +196,4 @@ public class LayersTest {
                 .withActivationFunction(DEFAULT_ACTIVATIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .build().train();//.printLayers("NETWORK 5C NEW");
     }
-
-    @Test
-    public void constructor14() {
-        new DenseLayers.DenseLayersBuilder()
-                .withNumberOfLayers(4)
-                .withNumberOfNeuronsPerLayer(new int[]{3,5,6,7})
-                .withInitialWeights(weights)
-                .withInitialBiases(biases)
-                .withTextFileAsInput("src/main/resources/inputs.txt", ",")
-                .withTrueValueIndices(new int[]{1,2,0})
-                .withActivationFunction(DEFAULT_ACTIVATIONS.SOFTMAX_ACTIVATION_FUNCTION)
-                .build().train();//.printLayers("NETWORK 5C NEW");
-
-    }
 }

@@ -19,4 +19,14 @@ public class ErrorLossDerivatives {
             default -> throw new RuntimeException("Incorrect Loss Function Name Entered: " + lossFunction.name());
         }
     }
+    public static double[] derivative(DEFAULT_LOSSES lossFunction, int[] hotOneVector, int selectedOutputIndex, double[] outputs){
+        int trueValueIndex = 0;
+        for(int i = 0; i < hotOneVector.length; i++) {
+            if(hotOneVector[i] != 0){
+                trueValueIndex = i;
+                break;
+            }
+        }
+        return derivative(lossFunction, trueValueIndex, selectedOutputIndex, outputs);
+    }
 }
