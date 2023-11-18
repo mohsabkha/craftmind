@@ -22,7 +22,7 @@ import static com.craftsentient.craftmind.utils.PrintUtils.*;
 
 
 @Getter
-public class DenseLayers {
+public class BaseNeuralNetwork {
     private final ArrayList<DenseLayer> layerList;
     private final double[][] initialInput;
     private int dataCounter = 0;
@@ -48,7 +48,7 @@ public class DenseLayers {
     private DEFAULT_LOSSES lossFunction;
     public static final Random random = new Random(0);
 
-    private DenseLayers(int layers, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
+    private BaseNeuralNetwork(int layers, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
         // create layer list
         this.layerList = new ArrayList<>();
         // create an initial input array of random numbers of size layers
@@ -76,7 +76,7 @@ public class DenseLayers {
             }
         });
     }
-    private DenseLayers(int layers, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
+    private BaseNeuralNetwork(int layers, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
         this.decisionsIndex = new int[initialInput.length];
@@ -96,7 +96,7 @@ public class DenseLayers {
             }
         });
     }
-    private DenseLayers(int layers, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
+    private BaseNeuralNetwork(int layers, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
         // instantiate the decisions index
@@ -118,7 +118,7 @@ public class DenseLayers {
             }
         });
     }
-    private DenseLayers(int layers, double[][] initialWeights, double[] biases, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
+    private BaseNeuralNetwork(int layers, double[][] initialWeights, double[] biases, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
         this.layerList = new ArrayList<>();
         this.initialInput = initialInput;
         // instantiate the decisions index
@@ -140,7 +140,7 @@ public class DenseLayers {
             }
         });
     }
-    private DenseLayers(int layers, int numberOfNeurons, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
+    private BaseNeuralNetwork(int layers, int numberOfNeurons, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
         this.layerList = new ArrayList<>();
         this.initialInput = randn(1,numberOfNeurons);
         // instantiate the decisions index
@@ -163,7 +163,7 @@ public class DenseLayers {
             }
         });
     }
-    private DenseLayers(int layers, int numberOfNeurons, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
+    private BaseNeuralNetwork(int layers, int numberOfNeurons, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
         if(numberOfNeurons != initialInput.length) { throw new IllegalArgumentException("neuronsPerLayer of " + numberOfNeurons + " and initialInput size of " + initialInput.length + " do not match!");}
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
@@ -188,7 +188,7 @@ public class DenseLayers {
             }
         });
     }
-    private DenseLayers(int layers, int numberOfNeurons, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
+    private BaseNeuralNetwork(int layers, int numberOfNeurons, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
         this.initialInput = initialInput;
         this.layerList = new ArrayList<>();
         // instantiate the decisions index
@@ -210,7 +210,7 @@ public class DenseLayers {
             }
         });
     }
-    private DenseLayers(int layers, int numberOfNeurons, double[][] initialWeights, double[] biases, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
+    private BaseNeuralNetwork(int layers, int numberOfNeurons, double[][] initialWeights, double[] biases, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
         this.layerList = new ArrayList<>();
         this.initialInput = initialInput;
         // instantiate the decisions index
@@ -232,7 +232,7 @@ public class DenseLayers {
             }
         });
     }
-    private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
+    private BaseNeuralNetwork(int layers, int[] numberOfNeuronsPerLayer, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
         if(layers != numberOfNeuronsPerLayer.length) {
             throw new IllegalArgumentException(layers + " Layers given but only " + numberOfNeuronsPerLayer.length
                     + " layers described!\nAdjust neuronsPerLayer to be of same length as number of layers!");
@@ -260,7 +260,7 @@ public class DenseLayers {
             }
         });
     }
-    private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
+    private BaseNeuralNetwork(int layers, int[] numberOfNeuronsPerLayer, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
         if(layers != numberOfNeuronsPerLayer.length) {
             throw new IllegalArgumentException(layers + " Layers given but only " + numberOfNeuronsPerLayer.length
                     + " layers described!\nAdjust neuronsPerLayer to be of same length as number of layers!");
@@ -288,7 +288,7 @@ public class DenseLayers {
             }
         });
     }
-    private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
+    private BaseNeuralNetwork(int layers, int[] numberOfNeuronsPerLayer, double[][] initialWeights, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
         if(layers != numberOfNeuronsPerLayer.length) {
             throw new IllegalArgumentException(layers + " Layers given but only " + numberOfNeuronsPerLayer.length
                     + " layers described!\nAdjust neuronsPerLayer to be of same length as number of layers!");
@@ -314,7 +314,7 @@ public class DenseLayers {
             }
         });
     }
-    private DenseLayers(int layers, int[] numberOfNeuronsPerLayer, double[][] initialWeights, double[] initialBiases, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
+    private BaseNeuralNetwork(int layers, int[] numberOfNeuronsPerLayer, double[][] initialWeights, double[] initialBiases, double[][] initialInput, DEFAULT_ACTIVATIONS activationFunction, Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap) {
         if(layers != numberOfNeuronsPerLayer.length) {
             throw new IllegalArgumentException(layers + " Layers given but only " + numberOfNeuronsPerLayer.length
                     + " layers described!\nAdjust neuronsPerLayer to be of same length as number of layers!");
@@ -857,122 +857,122 @@ public class DenseLayers {
             return this;
         }
 
-        public DenseLayers build() {
-            DenseLayers built = null;
+        public BaseNeuralNetwork build() {
+            BaseNeuralNetwork built = null;
             if(!this.isUsingNumberOfLayers && !this.isUsingListOfLayers) { throw new IllegalArgumentException("Please use the numberOfLayers() builder method to initialize, or provide an ArrayList<DenseLayer> using the withLayerList() builder method!"); }
 
             if(!this.isUsingSpecificNeurons && !this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingBatchInputs) {
                 if(this.isUsingFileAsInput && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     printTitle("Using construct 1.1");
-                    built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                    built = new BaseNeuralNetwork(this.numberOfLayers, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(this.isUsingFileAsInput && this.isUsingSpecificWeights) {
                     printTitle("Using construct 1.2");
-                    built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                    built = new BaseNeuralNetwork(this.numberOfLayers, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(this.isUsingFileAsInput) {
                     printTitle("Using construct 1.3");
-                    built = new DenseLayers(this.numberOfLayers, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                    built = new BaseNeuralNetwork(this.numberOfLayers, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(!this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printTitle("Using construct 1.4");
-                    built = new DenseLayers(this.numberOfLayers, this.activationFunction, this.activationFunctionsMap);
+                    built = new BaseNeuralNetwork(this.numberOfLayers, this.activationFunction, this.activationFunctionsMap);
                 }
             }
             else if(this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingBatchInputs) {
                 if(this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     printTitle("Using construct 2.1");
-                    built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                    built = new BaseNeuralNetwork(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(this.isUsingFileAsInput  && this.isUsingSpecificWeights) {
                     printTitle("Using construct 2.2");
-                    built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                    built = new BaseNeuralNetwork(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(this.isUsingFileAsInput) {
                     printTitle("Using construct 2.3");
-                    built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                    built = new BaseNeuralNetwork(this.numberOfLayers, this.numberOfNeurons, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(!this.isUsingFileAsInput && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printTitle("Using construct 2.4");
-                    built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.activationFunction, this.activationFunctionsMap);
+                    built = new BaseNeuralNetwork(this.numberOfLayers, this.numberOfNeurons, this.activationFunction, this.activationFunctionsMap);
                 }
             }
             else if(this.isUsingSpecificNeurons && this.isUsingNumberOfLayers && !this.isUsingBatchInputs) {
                 if(this.isUsingFileAsInput && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     printTitle("Using construct 3.1");
-                    built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                    built = new BaseNeuralNetwork(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(this.isUsingFileAsInput && this.isUsingSpecificWeights) {
                     printTitle("Using construct 3.2");
-                    built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                    built = new BaseNeuralNetwork(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(this.isUsingFileAsInput) {
                     printTitle("Using construct 3.3");
-                    built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                    built = new BaseNeuralNetwork(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(!this.isUsingFileAsInput && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printTitle("Using construct 3.4");
-                    built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.activationFunction, this.activationFunctionsMap);
+                    built = new BaseNeuralNetwork(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.activationFunction, this.activationFunctionsMap);
                 }
             }
             // neurons are not being specified, file input is not being used
             else if(!this.isUsingSpecificNeurons && !this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingFileAsInput) {
                 if(this.isUsingBatchInputs && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     printTitle("Using construct 4.1");
-                    built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                    built = new BaseNeuralNetwork(this.numberOfLayers, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(this.isUsingBatchInputs  && this.isUsingSpecificWeights) {
                     printTitle("Using construct 4.2");
-                    built = new DenseLayers(this.numberOfLayers, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                    built = new BaseNeuralNetwork(this.numberOfLayers, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(this.isUsingBatchInputs) {
                     printTitle("Using construct 4.3");
-                    built = new DenseLayers(this.numberOfLayers, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                    built = new BaseNeuralNetwork(this.numberOfLayers, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(!this.isUsingBatchInputs && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printTitle("Using construct 4.4");
-                    built = new DenseLayers(this.numberOfLayers, this.activationFunction, this.activationFunctionsMap);
+                    built = new BaseNeuralNetwork(this.numberOfLayers, this.activationFunction, this.activationFunctionsMap);
                 }
             }
             else if(this.isUsingNumberOfNeurons && this.isUsingNumberOfLayers && !this.isUsingFileAsInput) {
                 if(this.isUsingBatchInputs && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     printTitle("Using construct 5.1");
-                    built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                    built = new BaseNeuralNetwork(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(this.isUsingBatchInputs  && this.isUsingSpecificWeights) {
                     printTitle("Using construct 5.2");
-                    built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                    built = new BaseNeuralNetwork(this.numberOfLayers, this.numberOfNeurons, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(this.isUsingBatchInputs) {
                     printTitle("Using construct 5.3");
-                    built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                    built = new BaseNeuralNetwork(this.numberOfLayers, this.numberOfNeurons, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(!this.isUsingBatchInputs && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printTitle("Using construct 5.4");
-                    built = new DenseLayers(this.numberOfLayers, this.numberOfNeurons, this.activationFunction, this.activationFunctionsMap);
+                    built = new BaseNeuralNetwork(this.numberOfLayers, this.numberOfNeurons, this.activationFunction, this.activationFunctionsMap);
                 }
             }
             else if(this.isUsingSpecificNeurons && this.isUsingNumberOfLayers && !this.isUsingFileAsInput) {
                 if(this.isUsingBatchInputs && this.isUsingSpecificWeights && this.isUsingSpecificBiases) {
                     printTitle("Using construct 6.1");
-                    built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                    built = new BaseNeuralNetwork(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialBiases, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(this.isUsingBatchInputs  && this.isUsingSpecificWeights) {
                     printTitle("Using construct 6.2");
-                    built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                    built = new BaseNeuralNetwork(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialWeights, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(this.isUsingBatchInputs) {
                     printTitle("Using construct 6.3");
-                    built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialInput, this.activationFunction, this.activationFunctionsMap);
+                    built = new BaseNeuralNetwork(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.initialInput, this.activationFunction, this.activationFunctionsMap);
                 }
                 else if(!this.isUsingBatchInputs && !this.isUsingSpecificWeights && !this.isUsingSpecificBiases) {
                     printTitle("Using construct 6.4");
-                    built = new DenseLayers(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.activationFunction, this.activationFunctionsMap);
+                    built = new BaseNeuralNetwork(this.numberOfLayers, this.numberOfNeuronsPerLayer, this.activationFunction, this.activationFunctionsMap);
                 }
             }
             else {
                 printTitle("Using construct 7");
-                built = new DenseLayers(2, DEFAULT_ACTIVATIONS.LINEAR_ACTIVATION_FUNCTION, this.activationFunctionsMap);
+                built = new BaseNeuralNetwork(2, DEFAULT_ACTIVATIONS.LINEAR_ACTIVATION_FUNCTION, this.activationFunctionsMap);
                 if(this.isUsingBatchInputs && this.isUsingFileAsInput) {
                     throw new RuntimeException(bold(red("Builder Not Configured Properly! Do Not Use File As Input and Batch Input Together!")));
                 }

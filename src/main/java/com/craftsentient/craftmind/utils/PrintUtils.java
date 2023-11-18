@@ -1,7 +1,7 @@
 package com.craftsentient.craftmind.utils;
 
 import com.craftsentient.craftmind.layer.DenseLayer;
-import com.craftsentient.craftmind.layers.DenseLayers;
+import com.craftsentient.craftmind.layers.BaseNeuralNetwork;
 import com.craftsentient.craftmind.neuron.Neuron;
 
 import java.math.BigDecimal;
@@ -380,7 +380,7 @@ public class PrintUtils {
         print("Outputs: ", layer.getLayerOutputs());
     }
 
-    public static void printLayers(String label, DenseLayers layers) {
+    public static void printLayers(String label, BaseNeuralNetwork layers) {
         System.out.println(bold(green(":::: " + label + " NETWORK ::::")));
         for(int i = 1; i <= layers.getLayerList().size(); i++){
             printLayer("" + i, layers.getLayerAt(i-1));

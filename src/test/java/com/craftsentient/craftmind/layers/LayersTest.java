@@ -27,7 +27,7 @@ public class LayersTest {
     public void constructor1() {
         // this will auto create a classification neural network!
         printPositive("First DenseLayer");
-        new DenseLayers.DenseLayersBuilder()
+        new BaseNeuralNetwork.DenseLayersBuilder()
                 .withNumberOfLayers(5)
                 .withTrueValueIndices(new int[]{4})
                 .build().train();//.printLayers("NETWORK 1 NEW");
@@ -37,7 +37,7 @@ public class LayersTest {
     public void constructor2() {
         // when no batch input is provided, one layer of input will be created
         printPositive("Second DenseLayer");
-        new DenseLayers.DenseLayersBuilder()
+        new BaseNeuralNetwork.DenseLayersBuilder()
                 .withNumberOfLayers(7)
                 .withNumberOfNeurons(7)
                 .withTrueValueIndices(new int[]{1})
@@ -49,7 +49,7 @@ public class LayersTest {
     public void constructor3() {
         // when no batch input is provided, one layer of input will be created with a specific amount of data
         printPositive("Third DenseLayer");
-        new DenseLayers.DenseLayersBuilder()
+        new BaseNeuralNetwork.DenseLayersBuilder()
                 .withNumberOfLayers(64)
                 .withNumberOfInputs(27)
                 .withNumberOfNeurons(64)
@@ -63,7 +63,7 @@ public class LayersTest {
         // create neural network with number of layers and specific number of neurons in each layer as input
         // with no input, it will default to the first layers number of neurons as batch size
         printPositive("Fourth Layer");
-        new DenseLayers.DenseLayersBuilder()
+        new BaseNeuralNetwork.DenseLayersBuilder()
                 .withNumberOfLayers(7)
                 .withNumberOfNeuronsPerLayer(new int[]{2, 5, 9, 2, 5, 4, 10})
                 .withHotOneVector(new int[][] {{0,0,0,0,0,0,0,1,0,0}})
@@ -75,7 +75,7 @@ public class LayersTest {
     public void constructor5() {
         // create neural network with number of layers and initial inputs as input
         printPositive("Fifth Layer");
-        new DenseLayers.DenseLayersBuilder()
+        new BaseNeuralNetwork.DenseLayersBuilder()
                 .withNumberOfLayers(3)
                 .withInitialInput(inputs)
                 .withTrueValueIndices(new int[]{0,2,1})
@@ -87,7 +87,7 @@ public class LayersTest {
     @Test
     public void constructor6() {
         // create neural network with number of layers, number of neurons per layer, and initial inputs as input
-        new DenseLayers.DenseLayersBuilder()
+        new BaseNeuralNetwork.DenseLayersBuilder()
                 .withNumberOfLayers(7)
                 .withNumberOfNeurons(3)
                 .withInitialInput(inputs)
@@ -102,7 +102,7 @@ public class LayersTest {
     @Test
     public void constructor7() {
         // create neural network with number of layers, the specific number of neurons in each layer, and initial inputs
-        new DenseLayers.DenseLayersBuilder()
+        new BaseNeuralNetwork.DenseLayersBuilder()
                 .withNumberOfLayers(3)
                 .withNumberOfNeuronsPerLayer(new int[]{3, 5, 9})
                 .withInitialInput(inputs)
@@ -119,7 +119,7 @@ public class LayersTest {
     @Test
     public void constructor8() {
         // create neural network with number of layers, initial weights for inputs, and initial inputs
-        new DenseLayers.DenseLayersBuilder()
+        new BaseNeuralNetwork.DenseLayersBuilder()
                 .withNumberOfLayers(5)
                 .withInitialWeights(weights)
                 .withInitialInput(inputs)
@@ -132,7 +132,7 @@ public class LayersTest {
     @Test
     public void constructor9() {
         // create neural network with number of layers, number of neurons per layer, initial weights for inputs, and initial inputs
-        new DenseLayers.DenseLayersBuilder()
+        new BaseNeuralNetwork.DenseLayersBuilder()
                 .withNumberOfLayers(5)
                 .withNumberOfNeurons(3)
                 .withTrueValueIndices(new int[]{1,2,0})
@@ -146,7 +146,7 @@ public class LayersTest {
     @Test
     public void constructor10() {
         // create neural network with number of layers, specific number of neurons per layer, initial weights for inputs, and initial inputs
-        new DenseLayers.DenseLayersBuilder()
+        new BaseNeuralNetwork.DenseLayersBuilder()
                 .withNumberOfLayers(5)
                 .withNumberOfNeuronsPerLayer( new int[]{3, 5, 9, 2, 7})
                 .withInitialWeights(weights)
@@ -159,7 +159,7 @@ public class LayersTest {
     @Test
     public void constructor11() {
         // create neural network with number of layers, initial weights per input, biases for each neuron, and initial inputs
-        new DenseLayers.DenseLayersBuilder()
+        new BaseNeuralNetwork.DenseLayersBuilder()
                 .withNumberOfLayers(4)
                 .withInitialWeights(weights)
                 .withInitialBiases(biases)
@@ -172,7 +172,7 @@ public class LayersTest {
     @Test
     public void constructor12() {
         // create neural network with number of layers, number of neurons per layer, initial weights per input, biases for each neuron, and initial inputs
-        new DenseLayers.DenseLayersBuilder()
+        new BaseNeuralNetwork.DenseLayersBuilder()
                 .withNumberOfLayers(4)
                 .withNumberOfNeurons(3)
                 .withInitialWeights(weights)
@@ -186,7 +186,7 @@ public class LayersTest {
     @Test
     public void constructor13() {
         // create neural network with number of layers, specific number of neurons per layer, initial weights per input, biases for each neuron, and initial inputs
-        new DenseLayers.DenseLayersBuilder()
+        new BaseNeuralNetwork.DenseLayersBuilder()
                 .withNumberOfLayers(4)
                 .withNumberOfNeuronsPerLayer(new int[]{3,5,6,7})
                 .withInitialWeights(weights)

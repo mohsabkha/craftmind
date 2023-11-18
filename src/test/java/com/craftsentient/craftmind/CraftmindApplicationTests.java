@@ -2,7 +2,7 @@ package com.craftsentient.craftmind;
 
 import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATIONS;
 import com.craftsentient.craftmind.errorLoss.DEFAULT_LOSSES;
-import com.craftsentient.craftmind.layers.DenseLayers;
+import com.craftsentient.craftmind.layers.BaseNeuralNetwork;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -22,7 +22,7 @@ class CraftmindApplicationTests {
         };
         double[] biases = {2, 3, 0.5, 1}; // 1 per neuron
 
-        DenseLayers builtLayerWithFile = new DenseLayers.DenseLayersBuilder()
+        BaseNeuralNetwork builtLayerWithFile = new BaseNeuralNetwork.DenseLayersBuilder()
                 .withNumberOfLayers(3)
                 .withNumberOfNeuronsPerLayer(new int[]{4,250,3})
                 .withInitialInput(inputs)
@@ -63,7 +63,7 @@ class CraftmindApplicationTests {
         };
         double[] biases = {24, 10}; // 1 per neuron
 
-        DenseLayers builtLayerWithFile = new DenseLayers.DenseLayersBuilder()
+        BaseNeuralNetwork builtLayerWithFile = new BaseNeuralNetwork.DenseLayersBuilder()
                 .withNumberOfLayers(3)
                 .withNumberOfNeuronsPerLayer(new int[]{2,64,3})
                 .withEpoch(100)

@@ -9,7 +9,6 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 import static com.craftsentient.craftmind.activation.ActivationFunctions.activationFunction;
-import static com.craftsentient.craftmind.utils.PrintUtils.print;
 
 @Getter
 @AllArgsConstructor
@@ -20,7 +19,7 @@ public class DenseLayer {
     private double[] neuronBiases;
     @Setter
     private double[] inputs;
-    private boolean isHiddenLayer = true;
+    private boolean isHiddenLayer;
     private double alpha;
     private double beta;
     private double delta;

@@ -3,7 +3,7 @@ package com.craftsentient.craftmind.errorLoss;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 
-import static com.craftsentient.craftmind.layers.DenseLayers.*;
+import static com.craftsentient.craftmind.layers.BaseNeuralNetwork.*;
 import static com.craftsentient.craftmind.utils.PrintUtils.print;
 
 public class ErrorLossFunctionsImpl {
