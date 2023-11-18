@@ -26,9 +26,11 @@ public class DenseLayers {
     private final ArrayList<DenseLayer> layerList;
     private final double[][] initialInput;
     private int dataCounter = 0;
-    private int batchCounter = 0;
     private int miniBatchSize = 1;
     private int epoch = 1;
+    private int step = miniBatchSize;
+    private boolean epochDecay = false;
+    private boolean stepDecay = false;
     private final Map<Integer, Double> decisions;
     private final int[] decisionsIndex;
     private int[] trueValueIndices;
@@ -362,8 +364,7 @@ public class DenseLayers {
                     tempLoss += generateLoss();
                 }
                 this.loss = tempLoss / miniBatchSize;
-                this.batchCounter++;
-                print("Loss and Accuracy Data For Batch: " + this.batchCounter);
+                print("Loss and Accuracy Data On Epoch For Batch: " + this.dataCounter);
                 print("Accuracy:", this.getAccuracy());
                 print("Loss:", this.getLoss());
                 print("Layer Outputs:", this.getLastLayer().getLayerOutputs());
@@ -386,14 +387,16 @@ public class DenseLayers {
                     tempLoss += generateLoss();
                 }
                 this.loss = tempLoss / miniBatchSize;
-                this.batchCounter++;
-                print("Loss and Accuracy Data For Batch: " + this.batchCounter);
+                print("Loss and Accuracy Data On Epoch For Batch: " + this.dataCounter);
                 print("Accuracy:", this.getAccuracy());
                 print("Loss:", this.getLoss());
                 print("Layer Outputs:", this.getLastLayer().getLayerOutputs());
                 print("");
             }
-            this.batchCounter = 0;
+
+            if(this.decayFunction == DEFAULT_LEARNING_RATE_DECAY.EPOCH){
+                this.learningRate = updateLearningRate(this.decayFunction, this.learningRate, this.learningRateDecay, epochCounter);
+            }
             this.dataCounter = 0;
             this.accuracy = 0;
             this.sum = 0;
@@ -404,7 +407,6 @@ public class DenseLayers {
     }
 
     private double generateLoss(){
-        double loss = 0;
         if(this.hotOneVec != null && this.trueValueIndices != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
         // check if both the one hot vector mappings true values mappings are empty
         if(this.hotOneVec == null && this.trueValueIndices == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
@@ -422,7 +424,7 @@ public class DenseLayers {
             }
             this.generateDecisionsMap(hotValueIndex);
             loss = ErrorLossFunctions.lossFunction(lossFunction, hotValueIndex, this.getDecisionsIndex()[this.dataCounter], this.getLastLayer().getLayerOutputs());
-        } else if (this.trueValueIndices != null){
+        } else {
             if(trueValueIndices.length <= this.dataCounter) {
                 throw new RuntimeException("Too few true values for the number of inputs given!");
             }
@@ -509,10 +511,6 @@ public class DenseLayers {
                     neuron.setWeight(k, neuron.getWeights()[k] - deltaWeight);
                 }
             }
-        }
-        // decay learning rate
-        if(this.decayFunction == DEFAULT_LEARNING_RATE_DECAY.EPOCH){
-            this.learningRate = updateLearningRate(this.decayFunction, this.learningRate, this.learningRateDecay, this.batchCounter);
         }
         printPositive("Finished back-propagation!");
     }
@@ -601,7 +599,6 @@ public class DenseLayers {
         private final Map<Integer, DEFAULT_ACTIVATIONS> activationFunctionsMap = new HashMap<>();
         private boolean hasSetSpecificLayerActivationFunctions = false;
 
-        //
         private DEFAULT_LOSSES lossFunction = DEFAULT_LOSSES.NLL_LOSS_FUNCTION;
         private int[][] hotOneVec;
         private int[] trueValueIndices;
@@ -1027,6 +1024,7 @@ public class DenseLayers {
             printPositive("Learning rate set to " + built.learningRate);
             printPositive("Learning rate decay set to " + built.learningRateDecay);
             printPositive("Batch size set to " + built.miniBatchSize);
+            printPositive("Epochs set to " + built.epoch);
 
             double tl = built.loss;
             int counter = miniBatchSize;
@@ -1044,7 +1042,7 @@ public class DenseLayers {
             built.loss = tl / built.miniBatchSize;
             built.backPropagate();
             printSubTitle("Initialization Stats:");
-            print("Loss and Accuracy Data For Batch: " + built.batchCounter);
+            print("Loss and Accuracy Data For Batch: " + built.miniBatchSize);
             print("Accuracy:", built.getAccuracy());
             print("Loss:", built.getLoss());
             print("Layer Outputs:", built.getLastLayer().getLayerOutputs());
