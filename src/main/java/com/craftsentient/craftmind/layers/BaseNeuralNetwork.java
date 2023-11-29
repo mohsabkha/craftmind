@@ -1009,10 +1009,11 @@ public class BaseNeuralNetwork {
             built.learningRateDecay = this.learningRateDecay;
             built.decayFunction = this.decayFunction;
             built.momentum = momentum;
-            if(built.momentum != 0){
-                for(int i = 0; i < built.getLayerList().size(); i++){
+            if(built.momentum != 0) {
+                for (int i = 0; i < built.getLayerList().size(); i++) {
                     built.getLayerAt(i).setWeightMomentums(new double[built.getLayerAt(i).getNeuronWeights().length][]);
                     built.getLayerAt(i).setBiasMomentums(new double[built.getLayerAt(i).getNeuronBiases().length]);
+                }
             }
 
             built.lossFunction = this.lossFunction;
@@ -1061,11 +1062,11 @@ public class BaseNeuralNetwork {
 
             double tl = built.loss;
             int counter = miniBatchSize;
-            if(built.miniBatchSize == 1){
+            if(built.miniBatchSize == 1) {
                 counter = 2;
             }
             for(int y = 0; y < counter-1; y++) {
-                if(built.dataCounter >= built.initialInput.length - 1){
+                if(built.dataCounter >= built.initialInput.length - 1) {
                     break;
                 }
                 built.dataCounter++;
