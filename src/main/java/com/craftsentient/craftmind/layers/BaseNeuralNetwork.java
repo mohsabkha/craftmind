@@ -419,7 +419,7 @@ public class BaseNeuralNetwork {
             Neuron neuron = this.getNeuronFromLayerAt(outputIndex, j);
 
             // bias update
-            double biasUpdate = 0;
+            double biasUpdate;
             if(this.momentum != 0){
                 biasUpdate = outputLayer.getBiasMomentums()[j] - this.learningRate * gradients[outputIndex][j];
                 outputLayer.updateBiasMomentum(j, biasUpdate);
@@ -431,7 +431,7 @@ public class BaseNeuralNetwork {
             // weights update
             double[] inputs = this.getLayerAt(outputIndex - 1).getLayerOutputs();
             for (int k = 0; k < neuron.getWeights().length; k++) {
-                double weightUpdate = 0;
+                double weightUpdate;
                 if(this.momentum != 0){
                     weightUpdate = outputLayer.getWeightMomentums()[j][k] - this.learningRate * gradients[outputIndex][j];
                     outputLayer.updateWeightMomentum(j, k, weightUpdate);
@@ -472,19 +472,19 @@ public class BaseNeuralNetwork {
                 Neuron neuron = this.getNeuronFromLayerAt(index, j);
 
                 // update biases
-                double biasUpdate = 0;
+                double biasUpdate;
                 if(this.momentum != 0){
                     biasUpdate = currentLayer.getBiasMomentums()[j] - this.learningRate * gradients[index][j];
                     outputLayer.updateBiasMomentum(j, biasUpdate);
                 } else {
-                    biasUpdate = -(this.learningRate * gradients[outputIndex][j]);
+                    biasUpdate = -(this.learningRate * gradients[index][j]);
                 }
                 neuron.setBias(neuron.getBias() + biasUpdate );
 
                 // update weights
                 double[] inputs = (index == 0) ? this.getInitialInput()[dataCounter] : this.getLayerAt(index - 1).getLayerOutputs();
                 for (int k = 0; k < neuron.getWeights().length; k++) {
-                    double weightUpdate = 0;
+                    double weightUpdate;
                     if(this.momentum != 0){
                         weightUpdate = getLayerAt(index).getWeightMomentums()[j][k] - this.learningRate * gradients[index][j];
                         this.getLayerAt(index).updateWeightMomentum(j, k, weightUpdate);
@@ -1005,6 +1005,7 @@ public class BaseNeuralNetwork {
                 throw new RuntimeException(bold(red("Builder Not Configured Properly!")));
             }
             assert built != null;
+
             built.learningRate = this.learningRate;
             built.learningRateDecay = this.learningRateDecay;
             built.decayFunction = this.decayFunction;
