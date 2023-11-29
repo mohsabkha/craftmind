@@ -1,6 +1,10 @@
 package com.craftsentient.craftmind.learningRate;
 
 public class LearningRateImpl {
+    public static double SgdWithMomentum(double learningRate, double decayRate, int epoch){
+        return learningRate;
+    }
+
     public static double epochDecay(double learningRate, double decayRate, int epoch) {
         return learningRate * (1 / (1 + decayRate * epoch));
     }

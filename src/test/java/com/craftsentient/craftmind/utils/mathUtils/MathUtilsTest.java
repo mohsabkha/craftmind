@@ -1,7 +1,7 @@
 package com.craftsentient.craftmind.utils.mathUtils;
 
 import com.craftsentient.craftmind.neuron.Neuron;
-import com.craftsentient.craftmind.utils.MathUtils;
+import com.craftsentient.craftmind.utils.craftmath.MathUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

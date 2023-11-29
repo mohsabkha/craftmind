@@ -1,7 +1,7 @@
 package com.craftsentient.craftmind.layer;
 
 import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATIONS;
-import com.craftsentient.craftmind.utils.MathUtils;
+import com.craftsentient.craftmind.utils.craftmath.MathUtils;
 import com.craftsentient.craftmind.neuron.Neuron;
 import lombok.*;
 
@@ -27,6 +27,10 @@ public class DenseLayer {
     private double outputMean;
     @Setter
     private double[] layerOutputs;
+    @Setter
+    private double[][] weightMomentums;
+    @Setter
+    private double[] biasMomentums;
     @Setter
     private DEFAULT_ACTIVATIONS activationFunction;
 
@@ -215,5 +219,13 @@ public class DenseLayer {
         for (int i = 0; i < weights.length; i++) {
             this.neuronList.add(new Neuron(weights[i], biases[i]));
         }
+    }
+
+    public void updateBiasMomentum(int index, double value){
+        this.biasMomentums[index] = value;
+    }
+
+    public void updateWeightMomentum(int row, int column, double value) {
+        this.weightMomentums[row][column] = value;
     }
 }

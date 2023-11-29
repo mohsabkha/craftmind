@@ -1,6 +1,6 @@
 package com.craftsentient.craftmind.neuron;
 
-import com.craftsentient.craftmind.utils.MathUtils;
+import com.craftsentient.craftmind.utils.craftmath.MathUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.craftsentient.craftmind.utils;
+package com.craftsentient.craftmind.utils.craftmath;
 
 
 import java.util.ArrayList;
@@ -217,6 +217,27 @@ public class MathUtils {
             temp[array.length] = values;
         }
         return temp;
+    }
+
+    public static double[] scaleVector(double[] array, double scalar) {
+        IntStream.range(0, array.length).parallel().forEachOrdered(i -> { array[i] = array[i] * scalar; });
+        return array;
+    }
+    public static double[] scaleVector(double[] array, int scalar) {
+        IntStream.range(0, array.length).parallel().forEachOrdered(i -> { array[i] = array[i] * scalar; });
+        return array;
+    }
+    public static double[][] scaleVector(double[][] array, int scalar) {
+        IntStream.range(0, array.length).parallel().forEachOrdered(i -> {
+            scaleVector(array[i], scalar);
+        });
+        return array;
+    }
+    public static double[][] scaleVector(double[][] array, double scalar) {
+        IntStream.range(0, array.length).parallel().forEachOrdered(i -> {
+            scaleVector(array[i], scalar);
+        });
+        return array;
     }
 
     public static double[] fullMultiplication(double[] a, double[] b) {
