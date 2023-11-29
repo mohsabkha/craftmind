@@ -418,6 +418,7 @@ public class BaseNeuralNetwork {
         for (int j = 0; j < outputLayer.getNeuronList().size(); j++) {
             Neuron neuron = this.getNeuronFromLayerAt(outputIndex, j);
 
+            // bias update
             double biasUpdate = 0;
             if(this.momentum != 0){
                 biasUpdate = outputLayer.getBiasMomentums()[j] - this.learningRate * gradients[outputIndex][j];
@@ -427,6 +428,7 @@ public class BaseNeuralNetwork {
             }
             neuron.setBias(neuron.getBias() + biasUpdate );
 
+            // weights update
             double[] inputs = this.getLayerAt(outputIndex - 1).getLayerOutputs();
             for (int k = 0; k < neuron.getWeights().length; k++) {
                 double weightUpdate = 0;
@@ -468,8 +470,9 @@ public class BaseNeuralNetwork {
             // update each neuron
             for (int j = 0; j < this.getLayerAt(index).getNeuronList().size(); j++) {
                 Neuron neuron = this.getNeuronFromLayerAt(index, j);
-                double biasUpdate = 0;
 
+                // update biases
+                double biasUpdate = 0;
                 if(this.momentum != 0){
                     biasUpdate = currentLayer.getBiasMomentums()[j] - this.learningRate * gradients[index][j];
                     outputLayer.updateBiasMomentum(j, biasUpdate);
@@ -477,15 +480,23 @@ public class BaseNeuralNetwork {
                     biasUpdate = -(this.learningRate * gradients[outputIndex][j]);
                 }
                 neuron.setBias(neuron.getBias() + biasUpdate );
-                
+
+                // update weights
                 double[] inputs = (index == 0) ? this.getInitialInput()[dataCounter] : this.getLayerAt(index - 1).getLayerOutputs();
                 for (int k = 0; k < neuron.getWeights().length; k++) {
+                    double weightUpdate = 0;
+                    if(this.momentum != 0){
+                        weightUpdate = getLayerAt(index).getWeightMomentums()[j][k] - this.learningRate * gradients[index][j];
+                        this.getLayerAt(index).updateWeightMomentum(j, k, weightUpdate);
+                    } else {
+                        weightUpdate = -(this.learningRate * gradients[index][j]);
+                    }
                     double deltaWeight = this.learningRate * gradients[index][j] * inputs[k];
                     neuron.setWeight(k, neuron.getWeights()[k] - deltaWeight);
                 }
             }
 
-            // update learning rate per step
+            // basic learning rate update
             if(this.decayFunction == DEFAULT_LEARNING_RATE_DECAY.STEP){
                 this.learningRate = updateLearningRate(this.decayFunction, this.learningRate, this.learningRateDecay, index);
             }
