@@ -9,10 +9,18 @@ public class ErrorLossDerivativesImpl {
         for (int i = 0; i < outputs.length; i++) {
             if (i == trueValueIndex) {
                 // For the correct class
-                derivatives[i] = -1 / outputs[i];
+                if(outputs[i] != 0){
+                    derivatives[i] = -1 / outputs[i];
+                } else {
+                    derivatives[i] = -1 / outputs[i] + 0.000001;
+                }
             } else {
                 // For all other classes
-                derivatives[i] = 1 / (1 - outputs[i]);
+                if(1-outputs[i] != 0){
+                    derivatives[i] = 1 / (1 - outputs[i]);
+                } else {
+                    derivatives[i] = 1 / (1 - outputs[i] + 0.000001);
+                }
             }
         }
         return derivatives;

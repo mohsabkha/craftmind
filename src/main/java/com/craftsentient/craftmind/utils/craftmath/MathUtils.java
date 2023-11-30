@@ -53,13 +53,15 @@ public class MathUtils {
 
     public static double[][] matrixDotProduct(double[][] input1, double[][] input2) {
         double[][] output = new double[input1.length][input2[0].length];
-        for (int i = 0; i < output.length; i++)
-            for (int j = 0; j < output[0].length; j++) {
-                double value = 0;
-                for (int k = 0; k < input1[0].length; k++)
-                    value += input1[i][k] * input2[k][j];
-                output[i][j] = value;
-            }
+        IntStream.range(0, output.length).parallel().forEachOrdered(i -> {
+            IntStream.range(0, output[0].length).parallel().forEachOrdered( j -> {
+                AtomicReference<Double> value = new AtomicReference<>((double) 0);
+                IntStream.range(0, input1[0].length).parallel().forEachOrdered( k -> {
+                    value.updateAndGet(v -> (v + (input1[i][j] * input2[i][j])));
+                });
+                output[i][j] = value.get();
+            });
+        });
         return output;
     }
 
@@ -187,9 +189,11 @@ public class MathUtils {
 
     public static double[][] add(double[][] a, double[] b) {
         double[][] output = new double[a.length][a[0].length];
-        for (int i = 0; i < a.length; i++)
-            for (int j = 0; j < a[0].length; j++)
+        IntStream.range(0, a.length).parallel().forEachOrdered(i -> {
+            IntStream.range(0,a[0].length).parallel().forEachOrdered(j -> {
                 output[i][j] = a[i][j] + b[j];
+            });
+        });
         return output;
     }
 
@@ -200,7 +204,7 @@ public class MathUtils {
             temp[0] = value;
         } else {
             temp = new double[array.length + 1];
-            for(int i = 0; i < array.length; i++) temp[i] = array[i];
+            IntStream.range(0, array.length).parallel().forEachOrdered(i -> { temp[i] = array[i]; });
             temp[array.length] = value;
         }
         return temp;
@@ -213,7 +217,7 @@ public class MathUtils {
             temp[0] = values;
         } else {
             temp = new double[array.length+1][array[0].length];
-            for(int i = 0; i < array.length; i++) temp[i] = array[i];
+            IntStream.range(0, array.length).parallel().forEachOrdered(i -> { temp[i] = array[i]; });
             temp[array.length] = values;
         }
         return temp;
@@ -242,7 +246,7 @@ public class MathUtils {
 
     public static double[] fullMultiplication(double[] a, double[] b) {
         return IntStream.range(0, a.length).parallel().mapToDouble(i -> {
-            return IntStream.range(0, b.length).mapToDouble(j -> a[i] * b[j]).sum();
+            return IntStream.range(0, b.length).parallel().mapToDouble(j -> a[i] * b[j]).sum();
         }).toArray();
     }
 
@@ -358,22 +362,26 @@ public class MathUtils {
 
     public static double accuracy(double[] trueValues, double[] predictedValues){
         double sum = accuracySum(trueValues, predictedValues);
-        return sum/trueValues.length;
+        if(trueValues.length != 0) { return sum/trueValues.length; }
+        else{ return sum/0.0001; }
     }
 
     public static double accuracy(double[] trueValues, int[] predictedValues){
         double sum = accuracySum(trueValues, predictedValues);
-        return sum/trueValues.length;
+        if(trueValues.length != 0) { return sum/trueValues.length; }
+        else{ return sum/0.0001; }
     }
 
     public static double accuracy(int[] trueValues, int[] predictedValues){
         double sum = accuracySum(trueValues, predictedValues);
-        return sum/trueValues.length;
+        if(trueValues.length != 0) { return sum/trueValues.length; }
+        else{ return sum/0.0001; }
     }
 
     public static double accuracy(int[][] trueHotValues, int[] predictedValues){
         double sum = accuracySum(trueHotValues, predictedValues);
-        return sum/trueHotValues.length;
+        if(trueHotValues.length != 0) { return sum/trueHotValues.length; }
+        else{ return sum/0.0001; }
     }
 
     public static void print(double[][] matrix) {

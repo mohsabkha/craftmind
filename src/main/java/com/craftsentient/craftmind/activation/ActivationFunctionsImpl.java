@@ -182,6 +182,7 @@ public class ActivationFunctionsImpl {
     public static double[] softmax(double[] values) {
         double sum = 0.0;
         for (double value : values) { sum += Math.exp(value); }
+        if (sum == 0) { sum = 0.00001; }
         for (int i = 0; i < values.length; i++) { values[i] = Math.exp(values[i]) / sum; }
         return values;
     }

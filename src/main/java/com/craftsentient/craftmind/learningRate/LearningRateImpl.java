@@ -6,7 +6,11 @@ public class LearningRateImpl {
     }
 
     public static double epochDecay(double learningRate, double decayRate, int epoch) {
-        return learningRate * (1 / (1 + decayRate * epoch));
+        if((1 + decayRate * epoch) != 0) {
+            return learningRate * (1 / (1 + decayRate * epoch));
+        } else {
+            return learningRate * (1 / (1 + decayRate * epoch) + 0.000001);
+        }
     }
 
     public static double stepDecay(double learningRate, double decayRate, int step) {
@@ -18,7 +22,12 @@ public class LearningRateImpl {
     }
 
     public static double AdagradAdaptiveDecay(double learningRate, double gradient, double alpha) {
-        return learningRate / Math.sqrt(gradient + alpha);
+        if(Math.sqrt(gradient + alpha) != 0) {
+            return learningRate / Math.sqrt(gradient + alpha);
+        } else {
+            return learningRate / Math.sqrt(gradient + alpha) + 0.000001;
+        }
+
     }
 
     public static double rmsPropAdaptiveDecay(){

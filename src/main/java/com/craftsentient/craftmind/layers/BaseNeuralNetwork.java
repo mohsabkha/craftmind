@@ -13,6 +13,9 @@ import com.craftsentient.craftmind.neuron.Neuron;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -328,74 +331,79 @@ public class BaseNeuralNetwork {
     }
 
     public void train() {
-        if(dataCounter == this.initialInput.length - 1){ return; }
+        if(dataCounter == this.initialInput.length - 1) { return; }
         int epochCounter = 0;
         while(epochCounter < this.epoch) {
             for(int y = 0; y < (this.initialInput.length-1)/this.miniBatchSize; y++) {
                 double tempLoss = 0;
-                // call back-propagate
                 this.backPropagate();
-                // mini batch processing
-                for(int x = 0; x < this.miniBatchSize; x++){
-                    if(dataCounter >= this.initialInput.length - 1){
-                        break;
-                    }
+
+                for(int x = 0; x < this.miniBatchSize; x++) {
+                    if(dataCounter >= this.initialInput.length - 1) { break; }
                     this.dataCounter++;
                     forward();
                     tempLoss += generateLoss();
                 }
-                this.loss = tempLoss / this.miniBatchSize;
-                print("Accuracy:", this.getAccuracy());
-                print("Loss:", this.getLoss());
-                print("Layer Outputs:", this.getLastLayer().getLayerOutputs());
-                printTitle("Batch Complete: " + epochCounter);
-                print("");
+
+                if(this.miniBatchSize != 0) { this.loss = tempLoss / this.miniBatchSize; }
+                else { this.loss = tempLoss / (this.miniBatchSize + 0.00001); }
+                if(this.miniBatchSize == 1) {
+                    appendNumberToFile("src/main/resources/accuracy.csv", this.getAccuracy() + ", " + this.getLoss());
+                    print("Accuracy:", this.getAccuracy());
+                    print("Loss:", this.getLoss());
+                    print("Layer Outputs:", this.getLastLayer().getLayerOutputs());
+                    printTitle("Batch Complete: " + this.dataCounter);
+                }
+                if(epochCounter == 4) {
+                    // got here
+                }
             }
-            print("finished processing initial data");
+            appendNumberToFile("src/main/resources/accuracy.csv", this.getAccuracy() + ", " + this.getLoss());
+            print("Accuracy:", this.getAccuracy());
+            print("Loss:", this.getLoss());
+            print("Layer Outputs:", this.getLastLayer().getLayerOutputs());
+            printTitle("Batch Complete: " + epochCounter);
             // if not all inputs processed, process remaining
-            if(this.initialInput.length % this.miniBatchSize != 0){
+            if(this.initialInput.length % this.miniBatchSize != 0) {
                 print("Processing Remaining Data Points...");
                 double tempLoss = 0;
                 // call back-propagate
                 this.backPropagate();
                 // mini batch processing (while x is less than remainder)
-                for(int x = 0; x < (this.initialInput.length % this.miniBatchSize); x++){
-                    if(this.dataCounter >= this.initialInput.length - 1){
-                        break;
-                    }
+                for(int x = 0; x < (this.initialInput.length % this.miniBatchSize); x++) {
+                    if(this.dataCounter >= this.initialInput.length - 1) { break; }
                     this.dataCounter++;
                     this.forward();
                     tempLoss += this.generateLoss();
                 }
-                this.loss = tempLoss / this.miniBatchSize;
+                if(this.miniBatchSize != 0) { this.loss = tempLoss / this.miniBatchSize; }
+                else { this.loss = tempLoss / (this.miniBatchSize + 0.00001); }
             }
-            if(this.decayFunction == DEFAULT_LEARNING_RATE_DECAY.EPOCH && this.momentum == 0){
+            if(this.decayFunction == DEFAULT_LEARNING_RATE_DECAY.EPOCH) {
                 this.learningRate = updateLearningRate(this.decayFunction, this.learningRate, this.learningRateDecay, epochCounter);
             }
             this.dataCounter = 0;
-            this.accuracy = 0;
             this.sum = 0;
+            this.accuracy = 0;
             epochCounter++;
         }
         printTitle("Training Complete!");
     }
+
     private void forward() {
-        // do forward pass with next batch of input
         for(int i = 0; i < this.getLayerList().size(); i ++) {
-            if (i != 0) {
-                this.getLayerAt(i).setInputs(this.getLayerAt(i-1).getLayerOutputs()); // use previous layers input
-            } else {
-                this.getLayerAt(i).setInputs(this.initialInput[dataCounter]); // use user-provided input
-            }
+            if (i != 0) { this.getLayerAt(i).setInputs(this.getLayerAt(i-1).getLayerOutputs()); }
+            else { this.getLayerAt(i).setInputs(this.initialInput[dataCounter]); }
             this.getLayerAt(i).regenerateLayerOutput();
         }
     }
+
     private void backPropagate() {
         double[][] gradients = new double[this.layerList.size()][];
         int outputIndex = this.getLayerList().size() - 1;
         DenseLayer outputLayer = this.getLayerAt(outputIndex);
         // loss function derivative
-        if(this.trueValueIndices != null){
+        if(this.trueValueIndices != null) {
             gradients[outputIndex] = ErrorLossDerivatives.derivative(lossFunction,
                     this.getTrueValueIndices()[dataCounter],
                     this.getDecisionsIndex()[dataCounter],
@@ -413,23 +421,23 @@ public class BaseNeuralNetwork {
 
             // bias update
             double biasUpdate;
-            if(this.momentum != 0){
-                biasUpdate = outputLayer.getBiasMomentums()[layerNeuronIterator] - this.learningRate * gradients[outputIndex][layerNeuronIterator];
+            if(this.momentum != 0) {
+                biasUpdate = outputLayer.getBiasMomentums()[layerNeuronIterator] + this.learningRate * gradients[outputIndex][layerNeuronIterator];
                 outputLayer.updateBiasMomentum(layerNeuronIterator, biasUpdate);
             } else {
-                biasUpdate = -(this.learningRate * gradients[outputIndex][layerNeuronIterator]);
+                biasUpdate = (this.learningRate * gradients[outputIndex][layerNeuronIterator]);
             }
-            neuron.setBias(neuron.getBias() + biasUpdate );
+            neuron.setBias(neuron.getBias() - biasUpdate);
 
             // weights update
             double[] inputs = this.getLayerAt(outputIndex - 1).getLayerOutputs();
             for (int neuronWeightIterator = 0; neuronWeightIterator < neuron.getWeights().length; neuronWeightIterator++) {
                 double weightUpdate;
-                if(this.momentum != 0){
-                    weightUpdate = outputLayer.getWeightMomentums()[layerNeuronIterator][neuronWeightIterator] - this.learningRate * gradients[outputIndex][layerNeuronIterator];
+                if(this.momentum != 0) {
+                    weightUpdate = outputLayer.getWeightMomentums()[layerNeuronIterator][neuronWeightIterator] + this.learningRate * gradients[outputIndex][layerNeuronIterator];
                     outputLayer.updateWeightMomentum(layerNeuronIterator, neuronWeightIterator, weightUpdate);
                 } else {
-                    weightUpdate = -(this.learningRate * gradients[outputIndex][layerNeuronIterator]);
+                    weightUpdate = (this.learningRate * gradients[outputIndex][layerNeuronIterator]);
                 }
 
                 double deltaWeight = weightUpdate * inputs[neuronWeightIterator];
@@ -442,47 +450,38 @@ public class BaseNeuralNetwork {
             DenseLayer currentLayer = this.getLayerAt(index+1);
             // create gradient for current layer
             gradients[index] = new double[this.getLayerAt(index).getNeuronList().size()];
-
-            // activation function derivative
             double[] derivatives = ActivationDerivatives.derivative(
                     this.getLayerAt(index).getActivationFunction(),
                     this.getLayerAt(index).getLayerOutputs()
             );
-
-            // determine gradient for the layer
             for (int j = 0; j < gradients[index].length; j++) {
                 double gradientSum = 0;
-                // sum the weights related to the given input by the gradients related to the given neuron (derivative related to input)
                 for (int k = 0; k < currentLayer.getNeuronList().size(); k++) {
                     gradientSum += gradients[index + 1][k] * currentLayer.getNeuronList().get(k).getWeights()[j];
                 }
-                // multiply the sum of the gradients and the derivative of that activation function to get the current error signal
                 gradients[index][j] = gradientSum * derivatives[j];
             }
 
             // update each neuron
             for (int j = 0; j < this.getLayerAt(index).getNeuronList().size(); j++) {
                 Neuron neuron = this.getNeuronFromLayerAt(index, j);
-
-                // update biases
                 double biasUpdate;
-                if(this.momentum != 0){
-                    biasUpdate = this.getLayerAt(index).getBiasMomentums()[j] - this.learningRate * gradients[index][j];
+                if(this.momentum != 0) {
+                    biasUpdate = this.getLayerAt(index).getBiasMomentums()[j] + this.learningRate * gradients[index][j];
                     this.getLayerAt(index).updateBiasMomentum(j, biasUpdate);
                 } else {
-                    biasUpdate = -(this.learningRate * gradients[index][j]);
+                    biasUpdate = (this.learningRate * gradients[index][j]);
                 }
-                neuron.setBias(neuron.getBias() + biasUpdate );
+                neuron.setBias(neuron.getBias() - biasUpdate );
 
-                // update weights
                 double[] inputs = (index == 0) ? this.getInitialInput()[dataCounter] : this.getLayerAt(index - 1).getLayerOutputs();
                 for (int k = 0; k < neuron.getWeights().length; k++) {
                     double weightUpdate;
-                    if(this.momentum != 0){
-                        weightUpdate = this.getLayerAt(index).getWeightMomentums()[j][k] - this.learningRate * gradients[index][j];
+                    if(this.momentum != 0) {
+                        weightUpdate = this.getLayerAt(index).getWeightMomentums()[j][k] + (this.learningRate * gradients[index][j]);
                         this.getLayerAt(index).updateWeightMomentum(j, k, weightUpdate);
                     } else {
-                        weightUpdate = -(this.learningRate * gradients[index][j]);
+                        weightUpdate = (this.learningRate * gradients[index][j]);
                     }
                     double deltaWeight = this.learningRate * gradients[index][j] * inputs[k];
                     neuron.setWeight(k, neuron.getWeights()[k] - deltaWeight);
@@ -490,13 +489,11 @@ public class BaseNeuralNetwork {
             }
 
             // basic learning rate update
-            if(this.decayFunction == DEFAULT_LEARNING_RATE_DECAY.STEP && this.momentum == 0){
+            if(this.decayFunction == DEFAULT_LEARNING_RATE_DECAY.STEP) {
                 this.learningRate = updateLearningRate(this.decayFunction, this.learningRate, this.learningRateDecay, index);
             }
         }
-        printPositive("Finished back-propagation!");
     }
-
     private double generateLoss(){
         if(this.hotOneVec != null && this.trueValueIndices != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
         // check if both the one hot vector mappings true values mappings are empty
@@ -504,11 +501,9 @@ public class BaseNeuralNetwork {
 
         if(this.hotOneVec != null) {
             int hotValueIndex = 0;
-            if(this.hotOneVec.length <= this.dataCounter) {
-                throw new RuntimeException("Too few true values for the number of inputs given!");
-            }
-            for(int i = 0; i < this.hotOneVec.length; i++){
-                if(this.hotOneVec[this.dataCounter][i] != 0){
+            if(this.hotOneVec.length <= this.dataCounter) { throw new RuntimeException("Too few true values for the number of inputs given!"); }
+            for(int i = 0; i < this.hotOneVec.length; i++) {
+                if(this.hotOneVec[this.dataCounter][i] != 0) {
                     hotValueIndex = i;
                     break;
                 }
@@ -516,18 +511,14 @@ public class BaseNeuralNetwork {
             this.generateDecisionsMap(hotValueIndex);
             loss = ErrorLossFunctions.lossFunction(lossFunction, hotValueIndex, this.getDecisionsIndex()[this.dataCounter], this.getLastLayer().getLayerOutputs());
         } else {
-            if(trueValueIndices.length <= this.dataCounter) {
-                throw new RuntimeException("Too few true values for the number of inputs given!");
-            }
+            if(trueValueIndices.length <= this.dataCounter) { throw new RuntimeException("Too few true values for the number of inputs given!"); }
             this.generateDecisionsMap(trueValueIndices[this.dataCounter]);
-            loss =  ErrorLossFunctions.lossFunction(lossFunction, this.trueValueIndices[this.dataCounter],  this.getDecisionsIndex()[this.dataCounter], this.getLastLayer().getLayerOutputs());
+            loss = ErrorLossFunctions.lossFunction(lossFunction, this.trueValueIndices[this.dataCounter],  this.getDecisionsIndex()[this.dataCounter], this.getLastLayer().getLayerOutputs());
         }
         return loss;
     }
     private double accuracy(int trueIndex, int predictedIndex) {
-        if(trueIndex == predictedIndex) {
-            sum+=1;
-        }
+        if(trueIndex == predictedIndex) { sum+=1; }
         this.accuracy = sum / (dataCounter + 1);
         return this.accuracy;
     }
@@ -549,9 +540,7 @@ public class BaseNeuralNetwork {
     }
     private double[] batchDecisions() {
         double[] decisions = new double[this.getLastLayer().getLayerOutputs().length];
-        for(int i = 0; i < decisions.length; i++) {
-            decisions[i] = decision(this.getLastLayer().getLayerOutputs())[1];
-        }
+        for(int i = 0; i < decisions.length; i++) { decisions[i] = decision(this.getLastLayer().getLayerOutputs())[1]; }
         return decisions;
     }
     private double[] decision(double[] values) {
@@ -567,14 +556,16 @@ public class BaseNeuralNetwork {
     }
     private static double[][] getRandomMatrix(int rows, int cols) {
         double[][] output = new double[rows][cols];
-        for (int i = 0; i < output.length; i++)
-            for (int j = 0; j < output[0].length; j++)
+        for (int i = 0; i < output.length; i++) {
+            for (int j = 0; j < output[0].length; j++) {
                 output[i][j] = (0.1 * random.nextGaussian());
+            }
+        }
         return output;
     }
     private static double[] getRandomArray(int elementCount) {
         double[] output = new double[elementCount];
-        for(int i = 0; i < output.length; i++){
+        for(int i = 0; i < output.length; i++) {
             output[i] = (0.1 * random.nextGaussian());
         }
         return output;
@@ -588,7 +579,7 @@ public class BaseNeuralNetwork {
     public double[] getOutputs() {
         return getLayerAt(getLayerList().size()-1).getLayerOutputs();
     }
-    public DEFAULT_ACTIVATIONS getActivationFunctionFrom(int index){
+    public DEFAULT_ACTIVATIONS getActivationFunctionFrom(int index) {
         return this.getLayerAt(index).getActivationFunction();
     }
     public DenseLayer getLayerAt(int index) {
@@ -599,6 +590,14 @@ public class BaseNeuralNetwork {
     }
     public DenseLayer getLastLayer() {
         return this.getLayerAt(this.getLayerList().size()-1);
+    }
+    public static void appendNumberToFile(String filePath, String number) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
+            writer.write(String.valueOf(number));
+            writer.newLine();  // This will add a new line after writing the number
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     // builder class for the neural network
@@ -664,10 +663,9 @@ public class BaseNeuralNetwork {
             char char2 = filePath.charAt(filePath.length()-2);
             char char3 = filePath.charAt(filePath.length()-3);
             char char4 = filePath.charAt(filePath.length()-4);
-            if (char1 == 't' && char2 == 'x' && char3 == 't' && char4 == '.'){
+            if (char1 == 't' && char2 == 'x' && char3 == 't' && char4 == '.') {
                 this.initialInput = (double[][])FileUtils.readTextFile(filePath, delimiter);
-
-            } else if (char1 == 'v' && char2 == 's' && char3 == 'c' && char4 == '.'){
+            } else if (char1 == 'v' && char2 == 's' && char3 == 'c' && char4 == '.') {
                 this.initialInput = FileUtils.readCsvFile(filePath);
             } else {
                 throw new IllegalArgumentException("Error: file must be of type txt or csv");

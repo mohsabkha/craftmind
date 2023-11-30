@@ -51,7 +51,7 @@ class CraftmindApplicationTests {
             // Example usage
         double[][] X; // x y coordinates
         int[] y; // true values
-        int samples = 100; // Number of samples per class
+        int samples = 1000; // Number of samples per class
         int classes = 3;   // Number of classes
 
         Object[] data = createData(samples, classes);
@@ -65,14 +65,16 @@ class CraftmindApplicationTests {
         double[] biases = {24, 10}; // 1 per neuron
 
         BaseNeuralNetwork builtLayerWithFile = new BaseNeuralNetwork.DenseLayersBuilder()
-                .withNumberOfLayers(3)
-                .withNumberOfNeuronsPerLayer(new int[]{2,64,3})
-                .withEpoch(400)
-                .withMiniBatchProcessing(90)
+                .withNumberOfLayers(4)
+                .withEpoch(100)
+                .withNumberOfNeuronsPerLayer(new int[]{2,64,102,3})
+                .withMiniBatchProcessing(10)
                 .withInitialInput(X)
                 .withInitialBiases(biases)
                 .withInitialWeights(weights)
-                .withLearningRate(0.70)
+                .withLearningRate(0.1)
+                .withLearningRateDecay(0.01)
+                .withMomentum(0.9)
                 .withActivationFunction(DEFAULT_ACTIVATIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .withLossFunction(DEFAULT_LOSSES.CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION)
                 .withTrueValueIndices(y)
