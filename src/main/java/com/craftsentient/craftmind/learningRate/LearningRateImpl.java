@@ -9,7 +9,7 @@ public class LearningRateImpl {
         if((1 + decayRate * epoch) != 0) {
             return learningRate * (1 / (1 + decayRate * epoch));
         } else {
-            return learningRate * (1 / (1 + decayRate * epoch) + 0.000001);
+            return learningRate * (1 / (1 + decayRate * epoch) + 1e-15);
         }
     }
 
@@ -25,7 +25,7 @@ public class LearningRateImpl {
         if(Math.sqrt(gradient + alpha) != 0) {
             return learningRate / Math.sqrt(gradient + alpha);
         } else {
-            return learningRate / Math.sqrt(gradient + alpha) + 0.000001;
+            return learningRate / Math.sqrt(gradient + alpha) + 1e-15;
         }
 
     }

@@ -12,14 +12,14 @@ public class ErrorLossDerivativesImpl {
                 if(outputs[i] != 0){
                     derivatives[i] = -1 / outputs[i];
                 } else {
-                    derivatives[i] = -1 / outputs[i] + 0.000001;
+                    derivatives[i] = -1 / outputs[i] + 1e-15;
                 }
             } else {
                 // For all other classes
                 if(1-outputs[i] != 0){
                     derivatives[i] = 1 / (1 - outputs[i]);
                 } else {
-                    derivatives[i] = 1 / (1 - outputs[i] + 0.000001);
+                    derivatives[i] = 1 / (1 - outputs[i] + 1e-15);
                 }
             }
         }

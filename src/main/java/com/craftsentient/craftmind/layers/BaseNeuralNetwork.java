@@ -331,7 +331,6 @@ public class BaseNeuralNetwork {
     }
 
     public void train() {
-        if(dataCounter == this.initialInput.length - 1) { return; }
         int epochCounter = 0;
         while(epochCounter < this.epoch) {
             for(int y = 0; y < (this.initialInput.length-1)/this.miniBatchSize; y++) {
@@ -340,51 +339,44 @@ public class BaseNeuralNetwork {
 
                 for(int x = 0; x < this.miniBatchSize; x++) {
                     if(dataCounter >= this.initialInput.length - 1) { break; }
-                    this.dataCounter++;
                     forward();
+                    this.dataCounter++;
                     tempLoss += generateLoss();
                 }
 
-                if(this.miniBatchSize != 0) { this.loss = tempLoss / this.miniBatchSize; }
-                else { this.loss = tempLoss / (this.miniBatchSize + 0.00001); }
-                if(this.miniBatchSize == 1) {
-                    appendNumberToFile("src/main/resources/accuracy.csv", this.getAccuracy() + ", " + this.getLoss());
-                    print("Accuracy:", this.getAccuracy());
-                    print("Loss:", this.getLoss());
-                    print("Layer Outputs:", this.getLastLayer().getLayerOutputs());
-                    printTitle("Batch Complete: " + this.dataCounter);
-                }
-                if(epochCounter == 4) {
-                    // got here
-                }
+                this.loss = tempLoss / this.miniBatchSize;
             }
-            appendNumberToFile("src/main/resources/accuracy.csv", this.getAccuracy() + ", " + this.getLoss());
-            print("Accuracy:", this.getAccuracy());
-            print("Loss:", this.getLoss());
-            print("Layer Outputs:", this.getLastLayer().getLayerOutputs());
-            printTitle("Batch Complete: " + epochCounter);
+
             // if not all inputs processed, process remaining
-            if(this.initialInput.length % this.miniBatchSize != 0) {
-                print("Processing Remaining Data Points...");
+            if((((this.initialInput.length-1) % this.miniBatchSize)) != 0) {
                 double tempLoss = 0;
-                // call back-propagate
                 this.backPropagate();
-                // mini batch processing (while x is less than remainder)
-                for(int x = 0; x < (this.initialInput.length % this.miniBatchSize); x++) {
-                    if(this.dataCounter >= this.initialInput.length - 1) { break; }
-                    this.dataCounter++;
+
+                for(int x = 0; x < (((this.initialInput.length-1) % this.miniBatchSize)); x++) {
+                    if(this.dataCounter >= this.trueValueIndices.length - 1) { break; }
                     this.forward();
+                    this.dataCounter++;
                     tempLoss += this.generateLoss();
                 }
-                if(this.miniBatchSize != 0) { this.loss = tempLoss / this.miniBatchSize; }
-                else { this.loss = tempLoss / (this.miniBatchSize + 0.00001); }
+
+                this.loss = tempLoss / this.miniBatchSize;
             }
             if(this.decayFunction == DEFAULT_LEARNING_RATE_DECAY.EPOCH) {
                 this.learningRate = updateLearningRate(this.decayFunction, this.learningRate, this.learningRateDecay, epochCounter);
             }
-            this.dataCounter = 0;
+
+            if(epochCounter%100 == 0){
+                //appendNumberToFile("src/main/resources/accuracy.csv", this.getAccuracy() + ", " + this.getLoss());
+                print("Current Epoch ", epochCounter);
+                print("Accuracy:", String.format("%.2f", (this.getAccuracy() * 100)) + "%");
+                print("Loss:", String.format("%.2f", this.getLoss()));
+                printTitle("Epoch Complete: " + epochCounter);
+                print("");
+            }
+
             this.sum = 0;
             this.accuracy = 0;
+            this.dataCounter = 0;
             epochCounter++;
         }
         printTitle("Training Complete!");
@@ -392,8 +384,11 @@ public class BaseNeuralNetwork {
 
     private void forward() {
         for(int i = 0; i < this.getLayerList().size(); i ++) {
-            if (i != 0) { this.getLayerAt(i).setInputs(this.getLayerAt(i-1).getLayerOutputs()); }
-            else { this.getLayerAt(i).setInputs(this.initialInput[dataCounter]); }
+            if (i != 0) {
+                this.getLayerAt(i).setInputs(this.getLayerAt(i-1).getLayerOutputs());
+            } else {
+                this.getLayerAt(i).setInputs(this.initialInput[dataCounter]);
+            }
             this.getLayerAt(i).regenerateLayerOutput();
         }
     }
@@ -495,6 +490,7 @@ public class BaseNeuralNetwork {
         }
     }
     private double generateLoss(){
+        double loss = 0;
         if(this.hotOneVec != null && this.trueValueIndices != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
         // check if both the one hot vector mappings true values mappings are empty
         if(this.hotOneVec == null && this.trueValueIndices == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }
@@ -518,8 +514,8 @@ public class BaseNeuralNetwork {
         return loss;
     }
     private double accuracy(int trueIndex, int predictedIndex) {
-        if(trueIndex == predictedIndex) { sum+=1; }
-        this.accuracy = sum / (dataCounter + 1);
+        if(trueIndex == predictedIndex) { this.sum+=1; }
+        this.accuracy = sum / (this.dataCounter + 1e-15);
         return this.accuracy;
     }
     private void generateDecisionsMap(int trueValueIndex) {
@@ -556,11 +552,11 @@ public class BaseNeuralNetwork {
     }
     private static double[][] getRandomMatrix(int rows, int cols) {
         double[][] output = new double[rows][cols];
-        for (int i = 0; i < output.length; i++) {
+        IntStream.range(0, output.length).parallel().forEachOrdered(i -> {
             for (int j = 0; j < output[0].length; j++) {
                 output[i][j] = (0.1 * random.nextGaussian());
             }
-        }
+        });
         return output;
     }
     private static double[] getRandomArray(int elementCount) {
@@ -1019,6 +1015,9 @@ public class BaseNeuralNetwork {
             } else {
                 built.hotOneVec = this.hotOneVec;
                 printPositive("Hot Vector Set!");
+            }
+            if(built.miniBatchSize > built.initialInput.length){
+                throw new RuntimeException("The miniBatchSize exceeds the provided data!");
             }
             ALPHA = this.alpha;
             GAMMA = this.gamma;
