@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.stream.IntStream;
 
-import static com.craftsentient.craftmind.layers.BaseNeuralNetwork.random;
+import static com.craftsentient.craftmind.neuralNetwork.BaseNeuralNetwork.random;
 
 @Component
 @Data

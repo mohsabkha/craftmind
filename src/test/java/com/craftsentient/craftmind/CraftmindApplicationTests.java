@@ -2,7 +2,7 @@ package com.craftsentient.craftmind;
 
 import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATIONS;
 import com.craftsentient.craftmind.errorLoss.DEFAULT_LOSSES;
-import com.craftsentient.craftmind.layers.BaseNeuralNetwork;
+import com.craftsentient.craftmind.neuralNetwork.BaseNeuralNetwork;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -29,11 +29,9 @@ class CraftmindApplicationTests {
                 .withInitialBiases(biases)
                 .withInitialWeights(weights)
                 .withEpoch(3)
-                .withLearningRate(0.1)
+                .withLearningRate(1)
                 .withMomentum(0.5)
-                .withMiniBatchProcessing(7)
-                .withActivationFunction(DEFAULT_ACTIVATIONS.RELU_ACTIVATION_FUNCTION)
-                .withActivationFunctionForOutput(DEFAULT_ACTIVATIONS.SOFTMAX_ACTIVATION_FUNCTION)
+                .withActivationFunction(DEFAULT_ACTIVATIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .withLossFunction(DEFAULT_LOSSES.CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION)
                 .withTrueValueIndices(new int[] {0, 1, 2})
                 .build();
@@ -62,20 +60,21 @@ class CraftmindApplicationTests {
                 {0.2, 0.8},
                 {2.0, -0.91}
         };
-        double[] biases = {24, 10}; // 1 per neuron
+        double[] biases = {0.1, 0.1}; // 1 per neuron
 
         BaseNeuralNetwork builtLayerWithFile = new BaseNeuralNetwork.DenseLayersBuilder()
                 .withNumberOfLayers(3)
-                .withEpoch(10001)
-                .withNumberOfNeuronsPerLayer(new int[]{2,64,3})
-                .withMiniBatchProcessing(300)
+                .withEpoch(100)
+                .withNumberOfNeuronsPerLayer(new int[]{2,12,3})
                 .withInitialInput(X)
                 .withInitialBiases(biases)
                 .withInitialWeights(weights)
                 .withLearningRate(1)
-                .withLearningRateDecay(0.001)
-                .withMomentum(0.5)
-                .withActivationFunction(DEFAULT_ACTIVATIONS.SOFTMAX_ACTIVATION_FUNCTION)
+                .withMiniBatchProcessing(25)
+                .withMomentum(0.76)
+                //.withLearningRateDecay(0.0001)
+                .withActivationFunction(DEFAULT_ACTIVATIONS.RELU_6_ACTIVATION_FUNCTION)
+                .withActivationFunctionForOutput(DEFAULT_ACTIVATIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .withLossFunction(DEFAULT_LOSSES.CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION)
                 .withTrueValueIndices(y)
                 .build();

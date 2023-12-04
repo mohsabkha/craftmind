@@ -1,4 +1,4 @@
-package com.craftsentient.craftmind.layers;
+package com.craftsentient.craftmind.neuralNetwork;
 
 import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATIONS;
 import org.junit.jupiter.api.BeforeEach;

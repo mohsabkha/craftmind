@@ -1,7 +1,7 @@
 package com.craftsentient.craftmind.utils;
 
 import com.craftsentient.craftmind.layer.DenseLayer;
-import com.craftsentient.craftmind.layers.BaseNeuralNetwork;
+import com.craftsentient.craftmind.neuralNetwork.BaseNeuralNetwork;
 import com.craftsentient.craftmind.neuron.Neuron;
 
 import java.math.BigDecimal;
@@ -110,7 +110,7 @@ public class PrintUtils {
         System.out.println(green(bold("[SUCCESS] ") + data));
     }
     public static void printPositive(double[] vec, String label){
-        System.out.println(bold(cyan(":::: " + label + " ::::")));
+        System.out.println(bold(green(":::: " + label + " ::::")));
         System.out.print(bold(green("[SUCCESS] ")));
         IntStream.range(0, vec.length).forEach(i-> {
             if(i == vec.length-1) System.out.print(vec[i] + bold(green("]")));
@@ -145,6 +145,66 @@ public class PrintUtils {
         IntStream.range(0, vec.size()).forEach(i-> {
             if(i == vec.size()-1) System.out.print(vec.get(i) + bold(green("]")));
             else if(i == 0) System.out.print(bold(green("[")) + vec.get(i) + ", ");
+            else System.out.print(String.valueOf(vec.get(i)) + ", ");
+        });
+        System.out.print("\n");
+    }
+
+    // positive
+    public static void warning(String data){
+        System.out.println(red(bold("[WARNING] ") + data));
+    }
+    public static void warning(double data){
+        System.out.println(red(bold("[WARNING] ") + data));
+    }
+    public static void warning(int data){
+        System.out.println(red(bold("[WARNING] ") + data));
+    }
+    public static void warning(float data){
+        System.out.println(red(bold("[WARNING] ") + data));
+    }
+    public static void warning(short data){
+        System.out.println(red(bold("[WARNING] ") + data));
+    }
+    public static void warning(long data){
+        System.out.println(red(bold("[WARNING] ") + data));
+    }
+    public static void warning(double[] vec, String label){
+        System.out.println(bold(red(":::: " + label + " ::::")));
+        System.out.print(bold(red("[WARNING] ")));
+        IntStream.range(0, vec.length).forEach(i-> {
+            if(i == vec.length-1) System.out.print(vec[i] + bold(red("]")));
+            else if(i == 0) System.out.print(bold(red("[")) + vec[i] + ", ");
+            else System.out.print(String.valueOf(vec[i]) + ", ");
+        });
+        System.out.print("\n");
+    }
+    public static void warning(int[] vec, String label){
+        System.out.println(bold(red(":::: " + label + " ::::")));
+        System.out.print(bold(red("[WARNING] ")));
+        IntStream.range(0, vec.length).forEach(i-> {
+            if(i == vec.length-1) System.out.print(vec[i] + bold(red("]")));
+            else if(i == 0) System.out.print(bold(red("[")) + vec[i] + ", ");
+            else System.out.print(String.valueOf(vec[i]) + ", ");
+        });
+        System.out.print("\n");
+    }
+    public static void warning(String[] vec, String label){
+        System.out.println(bold(red(":::: " + label + " ::::")));
+        System.out.print(bold(red("[WARNING] ")));
+        IntStream.range(0, vec.length).forEach(i-> {
+            if(i == vec.length-1) System.out.print(vec[i] + bold(red("]")));
+            else if(i == 0) System.out.print(bold(red("[")) + vec[i] + ", ");
+            else System.out.print(String.valueOf(vec[i]) + ", ");
+        });
+        System.out.print("\n");
+    }
+    public static void warning(ArrayList<Object> vec, String label){
+        System.out.println(bold(red(":::: " + label + " ::::")));
+        System.out.print(bold(green("[WARNING] ")));
+        IntStream.range(0, vec.size()).forEach(i-> {
+            if(i == vec.size()-1) System.out.print(vec.get(i) + bold(red("]")));
+            else if(i == 0) System.out.print(bold(red("[")) + vec.get(i) + ", ");
             else System.out.print(String.valueOf(vec.get(i)) + ", ");
         });
         System.out.print("\n");

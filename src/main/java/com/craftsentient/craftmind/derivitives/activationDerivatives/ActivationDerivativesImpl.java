@@ -214,8 +214,18 @@ public class ActivationDerivativesImpl {
     // SOFTMAX
     public static double[] softmax(double[] values) {
         double sum = 0.0;
-        for (double value : values) { sum += Math.exp(value); }
-        for (int i = 0; i < values.length; i++) { values[i] = Math.exp(values[i]) / sum; }
+        for (double value : values) {
+            if(value > 709) {
+                value = 709;
+            }
+            sum += Math.exp(value);
+        }
+        for (int i = 0; i < values.length; i++) {
+            if(values[i] > 709) {
+                values[i] = 709;
+            }
+            values[i] = Math.exp(values[i]) / sum;
+        }
         return values;
     }
     public static double[][] softmax(double[][] values) {

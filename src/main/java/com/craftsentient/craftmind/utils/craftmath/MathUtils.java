@@ -363,25 +363,25 @@ public class MathUtils {
     public static double accuracy(double[] trueValues, double[] predictedValues){
         double sum = accuracySum(trueValues, predictedValues);
         if(trueValues.length != 0) { return sum/trueValues.length; }
-        else{ return sum/0.0001; }
+        else{ return sum/1e-15; }
     }
 
     public static double accuracy(double[] trueValues, int[] predictedValues){
         double sum = accuracySum(trueValues, predictedValues);
         if(trueValues.length != 0) { return sum/trueValues.length; }
-        else{ return sum/0.0001; }
+        else{ return sum/1e-15; }
     }
 
     public static double accuracy(int[] trueValues, int[] predictedValues){
         double sum = accuracySum(trueValues, predictedValues);
         if(trueValues.length != 0) { return sum/trueValues.length; }
-        else{ return sum/0.0001; }
+        else{ return sum/1e-15; }
     }
 
     public static double accuracy(int[][] trueHotValues, int[] predictedValues){
         double sum = accuracySum(trueHotValues, predictedValues);
         if(trueHotValues.length != 0) { return sum/trueHotValues.length; }
-        else{ return sum/0.0001; }
+        else{ return sum/1e-15; }
     }
 
     public static void print(double[][] matrix) {

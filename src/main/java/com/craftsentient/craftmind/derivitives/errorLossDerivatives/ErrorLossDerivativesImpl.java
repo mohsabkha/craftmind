@@ -1,7 +1,7 @@
 package com.craftsentient.craftmind.derivitives.errorLossDerivatives;
 
-import static com.craftsentient.craftmind.layers.BaseNeuralNetwork.*;
-import static com.craftsentient.craftmind.layers.BaseNeuralNetwork.DELTA;
+import static com.craftsentient.craftmind.neuralNetwork.BaseNeuralNetwork.*;
+import static com.craftsentient.craftmind.neuralNetwork.BaseNeuralNetwork.DELTA;
 
 public class ErrorLossDerivativesImpl {
     public static double[] binaryCrossEntropy(int trueValueIndex, double[] outputs){
