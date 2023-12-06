@@ -4,7 +4,7 @@ package com.craftsentient.craftmind.learningRate;
 import static com.craftsentient.craftmind.learningRate.LearningRateImpl.*;
 
 public class LearningRate {
-    public static double updateLearningRate(DEFAULT_LEARNING_RATE_DECAY decayFunction, double learningRate, double decayRate, int iteration){
+    public static double updateLearningRate(DEFAULT_LEARNING_RATE decayFunction, double learningRate, double decayRate, int iteration){
         switch (decayFunction){
             case EPOCH: {
                 return epochDecay(learningRate, decayRate, iteration);
