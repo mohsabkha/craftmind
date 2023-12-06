@@ -31,7 +31,6 @@ public class DenseLayer {
     private double[][] weightMomentums;
     @Setter
     private double[] biasMomentums;
-    @Setter
     private double[][] weightsCache;
     @Setter
     private double[] biasCache;
@@ -239,5 +238,13 @@ public class DenseLayer {
 
     public void updateWeightCache(int row, int column, double value) {
         this.weightsCache[row][column] = value;
+    }
+
+    public void setWeightsCache(int weightIndex, double[] values) {
+        this.weightsCache[weightIndex] = values;
+    }
+
+    public void setWeightsCache(double[][] weights) {
+        this.weightsCache = weights;
     }
 }
