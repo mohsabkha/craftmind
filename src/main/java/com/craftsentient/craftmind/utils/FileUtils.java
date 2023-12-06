@@ -9,10 +9,10 @@ import java.util.stream.IntStream;
 
 public class FileUtils {
 
-    public static Object readTextFile(String filePath, String delimiter){
+    public static Object readTextFile(String filePathForInputs, String delimiter){
         ArrayList<double[]> inputs = new ArrayList<>();
         try {
-            FileReader fileReader = new FileReader(filePath);
+            FileReader fileReader = new FileReader(filePathForInputs);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line;
             while((line = bufferedReader.readLine()) != null){
@@ -34,10 +34,10 @@ public class FileUtils {
         }
     }
 
-    public static double[][] readCsvFile(String filePath){
+    public static double[][] readCsvFile(String filePathForInputs){
         ArrayList<double[]> inputs = new ArrayList<>();
         try {
-            FileReader fileReader = new FileReader(filePath);
+            FileReader fileReader = new FileReader(filePathForInputs);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line;
             while((line = bufferedReader.readLine()) != null){
@@ -58,4 +58,30 @@ public class FileUtils {
             throw new RuntimeException(e);
         }
     }
+
+//    public static double[] readCsvFile(String filePathForTrueValues){
+//        ArrayList<double[]> inputs = new ArrayList<>();
+//        try {
+//            FileReader fileReader = new FileReader(filePathForTrueValues);
+//            BufferedReader bufferedReader = new BufferedReader(fileReader);
+//            String line;
+//            while((line = bufferedReader.readLine()) != null){
+//                ArrayList<Double> input = new ArrayList<>();
+//                String[] cells = line.split(",");
+//                for(String cell : cells){
+//                    input.add(Double.parseDouble(cell));
+//                }
+//                inputs.add(input.stream().mapToDouble(Double::doubleValue).toArray());
+//            }
+//            bufferedReader.close();
+//            double[][] finalInputs = new double[inputs.size()];
+//            IntStream.range(0, inputs.size()).parallel().forEachOrdered( i -> finalInputs[i] = inputs.get(i));
+//            return finalInputs;
+//        } catch (FileNotFoundException e) {
+//            throw new RuntimeException(e);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+
 }
