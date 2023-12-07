@@ -1,11 +1,13 @@
 package com.craftsentient.craftmind.neuralNetwork;
 
+import ch.qos.logback.core.status.WarnStatus;
 import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATIONS;
 import com.craftsentient.craftmind.derivitives.activationDerivatives.ActivationDerivatives;
 import com.craftsentient.craftmind.derivitives.errorLossDerivatives.ErrorLossDerivatives;
 import com.craftsentient.craftmind.errorLoss.DEFAULT_LOSSES;
 import com.craftsentient.craftmind.errorLoss.ErrorLossFunctions;
 import com.craftsentient.craftmind.layer.DenseLayer;
+import com.craftsentient.craftmind.learningRate.DEFAULT_DECAY_TYPE;
 import com.craftsentient.craftmind.learningRate.DEFAULT_LEARNING_RATE;
 import com.craftsentient.craftmind.utils.FileUtils;
 import com.craftsentient.craftmind.utils.craftmath.MathUtils;
@@ -19,6 +21,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.IntStream;
 
+import static com.craftsentient.craftmind.learningRate.LearningRate.decayLearningRate;
 import static com.craftsentient.craftmind.learningRate.LearningRate.updateLearningRate;
 import static com.craftsentient.craftmind.utils.craftmath.MathUtils.getHotOneVecIndexValue;
 import static com.craftsentient.craftmind.utils.PrintUtils.*;
@@ -31,7 +34,6 @@ public class BaseNeuralNetwork {
     private int dataCounter = 0;
     private int miniBatchSize = 1;
     private int epoch = 1;
-    private int step = miniBatchSize;
     private boolean epochDecay = false;
     private boolean stepDecay = false;
     private final Map<Integer, Double> decisions;
@@ -42,8 +44,11 @@ public class BaseNeuralNetwork {
     private double sum;
     private double learningRate = 1.0;
     private double learningRateDecay = 0.0;
+    private int stepSize = 1;
+    private int stepCounter = 0;
     private double momentum;
     private double rho = 0.9;
+    private DEFAULT_DECAY_TYPE learningRateDecayFunction;
     private DEFAULT_LEARNING_RATE learningRateFunction;
     private int[][] hotOneVec;
     public static double ALPHA = 1.0;
@@ -345,6 +350,12 @@ public class BaseNeuralNetwork {
                     forward();
                     tempLoss += generateLoss();
                     this.dataCounter++;
+                    if(this.learningRateDecayFunction == DEFAULT_DECAY_TYPE.STEP_DECAY) {
+                        if(x % stepSize == 0) {
+                            this.learningRate = decayLearningRate(this.learningRateDecayFunction, this.learningRate, this.learningRateDecay, stepCounter);
+                            this.stepCounter++;
+                        }
+                    }
                 }
                 this.loss = tempLoss / this.miniBatchSize;
                 print("Current Epoch ", epochCounter);
@@ -369,13 +380,14 @@ public class BaseNeuralNetwork {
                 }
                 this.loss = tempLoss / this.miniBatchSize;
             }
-            if(this.learningRateFunction == DEFAULT_LEARNING_RATE.EPOCH_DECAY) {
-                this.learningRate = updateLearningRate(this.learningRateFunction, this.learningRate, this.learningRateDecay, epochCounter);
+            if(this.learningRateDecayFunction == DEFAULT_DECAY_TYPE.EPOCH_DECAY) {
+                this.learningRate = decayLearningRate(this.learningRateDecayFunction, this.learningRate, this.learningRateDecay, epochCounter);
             }
 
             this.sum = 0;
             this.accuracy = 0;
             this.dataCounter = 0;
+            this.stepCounter = 0;
             epochCounter++;
         }
         printTitle("Training Complete!");
@@ -680,7 +692,9 @@ public class BaseNeuralNetwork {
 
         double learningRate = 0.01;
         double learningRateDecay = 0;
-        DEFAULT_LEARNING_RATE learningRateFunction = DEFAULT_LEARNING_RATE.EPOCH_DECAY;
+        DEFAULT_LEARNING_RATE learningRateFunction = DEFAULT_LEARNING_RATE.MOMENTUM;
+        DEFAULT_DECAY_TYPE learningRateDecayType = DEFAULT_DECAY_TYPE.EPOCH_DECAY;
+        int stepSize = 1;
         double momentum = 0.0;
 
         double alpha = 1.0;
@@ -788,26 +802,38 @@ public class BaseNeuralNetwork {
             return this;
         }
 
-        public DenseLayersBuilder withLearningRateDecay(double learningRateDecay) {
-            this.learningRateDecay = learningRateDecay;
-            return this;
-        }
-
         public DenseLayersBuilder withLearningRateFunction(DEFAULT_LEARNING_RATE learningRateFunction) {
             this.learningRateFunction = learningRateFunction;
             return this;
         }
 
-        public DenseLayersBuilder withLearningRateFunction(DEFAULT_LEARNING_RATE learningRateFunction, double learningRateDecay) {
-            this.learningRateFunction = learningRateFunction;
-            if(learningRateFunction != DEFAULT_LEARNING_RATE.EPOCH_DECAY ||
-                    learningRateFunction != DEFAULT_LEARNING_RATE.STEP_DECAY ||
-                    learningRateFunction != DEFAULT_LEARNING_RATE.EXPONENTIAL_DECAY ){
-                throw new RuntimeException("Learning rate decay is not applicable with + " + learningRateFunction.name());
-            }
+        public DenseLayersBuilder withLearningRateDecay(double learningRateDecay) {
             this.learningRateDecay = learningRateDecay;
             return this;
         }
+
+        public DenseLayersBuilder withLearningRateDecayType(DEFAULT_DECAY_TYPE decayType) {
+            this.learningRateDecayType = decayType;
+            if(decayType == DEFAULT_DECAY_TYPE.STEP_DECAY) {
+                warning("Step Decay In Use! Step size is set to 1 by default! Be sure to use the withStepSize() to change this!");
+            }
+            return this;
+        }
+
+        public DenseLayersBuilder withLearningRateDecayFunction(DEFAULT_DECAY_TYPE decayType, double learningRateDecay) {
+            this.learningRateDecayType = decayType;
+            this.learningRateDecay = learningRateDecay;
+            return this;
+        }
+
+        public DenseLayersBuilder withStepSize(int stepSize) {
+            if(stepSize < 1) {
+                throw new RuntimeException("Step size cannot be less than 1!");
+            }
+            this.stepSize = stepSize;
+            return this;
+        }
+
 
         public DenseLayersBuilder withMomentum(double momentum) {
             if(momentum < 0 || momentum > 1){
@@ -1042,6 +1068,7 @@ public class BaseNeuralNetwork {
             built.learningRate = this.learningRate;
             built.learningRateDecay = this.learningRateDecay;
             built.learningRateFunction = this.learningRateFunction;
+            built.stepSize = this.stepSize;
             built.momentum = momentum;
             built.loss = 0;
             built. accuracy = 0;

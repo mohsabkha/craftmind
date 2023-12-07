@@ -13,14 +13,23 @@ import static com.craftsentient.craftmind.testDataGenerator.DataGenerator.create
 class CraftmindApplicationTests {
     @Test
     public void neuralNetworkTest() throws Exception {
-        double[][] inputs = {{1, 2, 3, 2.5}, {2.0,7.0,-1.0,2.0}, {-1.5,2.7,3.3,-0.8}};
+        double[][] inputs = {
+                {1, 2, 3, 2.5},
+                {2.0,7.0,-1.0,2.0},
+                {-1.5,2.7,3.3,-0.8}
+        };
         double[][] weights = { // 1 per neuron
                 {0.2, 0.8, -0.5, 1.0},
                 {0.5, -0.91, 0.26, -0.5},
                 {-0.26, -0.27, 0.17, 0.87},
                 {-0.5, 0.91, -0.26, 0.5}
         };
-        double[] biases = {2, 3, 0.5, 1}; // 1 per neuron
+        double[] biases = {
+                2,
+                3,
+                0.5,
+                1
+        }; // 1 per neuron
 
         BaseNeuralNetwork builtLayerWithFile = new BaseNeuralNetwork.DenseLayersBuilder()
                 .withNumberOfLayers(3)
@@ -72,7 +81,7 @@ class CraftmindApplicationTests {
                 .withLearningRate(1)
                 .withMiniBatchProcessing(25)
                 .withMomentum(0.76)
-                //.withLearningRateDecay(0.0001)
+                .withLearningRateDecay(0.0001)
                 .withActivationFunction(DEFAULT_ACTIVATIONS.RELU_6_ACTIVATION_FUNCTION)
                 .withActivationFunctionForOutput(DEFAULT_ACTIVATIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .withLossFunction(DEFAULT_LOSSES.CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION)
