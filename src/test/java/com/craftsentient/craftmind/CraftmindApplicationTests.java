@@ -2,6 +2,7 @@ package com.craftsentient.craftmind;
 
 import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATIONS;
 import com.craftsentient.craftmind.errorLoss.DEFAULT_LOSSES;
+import com.craftsentient.craftmind.learningRate.DEFAULT_LEARNING_RATE;
 import com.craftsentient.craftmind.neuralNetwork.BaseNeuralNetwork;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -82,6 +83,7 @@ class CraftmindApplicationTests {
                 .withMiniBatchProcessing(25)
                 .withMomentum(0.76)
                 .withLearningRateDecay(0.0001)
+                //.withLearningRateFunction(DEFAULT_LEARNING_RATE.ADAGRAD)
                 .withActivationFunction(DEFAULT_ACTIVATIONS.RELU_6_ACTIVATION_FUNCTION)
                 .withActivationFunctionForOutput(DEFAULT_ACTIVATIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .withLossFunction(DEFAULT_LOSSES.CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION)

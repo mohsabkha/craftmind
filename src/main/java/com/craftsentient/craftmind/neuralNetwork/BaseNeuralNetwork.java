@@ -451,7 +451,6 @@ public class BaseNeuralNetwork {
                     weightUpdate = (this.momentum * outputLayer.getWeightMomentums()[layerNeuronIterator][neuronWeightIterator]) + (this.learningRate * gradients[outputIndex][layerNeuronIterator]);
                     outputLayer.updateWeightMomentum(layerNeuronIterator, neuronWeightIterator, weightUpdate);
                 } else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.ADAGRAD) {
-                    // increment weight cache by (weight cache squared)
                     double[] weightCache = MathUtils.addArrays(
                             MathUtils.multiplyArrays(gradients[outputIndex], gradients[outputIndex]),
                             outputLayer.getWeightsCache()[neuronWeightIterator]);
@@ -466,7 +465,7 @@ public class BaseNeuralNetwork {
                 }
 
                 double deltaWeight = weightUpdate * inputs[neuronWeightIterator];
-                neuron.setWeight(neuronWeightIterator, neuron.getWeights()[neuronWeightIterator] + deltaWeight);
+                neuron.setWeight(neuronWeightIterator, neuron.getWeights()[neuronWeightIterator] - deltaWeight);
             }
         }
 
@@ -492,12 +491,17 @@ public class BaseNeuralNetwork {
                 Neuron neuron = this.getNeuronFromLayerAt(index, layerNeuronIterator);
                 double biasUpdate = 0;
                 if(this.learningRateFunction == DEFAULT_LEARNING_RATE.MOMENTUM) {
-                    biasUpdate = (this.momentum * this.getLayerAt(index).getBiasMomentums()[layerNeuronIterator])  + (this.learningRate * gradients[index][layerNeuronIterator]);
+                    biasUpdate = (this.momentum * this.getLayerAt(index).getBiasMomentums()[layerNeuronIterator])  +
+                            (this.learningRate * gradients[index][layerNeuronIterator]);
                     this.getLayerAt(index).updateBiasMomentum(layerNeuronIterator, biasUpdate);
                 } else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.ADAGRAD) {
                     this.getLayerAt(index).getBiasCache()[layerNeuronIterator] =
-                            (gradients[index][layerNeuronIterator] * gradients[index][layerNeuronIterator]) + this.getLayerAt(index).getBiasCache()[layerNeuronIterator];
-                    biasUpdate = this.learningRate * gradients[index][layerNeuronIterator] / (Math.sqrt(this.getLayerAt(index).getBiasCache()[layerNeuronIterator]) + EPSILON);
+                            (gradients[index][layerNeuronIterator] * gradients[index][layerNeuronIterator]) +
+                                    this.getLayerAt(index).getBiasCache()[layerNeuronIterator];
+                    biasUpdate = this.learningRate * gradients[index][layerNeuronIterator] /
+                            (Math.sqrt(this.getLayerAt(index).getBiasCache()[layerNeuronIterator]) + EPSILON);
+                } else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.RMSPROP) {
+                    // TODO
                 } else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.ADAM) {
                     // TODO
                 } else {
@@ -507,23 +511,26 @@ public class BaseNeuralNetwork {
 
                 double[] inputs = (index == 0) ? this.getInitialInput()[dataCounter] : this.getLayerAt(index - 1).getLayerOutputs();
                 for (int neuronWeightIterator = 0; neuronWeightIterator < neuron.getWeights().length; neuronWeightIterator++) {
-                    double weightUpdate;
+                    double weightUpdate = 0;
                     if(this.learningRateFunction == DEFAULT_LEARNING_RATE.MOMENTUM) {
-                        weightUpdate = (this.momentum * this.getLayerAt(index).getWeightMomentums()[layerNeuronIterator][neuronWeightIterator]) + (this.learningRate * gradients[index][layerNeuronIterator]);
+                        weightUpdate = (this.momentum * this.getLayerAt(index).getWeightMomentums()[layerNeuronIterator][neuronWeightIterator]) +
+                                (this.learningRate * gradients[index][layerNeuronIterator]);
                         this.getLayerAt(index).updateWeightMomentum(layerNeuronIterator, neuronWeightIterator, weightUpdate);
                     }  else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.ADAGRAD) {
-                        // increment weight cache by (weight cache squared)
                         double[] weightCache = MathUtils.addArrays(
                                 MathUtils.multiplyArrays(gradients[index], gradients[index]),
                                 this.getLayerAt(index).getWeightsCache()[neuronWeightIterator]);
                         this.getLayerAt(index).setWeightsCache(neuronWeightIterator, weightCache);
-                        weightUpdate = this.learningRate * gradients[index][layerNeuronIterator] / (Math.sqrt(this.getLayerAt(index).getWeightsCache()[layerNeuronIterator][neuronWeightIterator]) + EPSILON);
+                        weightUpdate = this.learningRate * gradients[index][layerNeuronIterator] /
+                                (Math.sqrt(this.getLayerAt(index).getWeightsCache()[layerNeuronIterator][neuronWeightIterator]) + EPSILON);
+                    } else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.RMSPROP) {
+                        // TODO
                     } else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.ADAM) {
                         // TODO
                     } else {
                         weightUpdate = (this.learningRate * gradients[index][layerNeuronIterator]);
                     }
-                    double deltaWeight = this.learningRate * gradients[index][layerNeuronIterator] * inputs[neuronWeightIterator];
+                    double deltaWeight = weightUpdate * inputs[neuronWeightIterator];
                     neuron.setWeight(neuronWeightIterator, neuron.getWeights()[neuronWeightIterator] - deltaWeight);
                 }
             }
@@ -695,7 +702,7 @@ public class BaseNeuralNetwork {
         DEFAULT_LEARNING_RATE learningRateFunction = DEFAULT_LEARNING_RATE.MOMENTUM;
         DEFAULT_DECAY_TYPE learningRateDecayType = DEFAULT_DECAY_TYPE.EPOCH_DECAY;
         int stepSize = 1;
-        double momentum = 0.0;
+        double momentum = 0.5;
 
         double alpha = 1.0;
         double gamma = 1.0;
