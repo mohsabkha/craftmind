@@ -1,6 +1,5 @@
 package com.craftsentient.craftmind.neuralNetwork;
 
-import ch.qos.logback.core.status.WarnStatus;
 import com.craftsentient.craftmind.activation.DEFAULT_ACTIVATIONS;
 import com.craftsentient.craftmind.derivitives.activationDerivatives.ActivationDerivatives;
 import com.craftsentient.craftmind.derivitives.errorLossDerivatives.ErrorLossDerivatives;
@@ -22,7 +21,6 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 import static com.craftsentient.craftmind.learningRate.LearningRate.decayLearningRate;
-import static com.craftsentient.craftmind.learningRate.LearningRate.updateLearningRate;
 import static com.craftsentient.craftmind.utils.craftmath.MathUtils.getHotOneVecIndexValue;
 import static com.craftsentient.craftmind.utils.PrintUtils.*;
 
@@ -47,7 +45,7 @@ public class BaseNeuralNetwork {
     private int stepSize = 1;
     private int stepCounter = 0;
     private double momentum;
-    private double rho = 0.9;
+    private double rho;
     private DEFAULT_DECAY_TYPE learningRateDecayFunction;
     private DEFAULT_LEARNING_RATE learningRateFunction;
     private int[][] hotOneVec;
@@ -427,16 +425,21 @@ public class BaseNeuralNetwork {
             // bias update
             double biasUpdate = 0;
             if(this.learningRateFunction == DEFAULT_LEARNING_RATE.MOMENTUM) {
-                biasUpdate = (this.momentum * outputLayer.getBiasMomentums()[layerNeuronIterator]) + (this.learningRate * gradients[outputIndex][layerNeuronIterator]);
+                biasUpdate = (this.momentum * outputLayer.getBiasMomentums()[layerNeuronIterator])
+                        + (this.learningRate * gradients[outputIndex][layerNeuronIterator]);
                 outputLayer.updateBiasMomentum(layerNeuronIterator, biasUpdate);
             } else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.ADAGRAD) {
-                outputLayer.getBiasCache()[layerNeuronIterator] =
-                        (gradients[outputIndex][layerNeuronIterator] * gradients[outputIndex][layerNeuronIterator]) + outputLayer.getBiasCache()[layerNeuronIterator];
-                biasUpdate = this.learningRate * gradients[outputIndex][layerNeuronIterator] / (Math.sqrt(outputLayer.getBiasCache()[layerNeuronIterator]) + EPSILON);
+                double newCache = (gradients[outputIndex][layerNeuronIterator] *
+                        gradients[outputIndex][layerNeuronIterator]) + outputLayer.getBiasCache()[layerNeuronIterator];
+                outputLayer.updateBiasCache(layerNeuronIterator, newCache);
+                biasUpdate = this.learningRate * gradients[outputIndex][layerNeuronIterator] /
+                        (Math.sqrt(outputLayer.getBiasCache()[layerNeuronIterator]) + EPSILON);
             } else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.RMSPROP) {
-                outputLayer.getBiasCache()[layerNeuronIterator] =
-                        (gradients[outputIndex][layerNeuronIterator] * gradients[outputIndex][layerNeuronIterator]) + outputLayer.getBiasCache()[layerNeuronIterator];
-                biasUpdate = this.learningRate * gradients[outputIndex][layerNeuronIterator] / (Math.sqrt(outputLayer.getBiasCache()[layerNeuronIterator]) + EPSILON);
+                double newCache = this.rho * outputLayer.getBiasCache()[layerNeuronIterator] +
+                        (1-this.rho) * (gradients[outputIndex][layerNeuronIterator] * gradients[outputIndex][layerNeuronIterator]);
+                outputLayer.updateBiasCache(layerNeuronIterator, newCache);
+                biasUpdate = this.learningRate * gradients[outputIndex][layerNeuronIterator] /
+                        (Math.sqrt(outputLayer.getBiasCache()[layerNeuronIterator]) + EPSILON);
             } else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.ADAM) {
                 // TODO
             } else {
@@ -448,22 +451,29 @@ public class BaseNeuralNetwork {
             for (int neuronWeightIterator = 0; neuronWeightIterator < neuron.getWeights().length; neuronWeightIterator++) {
                 double weightUpdate = 0;
                 if(this.learningRateFunction == DEFAULT_LEARNING_RATE.MOMENTUM) {
-                    weightUpdate = (this.momentum * outputLayer.getWeightMomentums()[layerNeuronIterator][neuronWeightIterator]) + (this.learningRate * gradients[outputIndex][layerNeuronIterator]);
+                    weightUpdate = (this.momentum * outputLayer.getWeightMomentums()[layerNeuronIterator][neuronWeightIterator]) +
+                            (this.learningRate * gradients[outputIndex][layerNeuronIterator]);
                     outputLayer.updateWeightMomentum(layerNeuronIterator, neuronWeightIterator, weightUpdate);
                 } else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.ADAGRAD) {
-                    double[] weightCache = MathUtils.addArrays(
-                            MathUtils.multiplyArrays(gradients[outputIndex], gradients[outputIndex]),
-                            outputLayer.getWeightsCache()[neuronWeightIterator]);
-                    outputLayer.setWeightsCache(neuronWeightIterator, weightCache);
-                    weightUpdate = this.learningRate * gradients[outputIndex][layerNeuronIterator] / (Math.sqrt(outputLayer.getWeightsCache()[layerNeuronIterator][neuronWeightIterator]) + EPSILON);
+                    double gradientSquared = gradients[outputIndex][layerNeuronIterator] * gradients[outputIndex][layerNeuronIterator];
+                    double weightCache = gradientSquared + outputLayer.getWeightsCache()[layerNeuronIterator][neuronWeightIterator];
+                    outputLayer.updateWeightCache(layerNeuronIterator, neuronWeightIterator, weightCache);
+                    weightUpdate = this.learningRate * gradients[outputIndex][layerNeuronIterator] /
+                            (Math.sqrt(outputLayer.getWeightsCache()[layerNeuronIterator][neuronWeightIterator]) + EPSILON);
                 } else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.RMSPROP) {
-                    // TODO
+                    double gradientSquared = gradients[outputIndex][layerNeuronIterator] *
+                            gradients[outputIndex][layerNeuronIterator];
+                    double rhoScaledWeightCache = outputLayer.getWeightsCache()[layerNeuronIterator][neuronWeightIterator] * this.rho;
+                    double inverseRhoScaledGradient = gradientSquared * (1 - this.rho);
+                    double weightCache = rhoScaledWeightCache + inverseRhoScaledGradient;
+                    outputLayer.updateWeightCache(layerNeuronIterator, neuronWeightIterator, weightCache);
+                    weightUpdate = this.learningRate * gradients[outputIndex][layerNeuronIterator] /
+                            (Math.sqrt(outputLayer.getWeightsCache()[layerNeuronIterator][neuronWeightIterator]) + EPSILON);
                 } else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.ADAM) {
                     // TODO
                 } else {
                     weightUpdate = (this.learningRate * gradients[outputIndex][layerNeuronIterator]);
                 }
-
                 double deltaWeight = weightUpdate * inputs[neuronWeightIterator];
                 neuron.setWeight(neuronWeightIterator, neuron.getWeights()[neuronWeightIterator] - deltaWeight);
             }
@@ -494,17 +504,24 @@ public class BaseNeuralNetwork {
                     biasUpdate = (this.momentum * this.getLayerAt(index).getBiasMomentums()[layerNeuronIterator])  +
                             (this.learningRate * gradients[index][layerNeuronIterator]);
                     this.getLayerAt(index).updateBiasMomentum(layerNeuronIterator, biasUpdate);
-                } else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.ADAGRAD) {
-                    this.getLayerAt(index).getBiasCache()[layerNeuronIterator] =
-                            (gradients[index][layerNeuronIterator] * gradients[index][layerNeuronIterator]) +
-                                    this.getLayerAt(index).getBiasCache()[layerNeuronIterator];
+                }
+                else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.ADAGRAD) {
+                    double gradientSquared = (gradients[index][layerNeuronIterator] * gradients[index][layerNeuronIterator]);
+                    this.getLayerAt(index).updateBiasCache(index, (gradientSquared) + this.getLayerAt(index).getBiasCache()[layerNeuronIterator]);
                     biasUpdate = this.learningRate * gradients[index][layerNeuronIterator] /
                             (Math.sqrt(this.getLayerAt(index).getBiasCache()[layerNeuronIterator]) + EPSILON);
-                } else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.RMSPROP) {
+                }
+                else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.RMSPROP) {
+                    double gradientSquared = (gradients[index][layerNeuronIterator] * gradients[index][layerNeuronIterator]);
+                    double newCache = this.rho * this.getLayerAt(index).getBiasCache()[layerNeuronIterator] + (1-this.rho) * gradientSquared;
+                    this.getLayerAt(index).updateBiasCache(layerNeuronIterator, newCache);
+                    biasUpdate = this.learningRate * gradients[index][layerNeuronIterator] /
+                            (Math.sqrt(this.getLayerAt(index).getBiasCache()[layerNeuronIterator]) + EPSILON);
+                }
+                else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.ADAM) {
                     // TODO
-                } else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.ADAM) {
-                    // TODO
-                } else {
+                }
+                else {
                     biasUpdate = (this.learningRate * gradients[index][layerNeuronIterator]);
                 }
                 neuron.setBias(neuron.getBias() - biasUpdate );
@@ -517,14 +534,20 @@ public class BaseNeuralNetwork {
                                 (this.learningRate * gradients[index][layerNeuronIterator]);
                         this.getLayerAt(index).updateWeightMomentum(layerNeuronIterator, neuronWeightIterator, weightUpdate);
                     }  else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.ADAGRAD) {
-                        double[] weightCache = MathUtils.addArrays(
-                                MathUtils.multiplyArrays(gradients[index], gradients[index]),
-                                this.getLayerAt(index).getWeightsCache()[neuronWeightIterator]);
-                        this.getLayerAt(index).setWeightsCache(neuronWeightIterator, weightCache);
+                        double gradientSquared = gradients[index][layerNeuronIterator] * gradients[index][layerNeuronIterator];
+                        double weightCache = gradientSquared * this.getLayerAt(index).getWeightsCache()[layerNeuronIterator][neuronWeightIterator];
+                        this.getLayerAt(index).updateWeightCache(layerNeuronIterator, neuronWeightIterator, weightCache);
                         weightUpdate = this.learningRate * gradients[index][layerNeuronIterator] /
                                 (Math.sqrt(this.getLayerAt(index).getWeightsCache()[layerNeuronIterator][neuronWeightIterator]) + EPSILON);
                     } else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.RMSPROP) {
-                        // TODO
+                        double gradientSquared = gradients[index][layerNeuronIterator] *
+                                gradients[index][layerNeuronIterator];
+                        double rhoScaledWeightCache = this.getLayerAt(index).getWeightsCache()[layerNeuronIterator][neuronWeightIterator] * this.rho;
+                        double inverseRhoScaledGradient = gradientSquared * (1 - this.rho);
+                        double weightCache = rhoScaledWeightCache + inverseRhoScaledGradient;
+                        this.getLayerAt(index).updateWeightCache(layerNeuronIterator, neuronWeightIterator, weightCache);
+                        weightUpdate = this.learningRate * gradients[index][layerNeuronIterator] /
+                                (Math.sqrt(this.getLayerAt(index).getWeightsCache()[layerNeuronIterator][neuronWeightIterator]) + EPSILON);
                     } else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.ADAM) {
                         // TODO
                     } else {
@@ -703,6 +726,7 @@ public class BaseNeuralNetwork {
         DEFAULT_DECAY_TYPE learningRateDecayType = DEFAULT_DECAY_TYPE.EPOCH_DECAY;
         int stepSize = 1;
         double momentum = 0.5;
+        double rho =  0.9;
 
         double alpha = 1.0;
         double gamma = 1.0;
@@ -841,6 +865,10 @@ public class BaseNeuralNetwork {
             return this;
         }
 
+        public DenseLayersBuilder withRho(double rho) {
+            this.rho = rho;
+            return this;
+        }
 
         public DenseLayersBuilder withMomentum(double momentum) {
             if(momentum < 0 || momentum > 1){
@@ -1077,6 +1105,7 @@ public class BaseNeuralNetwork {
             built.learningRateFunction = this.learningRateFunction;
             built.stepSize = this.stepSize;
             built.momentum = momentum;
+            built.rho = rho;
             built.loss = 0;
             built. accuracy = 0;
             // create momentum arrays for each layer

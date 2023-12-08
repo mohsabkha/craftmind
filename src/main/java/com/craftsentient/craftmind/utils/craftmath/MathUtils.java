@@ -218,6 +218,18 @@ public class MathUtils {
         return output;
     }
 
+    public static double[] addScalar(double[] a, double scalar) {
+        double[] output = new double[a.length];
+        IntStream.range(0, a.length).parallel().forEachOrdered(i -> { a[i] = a[i] + scalar; });
+        return output;
+    }
+
+    public static double[] addScalar(double[][] a, double scalar) {
+        double[] output = new double[a.length];
+        IntStream.range(0, a.length).parallel().forEachOrdered(i -> { a[i] = addScalar(a[i], scalar); });
+        return output;
+    }
+
     public static double[] multiplyArrays(double[] a, double[] b) {
         if(a.length != b.length) {
             throw new ArithmeticException("Cannot multiply two arrays of different sizes!");
