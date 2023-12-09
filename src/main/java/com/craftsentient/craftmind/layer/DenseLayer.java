@@ -247,4 +247,17 @@ public class DenseLayer {
     public void setWeightsCache(double[][] weights) {
         this.weightsCache = weights;
     }
+
+    public double getWeight(int row, int col) {
+        return this.getNeuronList().get(row).getWeights()[col];
+    }
+    public void setWeight(int row, int col, double value) {
+        this.getNeuronList().get(row).setWeight(col, value);
+    }
+    public double getBias(int row) {
+        return  this.getNeuronList().get(row).getBias();
+    }
+    public void setBias(int row, double value) {
+        this.getNeuronList().get(row).setBias(value);
+    }
 }

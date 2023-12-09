@@ -56,7 +56,7 @@ class CraftmindApplicationTests {
 
     @Test
     public void testWithSpiralData(){
-            // Example usage
+        // Example usage
         double[][] X; // x y coordinates
         int[] y; // true values
         int samples = 100; // Number of samples per class
@@ -81,9 +81,8 @@ class CraftmindApplicationTests {
                 .withInitialWeights(weights)
                 .withLearningRate(1)
                 .withMiniBatchProcessing(25)
-                .withMomentum(0.76)
-                .withLearningRateDecay(0.0001)
-                //.withLearningRateFunction(DEFAULT_LEARNING_RATE.ADAGRAD)
+                .withMomentum(0.1)
+                .withLearningRateFunction(DEFAULT_LEARNING_RATE.RMSPROP)
                 .withActivationFunction(DEFAULT_ACTIVATIONS.RELU_6_ACTIVATION_FUNCTION)
                 .withActivationFunctionForOutput(DEFAULT_ACTIVATIONS.SOFTMAX_ACTIVATION_FUNCTION)
                 .withLossFunction(DEFAULT_LOSSES.CATEGORICAL_CROSS_ENTROPY_LOSS_FUNCTION)
