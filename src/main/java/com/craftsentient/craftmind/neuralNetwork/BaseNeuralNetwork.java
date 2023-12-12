@@ -339,16 +339,19 @@ public class BaseNeuralNetwork {
     public void train() {
         int epochCounter = 0;
         while(epochCounter < this.epoch) {
-            for(int y = 0; y < (this.initialInput.length-1)/this.miniBatchSize; y++) {
+            for(int y = 0; y <= (this.initialInput.length-1) / (double)this.miniBatchSize; y++) {
+                if(this.dataCounter > this.initialInput.length - 1) {
+                    break;
+                }
                 this.backPropagate();
                 double tempLoss = 0;
                 for(int x = 0; x < this.miniBatchSize; x++) {
-                    if(this.dataCounter >= this.initialInput.length - 1) {
+                    if(this.dataCounter > this.initialInput.length - 1) {
                         break;
                     }
                     this.forward();
-                    this.dataCounter++;
                     tempLoss += this.generateLoss();
+                    this.dataCounter++;
                     if(this.learningRateDecayFunction == DEFAULT_DECAY_TYPE.STEP_DECAY) {
                         if(x % stepSize == 0) {
                             this.learningRate = decayLearningRate(this.learningRateDecayFunction, this.learningRate, this.learningRateDecay, stepCounter);
@@ -356,7 +359,7 @@ public class BaseNeuralNetwork {
                         }
                     }
                 }
-                this.loss = tempLoss / this.miniBatchSize;
+                this.loss = (tempLoss / (double)this.miniBatchSize);
                 print("Current Batch:", y);
                 print("Output:", this.getOutputs());
                 print("Accuracy:", String.format("%.2f", (this.getAccuracy() * 100)) + "%");
@@ -369,24 +372,24 @@ public class BaseNeuralNetwork {
                 this.backPropagate();
                 double tempLoss = 0;
                 for(int x = 0; x < (((this.initialInput.length-1) % this.miniBatchSize)); x++) {
-                    if(this.dataCounter >= this.trueValueIndices.length - 1) {
+                    if(this.dataCounter > this.trueValueIndices.length - 1) {
                         break;
                     }
                     this.forward();
-                    this.dataCounter++;
                     tempLoss += this.generateLoss();
+                    this.dataCounter++;
                 }
-                this.loss = tempLoss / this.miniBatchSize;
+                this.loss = (tempLoss / (double)this.miniBatchSize);
             }
             if(this.learningRateDecayFunction == DEFAULT_DECAY_TYPE.EPOCH_DECAY) {
                 this.learningRate = decayLearningRate(this.learningRateDecayFunction, this.learningRate, this.learningRateDecay, epochCounter);
             }
 
             //printLayer("Neural Network", this.getLastLayer());
-            print("Output:", this.getOutputs());
-            print("Accuracy:", String.format("%.2f", (this.getAccuracy() * 100)) + "%");
-            print("Loss:", String.format("%.2f", this.getLoss()));
-            printSubTitle("Epoch Complete: " + epochCounter);
+            printSubTitle("EPOCH " + epochCounter + " RESULTS");
+            print("Epoch Output:", this.getOutputs());
+            print("Epoch Accuracy:", String.format("%.2f", (this.getAccuracy() * 100)) + "%");
+            print("Epoch Loss:", String.format("%.2f", this.getLoss()));
             print("");
 
             this.sum = 0;
@@ -544,7 +547,9 @@ public class BaseNeuralNetwork {
     }
     private double accuracy(int trueIndex, int predictedIndex) {
         if(trueIndex == predictedIndex) { this.sum+=1; }
-        this.accuracy = sum / (this.dataCounter + EPSILON);
+        print("Sum: " + this.sum);
+        print("dataCount: " + (this.dataCounter + 1));
+        this.accuracy = this.sum / (this.dataCounter + 1);
         return this.accuracy;
     }
     private void generateDecisionsMap(int trueValueIndex) {
@@ -556,6 +561,11 @@ public class BaseNeuralNetwork {
         this.decisions.put(dataCounter, indexAndMax[1]);
         // determine the accuracy of the decision
         this.accuracy = accuracy(trueValueIndex, this.decisionsIndex[dataCounter]);
+        if(trueValueIndex == this.decisionsIndex[dataCounter]) {
+            printPositive("Correctly Predicted");
+        } else {
+            warning("Incorrectly Predicted");
+        }
     }
     private void generateDecisionsMap(int[] hotOneVec) {
         double[] indexAndMax = decision(this.getLastLayer().getLayerOutputs());
