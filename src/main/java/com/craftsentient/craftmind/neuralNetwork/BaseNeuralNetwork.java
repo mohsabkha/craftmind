@@ -40,9 +40,9 @@ public class BaseNeuralNetwork {
     private double accuracy;
     private double loss;
     private double sum;
-    private double learningRate = 1.0;
-    private double learningRateDecay = 0.0;
-    private int stepSize = 1;
+    private double learningRate;
+    private double learningRateDecay;
+    private int stepSize;
     private int stepCounter = 0;
     private double momentum;
     private double rho;
@@ -55,6 +55,8 @@ public class BaseNeuralNetwork {
     public static double DELTA = 1.0;
     public static double MARGIN = 1.0;
     public static double EPSILON = 1e-15;
+    private double BETA1;
+    private double BETA2;
     private DEFAULT_LOSSES lossFunction;
     public static final Random random = new Random(0);
 
@@ -343,7 +345,7 @@ public class BaseNeuralNetwork {
                 if(this.dataCounter > this.initialInput.length - 1) {
                     break;
                 }
-                this.backPropagate();
+                this.backPropagate(y);
                 double tempLoss = 0;
                 for(int x = 0; x < this.miniBatchSize; x++) {
                     if(this.dataCounter > this.initialInput.length - 1) {
@@ -387,9 +389,9 @@ public class BaseNeuralNetwork {
 
             //printLayer("Neural Network", this.getLastLayer());
             printSubTitle("EPOCH " + epochCounter + " RESULTS");
-            print("Epoch Output:", this.getOutputs());
-            print("Epoch Accuracy:", String.format("%.2f", (this.getAccuracy() * 100)) + "%");
-            print("Epoch Loss:", String.format("%.2f", this.getLoss()));
+            printTitle("Epoch Output: " + this.getOutputs());
+            printTitle("Epoch Accuracy: " + String.format("%.2f", (this.getAccuracy() * 100)) + "%");
+            printTitle("Epoch Loss: " + String.format("%.2f", this.getLoss()));
             print("");
 
             this.sum = 0;
@@ -412,7 +414,7 @@ public class BaseNeuralNetwork {
         }
     }
 
-    private void backPropagate() {
+    private void backPropagate(int iteration) {
         this.gradients = new double[this.layerList.size()][];
         int outputIndex = this.getLayerList().size() - 1;
         // loss function derivative
@@ -431,13 +433,13 @@ public class BaseNeuralNetwork {
         }
 
         // output layer - starting and ending at the output layer
-        backPropagateBiasAndWeightUpdate(outputIndex, outputIndex);
+        backPropagateBiasAndWeightUpdate(outputIndex, outputIndex, iteration);
 
         // hidden layers - starting from the layer before the output and going backwards
-        backPropagateBiasAndWeightUpdate(outputIndex - 1, 0);
+        backPropagateBiasAndWeightUpdate(outputIndex - 1, 0, iteration);
     }
 
-    private void backPropagateBiasAndWeightUpdate(int starting, int ending) {
+    private void backPropagateBiasAndWeightUpdate(int starting, int ending, int iteration) {
         for (int index = starting; index >= ending; index--) {
             DenseLayer currentLayer = this.getLayerAt(index);
             if(starting != ending){
@@ -469,19 +471,23 @@ public class BaseNeuralNetwork {
                     this.getLayerAt(index).updateBiasMomentum(layerNeuronIterator, biasVelocity);
                     double newBias = this.getLayerAt(index).getBias(layerNeuronIterator) - biasVelocity;
                     this.getLayerAt(index).setBias(layerNeuronIterator, newBias);
+
                 } else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.ADAGRAD) {
                     double gradientSquared = (this.gradients[index][layerNeuronIterator] * this.gradients[index][layerNeuronIterator]);
                     currentLayer.updateBiasCache(index, (gradientSquared) + currentLayer.getBiasCache()[layerNeuronIterator]);
                     biasUpdate = this.learningRate * this.gradients[index][layerNeuronIterator] /
                             (Math.sqrt(currentLayer.getBiasCache()[layerNeuronIterator]) + EPSILON);
+
                 } else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.RMSPROP) {
                     double gradientSquared = (this.gradients[index][layerNeuronIterator] * this.gradients[index][layerNeuronIterator]);
                     double newCache = this.rho * currentLayer.getBiasCache()[layerNeuronIterator] + (1-this.rho) * gradientSquared;
                     currentLayer.updateBiasCache(layerNeuronIterator, newCache);
                     biasUpdate = this.learningRate * this.gradients[index][layerNeuronIterator] /
                             (Math.sqrt(currentLayer.getBiasCache()[layerNeuronIterator]) + EPSILON);
+
                 } else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.ADAM) {
                     // TODO
+
                 } else {
                     biasUpdate = (this.learningRate * this.gradients[index][layerNeuronIterator]);
                 }
@@ -496,12 +502,14 @@ public class BaseNeuralNetwork {
                         currentLayer.updateWeightMomentum(layerNeuronIterator, neuronWeightIterator, velocity);
                         double newWeight = currentLayer.getWeight(layerNeuronIterator, neuronWeightIterator) - velocity;
                         currentLayer.setWeight(layerNeuronIterator, neuronWeightIterator, newWeight);
+
                     }  else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.ADAGRAD) {
                         double gradientSquared = this.gradients[index][layerNeuronIterator] * this.gradients[index][layerNeuronIterator];
                         double weightCache = gradientSquared * currentLayer.getWeightsCache()[layerNeuronIterator][neuronWeightIterator];
                         currentLayer.updateWeightCache(layerNeuronIterator, neuronWeightIterator, weightCache);
                         weightUpdate = this.learningRate * this.gradients[index][layerNeuronIterator] /
                                 (Math.sqrt(currentLayer.getWeightsCache()[layerNeuronIterator][neuronWeightIterator]) + EPSILON);
+
                     } else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.RMSPROP) {
                         double gradientSquared = this.gradients[index][layerNeuronIterator] * this.gradients[index][layerNeuronIterator];
                         double rhoScaledWeightCache = currentLayer.getWeightsCache()[layerNeuronIterator][neuronWeightIterator] * this.rho;
@@ -510,8 +518,27 @@ public class BaseNeuralNetwork {
                         currentLayer.updateWeightCache(layerNeuronIterator, neuronWeightIterator, weightCache);
                         weightUpdate = this.learningRate * this.gradients[index][layerNeuronIterator] /
                                 (Math.sqrt(currentLayer.getWeightsCache()[layerNeuronIterator][neuronWeightIterator]) + EPSILON);
+
                     } else if(this.learningRateFunction == DEFAULT_LEARNING_RATE.ADAM) {
-                        // TODO
+                        // Reusing weightCache and weightMomentums from your existing structures
+                        double gradientMovingAverage = this.BETA1 * currentLayer.getWeightMomentums()[layerNeuronIterator][neuronWeightIterator] +
+                                (1 - this.BETA1) * this.gradients[index][layerNeuronIterator];
+                        double squaredGradientMovingAverage = this.BETA2 * currentLayer.getWeightsCache()[layerNeuronIterator][neuronWeightIterator] +
+                                (1 - this.BETA2) * (this.gradients[index][layerNeuronIterator] * this.gradients[index][layerNeuronIterator]);
+
+                        double correctedGradientMovingAverage = gradientMovingAverage / (1 - Math.pow(BETA1, iteration));
+                        double correctedSquaredGradientMovingAverage = squaredGradientMovingAverage / (1 - Math.pow(BETA2, iteration));
+
+                        double newWeight = currentLayer.getWeight(layerNeuronIterator, neuronWeightIterator) -
+                                this.learningRate * correctedGradientMovingAverage / (Math.sqrt(correctedSquaredGradientMovingAverage) + EPSILON);
+
+                        // Update the first and second moments in your layer using existing structures
+                        currentLayer.updateWeightMomentum(layerNeuronIterator, neuronWeightIterator, gradientMovingAverage);
+                        currentLayer.updateWeightCache(layerNeuronIterator, neuronWeightIterator, squaredGradientMovingAverage);
+
+                        // Set the new weight
+                        currentLayer.setWeight(layerNeuronIterator, neuronWeightIterator, newWeight);
+
                     } else {
                         weightUpdate = (this.learningRate * this.gradients[index][layerNeuronIterator]);
                     }
@@ -537,11 +564,19 @@ public class BaseNeuralNetwork {
                 }
             }
             this.generateDecisionsMap(hotValueIndex);
-            loss = ErrorLossFunctions.lossFunction(lossFunction, hotValueIndex, this.getDecisionsIndex()[this.dataCounter], this.getLastLayer().getLayerOutputs());
+            loss = ErrorLossFunctions.lossFunction(
+                    lossFunction,
+                    hotValueIndex,
+                    this.getDecisionsIndex()[this.dataCounter],
+                    this.getLastLayer().getLayerOutputs());
         } else {
             if(trueValueIndices.length <= this.dataCounter) { throw new RuntimeException("Too few true values for the number of inputs given!"); }
             this.generateDecisionsMap(trueValueIndices[this.dataCounter]);
-            loss = ErrorLossFunctions.lossFunction(lossFunction, this.trueValueIndices[this.dataCounter],  this.getDecisionsIndex()[this.dataCounter], this.getLastLayer().getLayerOutputs());
+            loss = ErrorLossFunctions.lossFunction(
+                    lossFunction,
+                    this.trueValueIndices[this.dataCounter],
+                    this.getDecisionsIndex()[this.dataCounter],
+                    this.getLastLayer().getLayerOutputs());
         }
         return loss;
     }
@@ -689,7 +724,7 @@ public class BaseNeuralNetwork {
         private boolean isUsingNumberOfNeurons = false;
         private boolean isUsingFileAsInput = false;
 
-        double learningRate = 0.01;
+        double learningRate = 1.0;
         double learningRateDecay = 0;
         DEFAULT_LEARNING_RATE learningRateFunction = DEFAULT_LEARNING_RATE.MOMENTUM;
         DEFAULT_DECAY_TYPE learningRateDecayType = DEFAULT_DECAY_TYPE.EPOCH_DECAY;
@@ -701,6 +736,9 @@ public class BaseNeuralNetwork {
         double gamma = 1.0;
         double delta = 1.0;
         double margin = 1.0;
+
+        double beta1 = 0.9;
+        double beta2 = 0.9;
 
         public DenseLayersBuilder withTextFileAsInput(String filePath, String delimiter) {
             this.isUsingFileAsInput = true;
@@ -915,6 +953,12 @@ public class BaseNeuralNetwork {
             return this;
         }
 
+        public DenseLayersBuilder withBetas(double beta1, double beta2) {
+            this.beta1 = beta1;
+            this.beta2 = beta2;
+            return this;
+        }
+
         public DenseLayersBuilder withLossFunctionAndHotEncodedVectors(DEFAULT_LOSSES lossFunction, int[][] hotOneOutput) {
             this.lossFunction = lossFunction;
             this.hotOneVec = hotOneOutput;
@@ -1072,11 +1116,9 @@ public class BaseNeuralNetwork {
             built.learningRate = this.learningRate;
             built.learningRateDecay = this.learningRateDecay;
             built.learningRateFunction = this.learningRateFunction;
-            built.stepSize = this.stepSize;
-            built.momentum = momentum;
             built.rho = rho;
-            built.loss = 0;
-            built. accuracy = 0;
+            built.momentum = momentum;
+
             // create momentum arrays for each layer
             if(learningRateFunction == DEFAULT_LEARNING_RATE.MOMENTUM) {
                 for (int i = 0; i < built.getLayerList().size(); i++) {
@@ -1090,8 +1132,13 @@ public class BaseNeuralNetwork {
                 }
             }
             built.lossFunction = this.lossFunction;
+            built.loss = 0;
+            built. accuracy = 0;
+
             built.miniBatchSize = this.miniBatchSize;
             built.epoch = this.epoch;
+            built.stepSize = this.stepSize;
+
             if(isUsingTrueValueIndex) {
                 built.trueValueIndices = this.trueValueIndices;
                 printPositive("True Values Set!");
@@ -1102,10 +1149,14 @@ public class BaseNeuralNetwork {
             if(built.miniBatchSize > built.initialInput.length){
                 throw new RuntimeException("The miniBatchSize exceeds the provided data!");
             }
+
             ALPHA = this.alpha;
             GAMMA = this.gamma;
             DELTA = this.delta;
             MARGIN = this.margin;
+
+            built.BETA1 = this.beta1;
+            built.BETA2 = this.beta2;
             if(built.hotOneVec != null && built.trueValueIndices != null) { throw new RuntimeException("Cannot initialize both Hot-One-Vector and a True-Value! You must select one method of error/loss checking!"); }
             // check if both the one hot vector mappings true values mappings are empty
             if(built.hotOneVec == null && trueValueIndices == null) { throw new RuntimeException("Must initialize either Hot-One-Vector or a True-Value!"); }

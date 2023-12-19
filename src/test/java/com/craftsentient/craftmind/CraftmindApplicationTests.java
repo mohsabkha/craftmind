@@ -28,7 +28,7 @@ class CraftmindApplicationTests {
         double[] biases = {2, 3, 0.5, 1}; // 1 per neuron
 
         BaseNeuralNetwork builtLayerWithFile = new BaseNeuralNetwork.DenseLayersBuilder()
-                .withNumberOfLayers(3)
+                .withNumberOfLayers(100)
                 .withNumberOfNeuronsPerLayer(new int[]{4,12,3})
                 .withInitialInput(inputs)
                 .withInitialBiases(biases)
